@@ -1,0 +1,37 @@
+# This is a sample YAML file with configuration. The default configuration loader
+# will all files it finds by name. So, by convention, we just prefix config names with
+# two digit numbers. Again, by convention, lower numbers are set for default files,
+# higher numbers for environment specific files.
+#
+# You can safely remove/replace with your app configurations.
+
+sample_scalar_1: hello world
+sample_scalar_2: this should be overriden by environment
+sample_list_1: [1, 2, 3]
+sample_env:
+    user: !env USER
+    secret_user: !env_secret USER
+
+sample_reference:
+    # return value of a config self reference using dot notation
+    self_1: !ref sample_env.user
+
+    # names can be quoted using quotes, you need to quote the whole expression as well
+    self_2: !ref "'sample_expr'.expr_1"
+
+
+sample_expr:
+    # note: using expressions is very powerful but may pose a security risk as it can
+    # execute any kind of code. We recommend blacklisting this tag if your config
+    # may come from unsecure sources.
+
+    # simple expressions, evalutated using Python's eval rules.
+    expr_1: !expr 1 + 1
+
+    # complex code, must capture the output in a variable called "out"
+    expr_2: !code |
+        import time
+        out = time.time()
+
+    # using globals set by the plugins
+    expr_3: !expr env['USER']

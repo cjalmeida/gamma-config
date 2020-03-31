@@ -1,0 +1,30 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      # - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=1024']
+      - id: check-executables-have-shebangs
+      - id: detect-private-key
+        exclude: data/responsys_key.pem
+      - id: check-byte-order-marker
+      - id: check-docstring-first
+      # - id: detect-aws-credentials
+      - id: mixed-line-ending
+      - id: check-case-conflict
+      - id: check-byte-order-marker
+      - id: debug-statements
+      - id: flake8
+  - repo: https://github.com/psf/black
+    rev: 19.10b0
+    hooks:
+      - id: black
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v4.3.21
+    hooks:
+    -   id: isort

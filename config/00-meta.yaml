@@ -1,0 +1,20 @@
+####
+# Meta parameters for configuring the gamma-config tool itself. This file must be
+# named '00-meta.yaml'.
+#
+# The configuration here is loaded *and evaluated* before any other configuration
+# file, so you're not able to use expressions that references other configs here.
+####
+
+# The environment to load, specified as subfolders of the 'config/' folder.
+# Can be overriden with the 'ENVIRONMENT' environment variable. Defaults to 'dev'
+environment: !env ENVIRONMENT|dev
+
+# List the names of any tag you want to disble in the configuration.
+# Note that all tags are enabled during for the 'meta' config.
+blacklist_tags:
+    # - "!expr"  # Python expressions
+    # - "!code"  # Python code blocks
+    # - "!ref"   # Config self referencing
+    # - "!fs"    # Returns a resolved (fs, path) tuple from an URI
+    # - "!env"   # References environment variables

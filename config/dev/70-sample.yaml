@@ -1,0 +1,3 @@
+# Sample of an environment specific config overriding the default values
+
+sample_scalar_2: foobar_dev
