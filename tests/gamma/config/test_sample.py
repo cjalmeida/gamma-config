@@ -60,17 +60,11 @@ def test_sample_dump():
 
 def test_expression():
     from gamma.config import get_config
-    import time
     import os
 
     config = get_config()
 
     assert config["sample_expr"]["expr_1"] == 2
-
-    first = config["sample_expr"]["expr_2"]
-    time.sleep(1)
-    second = config["sample_expr"]["expr_2"]
-    assert second > first
 
     e3 = config["sample_expr"]["expr_3"]
     assert e3 == os.environ["USER"]
