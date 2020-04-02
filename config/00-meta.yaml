@@ -13,8 +13,7 @@ environment: !env ENVIRONMENT|dev
 # List the names of any tag you want to disble in the configuration.
 # Note that all tags are enabled during for the 'meta' config.
 blacklist_tags:
-    # - "!expr"  # Python expressions
-    # - "!code"  # Python code blocks
-    # - "!ref"   # Config self referencing
-    # - "!fs"    # Returns a resolved (fs, path) tuple from an URI
-    # - "!env"   # References environment variables
+    # - "!expr"         # Python expressions
+    # - "!ref"          # Config self referencing
+    # - "!env"          # References environment variables
+    # - "!env_secret"   # References secret environment variables

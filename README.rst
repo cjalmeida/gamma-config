@@ -53,6 +53,7 @@ Install the latest stable version using ``pip``:
 Or, when adding to ``requirements.txt``
 
 ::
+
     gamma-config @ git+ssh://git@git.sourceai.io/devex-br/gamma-config.git@v0.1.0#egg=gamma-config
 
 
@@ -138,4 +139,77 @@ Builtin Tags
 ############
 
 The library can be extended by using YAML tags. We provide a couple of them to achieve
-basic functionality
+basic functionality:
+
+!env
+----
+
+References a system environment variable. **Do not use this tag to load secrets** as
+the contents are dumped by default on the ``to_yaml()`` call. You can use the ``|``
+(pipe) character to provide a default if a value is missing.
+
+Example:
+
+.. code-block:: yaml
+
+    sample_key:
+        my_var: !env VAR|my_default
+
+
+!env_secret
+-----------
+
+Similar to ``!env`` but won't dump the variable contents.
+
+Example:
+
+.. code-block:: yaml
+
+    sample_key:
+        my_var: !env_secret SECRET|my_secret
+
+!ref
+----
+
+References another entry in the config object, even if it's in another file or
+overriden by an environment specific entry.
+
+Example:
+
+.. code-block:: yaml
+
+    key_a:
+      sub_key: 100
+
+    # use dot notation to access nested entries
+    # will be the same as key_a -> subkey == 100
+    key_b: !ref key_a.sub_key
+
+
+!expr
+-----
+
+Allows you to evalute arbitrary Python expressions, using the ``eval()`` builtin. The
+objects available in the expression evaluation context can extended using a plugin
+hook implementation.
+
+Example usage:
+
+.. code-block:: yaml
+
+    sample_key:
+        # we may need to enclose the whole expression in quotes
+        my_var: !expr '"This is an env variable" + env["USER"]'
+
+
+Example globals extending plugin implementation:
+
+.. code-block:: yaml
+
+    from gamma.config import plugins
+
+    @plugins.hookimpl
+    def expr_globals():
+        return {"env": os.environ}
+
+    plugins.plugin_manager.register(sys.modules[__name__])

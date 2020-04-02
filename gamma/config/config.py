@@ -2,8 +2,9 @@ import inspect
 import os
 from abc import ABC, abstractproperty
 from collections import UserDict
-from typing import Iterable, List, Mapping, Optional, Set
+from typing import Callable, Dict, Iterable, List, Mapping, Optional, Set, Tuple
 
+import fsspec
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedBase
 
@@ -21,7 +22,22 @@ class EnvironmentFolderException(Exception):
 
 
 class Config(UserDict):
-    def __init__(self, data=None, parent=None, tags=None):
+    """The main config object.
+
+    Act as a regular dict, with functionality to render custom tags.
+
+    Args:
+        data: The raw content.
+        parent: The parent Config object, for sub entries.
+        tags: The dict of (str, callable) with tag handlers.
+    """
+
+    def __init__(
+        self,
+        data: Mapping = None,
+        parent: "Config" = None,
+        tags: Dict[str, Callable] = None,
+    ):
         data = data or {}
         super().__init__(data)
 
@@ -39,34 +55,46 @@ class Config(UserDict):
 
     @property
     def root(self):
+        """Pointer to the root config object."""
+
         if self.parent is None:
             return self
         return self.parent.root
 
-    def push(self, data: Mapping):
+    def push(self, partial: Mapping):
+        """Push and merge a partial config dict into the configuration stack"""
         self._check_root()
-        self._merge_data(data)
-        self.stack.insert(0, (data, self.data))
+        self._merge_data(partial)
+        self.stack.insert(0, (partial, self.data))
 
     def pop(self):
+        """Pop the last pushed partial, reverting the config state"""
         self._check_root()
         self.stack.pop()
         _, self.data = self.stack[0]
 
-    def _merge_data(self, data: Mapping):
-        dict_merge.merge(self.data, data)
+    def _merge_data(self, partial: Mapping):
+        """Merge a partial with the current state"""
+        dict_merge.merge(self.data, partial)
 
     def __getitem__(self, key):
         val = self.data[key]
         return self._parse_value(val)
 
     def _check_root(self):
+        """Check if we're the root config object"""
         if self.parent is not None:
             raise Exception(
                 "Config stack push/pull only implemented for the root config object"
             )
 
     def _parse_value(self, val):
+        """Parse a config entry value.
+
+        Return:
+            Any of a sub-config object, a scalar, a list, handling tags as needed.
+        """
+
         if (
             isinstance(val, CommentedBase)
             and hasattr(val, "tag")
@@ -89,6 +117,8 @@ class Config(UserDict):
         return val
 
     def _process_tagged(self, node):
+        """Proces tagged nodes"""
+
         tag = node.tag.value
         try:
             func = self.tags[tag]
@@ -111,7 +141,15 @@ class Config(UserDict):
 
         return func(**args)
 
-    def to_yaml(self, *, resolve_tags=True):
+    def to_yaml(self, *, resolve_tags=True) -> str:
+        """Dumps the config object to string
+
+        Keyword Args:
+            resolve_tags: If True (default), will dump the rendered result of the
+                custom tags at the time of the call. Otherwise, will keep the original
+                tags.
+        """
+
         from ruamel.yaml import YAML
         import io
 
@@ -134,6 +172,8 @@ class Config(UserDict):
 
 
 class ConfigLoader(ABC):
+    """Abstract class implementing a Config loader."""
+
     def __init__(self, yaml: YAML):
         self.yaml = yaml
 
@@ -145,6 +185,8 @@ class ConfigLoader(ABC):
         """
 
     def load(self, config: Config):
+        """Load YAML config entries into a Config object.
+        """
 
         entries = sorted(self.entries, key=lambda x: x[0])
         for entry in entries:
@@ -155,9 +197,13 @@ class ConfigLoader(ABC):
 
         return config
 
-    def get_fs_path(self, entry):
-        # TODO: replace with gamma-fs
-        import fsspec
+    def get_fs_path(self, entry) -> Tuple[fsspec.AbstractFileSystem, str]:
+        """Map an entry URI into
+        (*fs*: ``fsspec.AbstractFilesystem``, *path*: ``str``) tuple
+
+        TODO: replace with gamma-fs
+        """
+
         from urllib.parse import urlsplit
 
         fs = fsspec.filesystem("file")
@@ -166,12 +212,16 @@ class ConfigLoader(ABC):
 
 
 class MetaConfigLoader(ConfigLoader):
+    """A ConfigLoader for the meta config object"""
+
     @property
     def entries(self) -> List[str]:
         return {f"{PROJECT_HOME}/config/00-meta.yaml"}
 
 
 class DefaultConfigLoader(ConfigLoader):
+    """A ConfigLoader for the ``config/`` folder, supporting environments"""
+
     @property
     def entries(self) -> List[str]:
         import fsspec

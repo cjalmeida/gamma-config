@@ -28,10 +28,5 @@ sample_expr:
     # simple expressions, evalutated using Python's eval rules.
     expr_1: !expr 1 + 1
 
-    # complex code, must capture the output in a variable called "out"
-    expr_2: !code |
-        import time
-        out = time.time()
-
     # using globals set by the plugins
     expr_3: !expr env['USER']
