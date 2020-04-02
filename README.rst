@@ -12,7 +12,7 @@ standard way of implementing app configuration reduces the cognitive burden on f
 data scientists while promoting best practices.
 
 **Isn't just using a plain YAML file enough?** Yes, and no. To minimize confusion and
-help reproducibility we stick to the principal that **all** configuration parameters
+help reproducibility we stick to the principle that **all** configuration parameters
 should be reflected as part of the global object returned by ``get_config``. That
 include stuff such as secrets, deployed configuration, CLI parameters,
 external configuration, glue-code parameters, etc. By experience, you simplify a lot
@@ -26,17 +26,17 @@ Core features
 ~~~~~~~~~~~~~
 
 * By default, the configuration is expressed as a set of YAML 1.2 files inside a
-``config`` folder in the root of the project.
+  ``config`` folder in the root of the project.
 
 * The multiple YAML files are parsed as a Python dictionary-like object and merged
-following simple rules. The order of merging files matter.
+  following simple rules. The order of merging files matter.
 
 * Builtin support for environment specific parameters (production, development, etc.)
 
 * Support for ``.env`` files via ``python-dotenv``.
 
 * The feature set can be extended through the use of YAML tags. For instance, the
-``!ref`` tag allow you to reference other parameters in the config file.
+  ``!ref`` tag allow you to reference other parameters in the config file.
 
 * Support for plugins (via pluggy) extending functionality.
 
@@ -44,7 +44,8 @@ following simple rules. The order of merging files matter.
 Getting started
 ~~~~~~~~~~~~~~~
 
-Install the latest stable version using ``pip``:
+Install the latest stable version using ``pip``. You need to setup SSH access
+to ``git.sourceai.io`` for now:
 
 ::
 
@@ -204,8 +205,9 @@ Example usage:
 
 Example globals extending plugin implementation:
 
-.. code-block:: yaml
+.. code-block:: python
 
+    import os
     from gamma.config import plugins
 
     @plugins.hookimpl
