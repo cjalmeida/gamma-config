@@ -5,8 +5,13 @@
 import glob
 import os
 
-import setupext_janitor  # NOQA
 from setuptools import find_namespace_packages, setup
+
+try:
+    import setupext_janitor  # NOQA
+except ModuleNotFoundError:
+    pass
+
 
 with open("README.rst") as readme_file:
     readme = readme_file.read()
