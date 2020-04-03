@@ -40,6 +40,9 @@ Core features
 
 * Support for plugins (via pluggy) extending functionality.
 
+* Round-trip dump of config dict back into YAML. Support for hiding sensitive data
+  on dump.
+
 
 Getting started
 ~~~~~~~~~~~~~~~
@@ -49,7 +52,7 @@ to ``git.sourceai.io`` for now:
 
 ::
 
-    pip install ssh://git@git.sourceai.io/devex-br/gamma-config.git@v0.1.0
+    pip install git+ssh://git@git.sourceai.io/devex-br/gamma-config.git@v0.1.0
 
 Or, when adding to ``requirements.txt``
 

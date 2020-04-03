@@ -2,7 +2,11 @@
 
 """The setup script."""
 
-from setuptools import find_packages, setup
+import glob
+import os
+
+import setupext_janitor  # NOQA
+from setuptools import find_namespace_packages, setup
 
 with open("README.rst") as readme_file:
     readme = readme_file.read()
@@ -11,15 +15,19 @@ with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
 with open("requirements.txt") as f:
-    requirements = [x for x in f.read().splitlines() if x[0] not in "-# "]
+    requirements = [x for x in f.read().splitlines() if x and x[0] not in "-# "]
 
 setup_requirements = [
     "pytest-runner",
+    "setupext_janitor"
 ]
 
 test_requirements = [
     "pytest>=3",
 ]
+
+config_sample = [x for x in glob.glob("config/**", recursive=True) if os.path.isfile(x)]
+data_files = [("config", config_sample)]
 
 setup(
     # There are standard setuptools entries
@@ -35,20 +43,19 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
+    data_files=data_files,
     description="Gamma Config",
     install_requires=requirements,
     long_description=readme + "\n\n" + history,
     include_package_data=True,
     keywords="bcg gamma cli config",
     name="gamma-config",
-    packages=find_packages(include=["gamma", "gamma.*"]),
+    packages=find_namespace_packages(exclude=["test", "test.*", "test.gamma.config.*"]),
     setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/devex-br/gamma-config",
     version="0.1.0",
     zip_safe=False,
-    # This is where you specify your plugins. It must be under the "gamma.plugins"
-    # group.
-    entry_points={"gamma.plugins": ["config = gamma.config.plugin"]},
+    entry_points={"gamma.cli": ["config-cli = gamma.config.cli"]},
 )

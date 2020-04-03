@@ -1,5 +1,4 @@
 gamma-cli @ git+ssh://git@git.sourceai.io/devex-br/gamma-cli.git@v0.2.0#egg=gamma-cli
-fsspec==0.7.1
 ruamel.yaml==0.16.10
 frozendict==1.2
 
