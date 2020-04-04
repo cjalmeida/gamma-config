@@ -2,16 +2,14 @@ import inspect
 import os
 from abc import ABC, abstractproperty
 from collections import UserDict
-from typing import Callable, Dict, Iterable, List, Mapping, Optional, Set, Tuple
+from typing import Callable, Dict, Iterable, List, Mapping, Optional, Set
 
-import fsspec
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedBase
 
 from . import dict_merge, tags
 
 PROJECT_HOME = os.getenv("PROJECT_HOME", os.path.abspath(os.path.dirname(os.curdir)))
-PROJECT_HOME = f"file://{PROJECT_HOME}"
 
 blacklist: Set[str] = set()
 
@@ -181,7 +179,7 @@ class ConfigLoader(ABC):
     def entries(self) -> List[str]:
         """List of URIs mapping to YAML config files.
 
-        Each entry is loaded in order, using ``fsspec`` and merged into the config
+        Each entry is loaded in order and merged into the config
         """
 
     def load(self, config: Config):
@@ -190,25 +188,30 @@ class ConfigLoader(ABC):
 
         entries = sorted(self.entries, key=lambda x: x[0])
         for entry in entries:
-            fs, path = self.get_fs_path(entry)
-            content = fs.cat(path)
+            content = self.get_content(entry)
             data = self.yaml.load(content)
             config.push(data)
 
         return config
 
-    def get_fs_path(self, entry) -> Tuple[fsspec.AbstractFileSystem, str]:
-        """Map an entry URI into
-        (*fs*: ``fsspec.AbstractFilesystem``, *path*: ``str``) tuple
+    def get_content(self, entry: str) -> str:
+        """The the content for a single entry URI.
 
-        TODO: replace with gamma-fs
+        By default, it supports handling only standard ``file://`` URIs. Extensions
+        may add support for other protocols
+
+        Args:
+            entry: An entry URI, in whatever format returned by the ``entries`` method.
         """
+        from urllib.parse import urlsplit, unquote
+        from pathlib import Path
 
-        from urllib.parse import urlsplit
+        url = urlsplit(entry)
 
-        fs = fsspec.filesystem("file")
-        path = urlsplit(entry).path
-        return fs, path
+        if not url.scheme == "file":
+            raise Exception(f"Can't understand scheme '{url.scheme}' for URI '{entry}")
+
+        return Path(unquote(url.path)).read_text()
 
 
 class MetaConfigLoader(ConfigLoader):
@@ -216,7 +219,7 @@ class MetaConfigLoader(ConfigLoader):
 
     @property
     def entries(self) -> List[str]:
-        return {f"{PROJECT_HOME}/config/00-meta.yaml"}
+        return {f"file://{PROJECT_HOME}/config/00-meta.yaml"}
 
 
 class DefaultConfigLoader(ConfigLoader):
@@ -224,29 +227,28 @@ class DefaultConfigLoader(ConfigLoader):
 
     @property
     def entries(self) -> List[str]:
-        import fsspec
+        from pathlib import Path
 
-        fs = fsspec.filesystem("file")
-        cfg_dir = f"{PROJECT_HOME}/config"
+        cfg_dir = Path(f"{PROJECT_HOME}/config")
 
         # default
-        files = list(fs.glob(f"{cfg_dir}/*.yaml"))
-        files += list(fs.glob(f"{cfg_dir}/*.yml"))
+        files: List[Path] = list(cfg_dir.glob(f"*.yaml"))
+        files += list(cfg_dir.glob(f"*.yml"))
 
         # environment
         meta = get_meta_config()
         environment = meta["environment"]
-        env_dir = f"{cfg_dir}/{environment}"
+        env_dir = cfg_dir / environment
 
-        if fs.exists(env_dir):
-            files += list(fs.glob(f"{env_dir}/*.yaml"))
-            files += list(fs.glob(f"{env_dir}/*.yml"))
+        if env_dir.exists():
+            files += list(env_dir.glob("*.yaml"))
+            files += list(env_dir.glob("*.yml"))
         else:
             raise EnvironmentFolderException(env_dir)
 
         # use the file name as sort key, regardless of folder
-        files.sort(key=lambda f: f.split("/")[-1])
-        files = [f"file://{f}" for f in files]
+        files.sort(key=lambda f: f.name)
+        files = [str(f.absolute().as_uri()) for f in files]
         return files
 
 
