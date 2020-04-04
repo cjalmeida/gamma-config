@@ -1,6 +1,7 @@
 import sys
 
 import click
+
 from gamma.cli import plugins
 
 

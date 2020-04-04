@@ -22,10 +22,7 @@ with open("HISTORY.rst") as history_file:
 with open("requirements.txt") as f:
     requirements = [x for x in f.read().splitlines() if x and x[0] not in "-# "]
 
-setup_requirements = [
-    "pytest-runner",
-    "setupext_janitor"
-]
+setup_requirements = ["pytest-runner", "setupext_janitor"]
 
 test_requirements = [
     "pytest>=3",
