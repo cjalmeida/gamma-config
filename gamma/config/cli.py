@@ -1,7 +1,6 @@
 import sys
 
 import click
-
 from gamma.cli import plugins
 
 
@@ -27,7 +26,7 @@ def scaffold(target, force):
     import gamma.config as root_mod
 
     if not target:
-        target = os.curdir()
+        target = os.path.abspath(os.curdir)
 
     target = Path(target)
     confdir: Path = target / "config"
