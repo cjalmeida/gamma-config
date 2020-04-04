@@ -9,8 +9,6 @@ from ruamel.yaml.comments import CommentedBase
 
 from . import dict_merge, tags
 
-PROJECT_HOME = os.getenv("PROJECT_HOME", os.path.abspath(os.path.dirname(os.curdir)))
-
 blacklist: Set[str] = set()
 
 
@@ -219,7 +217,8 @@ class MetaConfigLoader(ConfigLoader):
 
     @property
     def entries(self) -> List[str]:
-        return {f"file://{PROJECT_HOME}/config/00-meta.yaml"}
+        home = get_project_home()
+        return {f"file://{home}/config/00-meta.yaml"}
 
 
 class DefaultConfigLoader(ConfigLoader):
@@ -229,7 +228,7 @@ class DefaultConfigLoader(ConfigLoader):
     def entries(self) -> List[str]:
         from pathlib import Path
 
-        cfg_dir = Path(f"{PROJECT_HOME}/config")
+        cfg_dir = Path(get_project_home()) / "config"
 
         # default
         files: List[Path] = list(cfg_dir.glob(f"*.yaml"))
@@ -254,6 +253,17 @@ class DefaultConfigLoader(ConfigLoader):
 
 _meta_config: Optional[Config] = None
 _config: Optional[Config] = None
+
+
+def get_project_home():
+    """Return the location for project home.
+
+    Overridable with the PROJECT_HOME environment variable.
+
+    This can be used in scripts or tests to change the expected location of the
+    project home without changing cwd.
+    """
+    return os.getenv("PROJECT_HOME", os.path.abspath(os.path.dirname(os.curdir)))
 
 
 def reset_config() -> Config:

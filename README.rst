@@ -218,3 +218,18 @@ Example globals extending plugin implementation:
         return {"env": os.environ}
 
     plugins.plugin_manager.register(sys.modules[__name__])
+
+
+
+Developing
+~~~~~~~~~~
+
+Relevant environment variables
+##############################
+
+PROJECT_HOME
+------------
+
+You can set the ``PROJECT_HOME`` environment variable to define the "home" location
+where the default config loaders should expect the ``config/`` folder to be. This is
+useful in testing and scripts.
