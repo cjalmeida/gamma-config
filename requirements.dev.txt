@@ -12,3 +12,4 @@ pytest-runner==5.1
 pytest-cov==2.8.1
 black==19.10b0
 pre-commit==2.2.0
+gitchangelog==3.0.4
