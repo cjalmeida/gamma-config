@@ -52,13 +52,13 @@ to ``git.sourceai.io`` for now:
 
 ::
 
-    pip install git+ssh://git@git.sourceai.io/devex-br/gamma-config.git@v0.1.0
+    pip install git+ssh://git@git.sourceai.io/devex-br/gamma-config.git@v0.1.1
 
 Or, when adding to ``requirements.txt``
 
 ::
 
-    gamma-config @ git+ssh://git@git.sourceai.io/devex-br/gamma-config.git@v0.1.0#egg=gamma-config
+    gamma-config @ git+ssh://git@git.sourceai.io/devex-br/gamma-config.git@v0.1.1#egg=gamma-config
 
 
 The dependency above install and extends the ``gamma`` CLI command. After installation
