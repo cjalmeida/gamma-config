@@ -47,19 +47,27 @@ Core features
 Getting started
 ~~~~~~~~~~~~~~~
 
-Install the latest stable version using ``pip``. You need to setup SSH access
-to ``git.sourceai.io`` for now:
+Currently the release packages are installed under the `devex-br` private Artifactory
+repository. To configure your access to it:
+
+1. Open your `Artifactor Profile Page <https://artifactory.gamma.bcg.com/artifactory/webapp/#/profile>`_
+2. Generate or copy your API Key
+3. Update your `pip` installation if needed
+   ::
+
+       pip install --upgrade pip
+
+4. Run the command below to configure `pip` to use the repo. Replace `<name>` with the
+   first part of your BCG email.
+   ::
+
+       pip config --user set global.extra-index-url https://<name>%40bcg.com:<api_key>@artifactory.gamma.bcg.com/artifactory/api/pypi/local-pypi-8999823-devex-br-01/simple
+
+You should be able to install the latest released version using ``pip``.
 
 ::
 
-    pip install git+ssh://git@git.sourceai.io/devex-br/gamma-config.git@v0.1.4
-
-Or, when adding to ``requirements.txt``
-
-::
-
-    gamma-config @ git+ssh://git@git.sourceai.io/devex-br/gamma-config.git@v0.1.4#egg=gamma-config
-
+    pip install gamma-config
 
 The dependency above install and extends the ``gamma`` CLI command. After installation
 you can "scaffold" a new config folder with samples using
