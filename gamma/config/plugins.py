@@ -1,8 +1,14 @@
 import sys
-from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable
 
 import pluggy
+
+try:
+    from dataclasses import dataclass
+except ModuleNotFoundError:
+    # shim for 3.6
+    from attr import dataclass
+
 
 PROJECT_NAME = "gamma-config"
 hookspec = pluggy.HookspecMarker(PROJECT_NAME)
