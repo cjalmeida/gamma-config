@@ -2,17 +2,16 @@
 #
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
-version: 2.1
+version: 2
 
 executors:
   py-executor:
-    docker:
-      - image: circleci/python:3.6.10
-    working_directory: ~/repo
 
 jobs:
   build:
-    executor: py-executor
+    docker:
+      - image: circleci/python:3.6.10
+    working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
@@ -45,29 +44,11 @@ jobs:
           path: htmlcov
           destination: htmlcov
 
-  deploy:
-    executor: py-executor
-    steps:
       - run:
-          name: build wheel
+          name: build and publish artifacts
           command: |
-            . venv/bin/activate
-            pip install twine
-            python setup.py bdist_wheel
-            twine upload --verbose \
-                --repository-url https://artifactory.gamma.bcg.com/artifactory/api/pypi/local-pypi-8999823-devex-br-01 \
-                -u almeida.cloves@bcg.com -p "$ARTIFACTORY_KEY" \
-                dist/*.whl
-
-workflows:
-  version: 2
-  build_and_deploy:
-    jobs:
-      - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            tags:
-              only: /v.*/
-
+            if [[ "v.*" =~ "$CIRCLE_TAG" ]]; then
+                ./publish.sh
+            else
+                echo "Not a version tag"
+            fi
