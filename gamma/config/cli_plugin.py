@@ -39,7 +39,7 @@ def scaffold(target, force):
 
     if not src.exists():
         raise Exception(
-            "Could not find template config in either ./config or under {src}"
+            f"Could not find template config in either ./config or under {src}"
         )
 
     # Check if config/00-meta.yaml already exists

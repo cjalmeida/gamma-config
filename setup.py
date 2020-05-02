@@ -25,8 +25,14 @@ test_requirements = [
     "pytest>=3",
 ]
 
-config_sample = [x for x in glob.glob("config/**", recursive=True) if os.path.isfile(x)]
-data_files = [("config", config_sample)]
+# collect sample config
+data_files = []
+for root, _, files in os.walk("config"):
+    dst = f"etc/gamma-config/{root}"
+    src = [f"{root}/{f}" for f in files]
+    data_files.append((dst, src))
+
+print(data_files)
 
 setup(
     # There are standard setuptools entries
@@ -49,7 +55,9 @@ setup(
     include_package_data=True,
     keywords="bcg gamma cli config",
     name="gamma-config",
-    packages=find_namespace_packages(exclude=["test", "test.*", "test.gamma.config.*"]),
+    packages=find_namespace_packages(
+        include=["gamma.config"], exclude=["test", "test.*", "test.gamma.config.*"]
+    ),
     setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=test_requirements,

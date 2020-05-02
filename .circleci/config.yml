@@ -2,25 +2,19 @@
 #
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
-version: 2
-jobs:
-  build:
+version: 2.1
+
+executors:
+  py-executor:
     docker:
-      # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
       - image: circleci/python:3.6.10
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
     working_directory: ~/repo
 
+jobs:
+  build:
+    executor: py-executor
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "dev-requirements.txt" }}
@@ -48,5 +42,32 @@ jobs:
             pytest
 
       - store_artifacts:
-          path: test-reports
-          destination: test-reports
+          path: htmlcov
+          destination: htmlcov
+
+  deploy:
+    executor: py-executor
+    steps:
+      - run:
+          name: build wheel
+          command: |
+            . venv/bin/activate
+            pip install twine
+            python setup.py bdist_wheel
+            twine upload --verbose \
+                --repository-url https://artifactory.gamma.bcg.com/artifactory/api/pypi/local-pypi-8999823-devex-br-01 \
+                -u almeida.cloves@bcg.com -p "$ARTIFACTORY_KEY" \
+                dist/*.whl
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /v.*/
+
