@@ -282,6 +282,16 @@ def get_config() -> "Config":
     return _config
 
 
+def create_config_from_string(yaml_str: str) -> "Config":
+    """Simple Config factory that builds a config object from a YAML string"""
+
+    yaml = YAML(typ="rt")
+    _config = Config(tags=tags.get_tags(blacklist=True))
+    content = yaml.load(yaml_str)
+    _config.push(content)
+    return _config
+
+
 def get_meta_config() -> "Config":
     global _meta_config
     if _meta_config is None:

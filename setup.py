@@ -59,5 +59,5 @@ setup(
     url="https://github.com/devex-br/gamma-config",
     version="0.1.5",
     zip_safe=False,
-    entry_points={"gamma.cli": ["config-cli = gamma.config.cli"]},
+    entry_points={"gamma.cli": ["config-cli = gamma.config.cli_plugin"]},
 )

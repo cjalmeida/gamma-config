@@ -83,6 +83,37 @@ def ref(value: Any, root: Config) -> Any:
 
 
 @plugins.hookimpl
+def cli(value: str):
+    """Return a command line option argument.
+
+    You can specify options using the :func:``gamma.config.cli.option`` decorator. They
+    can be referenced then using the `!cli <option_long_name>`.
+
+    Examples:
+
+        Given a command::
+
+        @click.command()
+        @option('-a', '--myarg')
+        def foo(myarg):
+            ...
+
+        You can reference the value of `--myarg` as::
+
+        args:
+            myarg: !cli myarg
+
+    See:
+        :func:``gamma.config.cli.option``
+    """
+
+    from gamma.config.cli import get_option
+
+    opt_value = get_option(value)
+    return opt_value
+
+
+@plugins.hookimpl
 def add_tags():
     """Add builtin tags to the YAML parsers"""
 
@@ -91,6 +122,7 @@ def add_tags():
         plugins.TagSpec("!env_secret", env_secret),
         plugins.TagSpec("!expr", expr),
         plugins.TagSpec("!ref", ref),
+        plugins.TagSpec("!cli", cli),
     ]
 
 

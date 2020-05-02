@@ -1,54 +1,24 @@
-import os
-import tempfile
-from pathlib import Path
-
-import pytest
 from click.testing import CliRunner
+import click
 
 
-@pytest.fixture
-def test_cwd():
+def test_cli_option():
 
-    with tempfile.TemporaryDirectory() as td:
-        cwd = os.getcwd()
-        os.chdir(td)
-        yield td
-        os.chdir(cwd)
+    from gamma.config.cli import option, get_option
+    from gamma.config.config import create_config_from_string
 
-
-def test_scaffold(test_cwd):
-    from gamma.config.cli import scaffold
+    @click.command()
+    @option("-a", "--myarg")
+    def foo(myarg):
+        print(myarg)
 
     runner = CliRunner()
 
-    # test cwd
-    runner.invoke(scaffold)
-    assert (Path(test_cwd) / "config/00-meta.yaml").exists()
+    res = runner.invoke(foo, ["-a", "hello-world"])
+    assert res.exit_code == 0
+    assert "hello-world" in res.output
+    assert get_option("myarg") == "hello-world"
 
-    # test exists meta fail
-    res = runner.invoke(scaffold)
-    assert res.exit_code != 0
-
-    # test target folder
-    with tempfile.TemporaryDirectory() as td:
-        runner.invoke(scaffold, args=["-t", td])
-        assert (Path(td) / "config/00-meta.yaml").exists()
-
-
-def test_project_home_env(monkeypatch):
-    from gamma.config.cli import scaffold
-
-    with tempfile.TemporaryDirectory() as td:
-        monkeypatch.setenv("PROJECT_HOME", td)
-
-        runner = CliRunner()
-
-        # test scaffolding
-        runner.invoke(scaffold)
-        assert (Path(td) / "config/00-meta.yaml").exists()
-
-        # test loading
-        from gamma.config import get_config
-
-        config = get_config()
-        assert config["environment"] == "dev"
+    content = "myarg: !cli myarg"
+    config = create_config_from_string(content)
+    assert config["myarg"] == "hello-world"

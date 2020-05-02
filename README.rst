@@ -227,6 +227,32 @@ Example globals extending plugin implementation:
 
     plugins.plugin_manager.register(sys.modules[__name__])
 
+!cli
+----
+
+Enables you to reference Click ``@options`` in your configuration.
+
+To capture an option, use ``gamma.config.cli.option`` decorator as a drop-in replacement
+for ``click.option``
+
+Example:
+
+.. code-block:: python
+    import click
+    from gamma.config.cli import option
+
+    @click.command()
+    @option('-m', '--myarg')
+    def my_command(myarg):
+        ...
+
+And in the configuration
+
+.. code-block:: yaml
+
+    sample_key:
+        my_arg: !cli myarg
+
 
 
 Developing
