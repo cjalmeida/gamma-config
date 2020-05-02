@@ -1,7 +1,6 @@
 import sys
 
 import click
-
 from gamma.cli import plugins
 
 
@@ -33,6 +32,16 @@ def scaffold(target, force):
     confdir: Path = target / "config"
     meta: Path = confdir / "00-meta.yaml"
 
+    # find source in either the local folder or under the sys.prefix
+    src = Path(root_mod.__file__).parents[2] / "config"
+    if not src.exists():
+        src = Path(sys.prefix) / "etc/gamma-config/config"
+
+    if not src.exists():
+        raise Exception(
+            "Could not find template config in either ./config or under {src}"
+        )
+
     # Check if config/00-meta.yaml already exists
     if not force and meta.exists():
         click.secho(
@@ -42,7 +51,6 @@ def scaffold(target, force):
         )
         raise SystemExit(1)
 
-    src = Path(root_mod.__file__).parents[2] / "config"
     shutil.copytree(src, confdir)
     click.secho("Copied config samples to: ", fg="yellow", nl=False)
     click.secho(str(confdir), fg="cyan")
