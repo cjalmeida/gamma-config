@@ -16,10 +16,7 @@ except ModuleNotFoundError:
 with open("README.rst") as readme_file:
     readme = readme_file.read()
 
-with open("HISTORY.rst") as history_file:
-    history = history_file.read()
-
-with open("requirements.txt") as f:
+with open("requirements.in") as f:
     requirements = [x for x in f.read().splitlines() if x and x[0] not in "-# "]
 
 setup_requirements = ["pytest-runner", "setupext_janitor"]
@@ -48,7 +45,7 @@ setup(
     data_files=data_files,
     description="Gamma Config",
     install_requires=requirements,
-    long_description=readme + "\n\n" + history,
+    long_description=readme,
     include_package_data=True,
     keywords="bcg gamma cli config",
     name="gamma-config",
