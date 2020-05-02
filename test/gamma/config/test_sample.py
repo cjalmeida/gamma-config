@@ -30,7 +30,9 @@ def test_load_sample(caplog, monkeypatch):
     assert config["sample_scalar_2"] == "foobar_prod"
 
 
-def test_sample_dump():
+def test_sample_dump(monkeypatch):
+    monkeypatch.setenv("USER", "dummy")
+
     from gamma.config import get_config
     from ruamel.yaml import YAML
 
@@ -58,7 +60,8 @@ def test_sample_dump():
     assert hasattr(loaded["environment"], "tag")
 
 
-def test_expression():
+def test_expression(monkeypatch):
+    monkeypatch.setenv("USER", "dummy")
     from gamma.config import get_config
     import os
 
