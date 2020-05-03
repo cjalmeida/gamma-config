@@ -41,11 +41,18 @@ jobs:
           path: htmlcov
           destination: htmlcov
 
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - ./
+
   deploy:
     docker:
       - image: circleci/python:3.6.10
     working_directory: ~/repo
     steps:
+      - attach_workspace:
+        at: ./
       - run:
           name: build and publish wheel
           command: ./publish.sh
