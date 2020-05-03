@@ -6,6 +6,19 @@ from gamma.config.config import Config
 
 from . import plugins
 
+UNDEFINED = "~~UNDEFINED~~"
+
+
+def _split_default(value):
+    """Get a value optional default, using the content after the last "|"
+    (pipe) as convention"""
+
+    default = UNDEFINED
+    parsed = value
+    if "|" in value:
+        parsed, default = value.rsplit("|", 1)
+    return parsed, default
+
 
 def env(value: Any) -> str:
     """Maps the value to an environment variable of the same name.
@@ -17,21 +30,15 @@ def env(value: Any) -> str:
 
         my_var: !env MYVAR|my_default
     """
-
-    NO_DEFAULT = "~~NO-DEFAULT~~"
-
-    default = NO_DEFAULT
     name = value
-    if "|" in name:
-        name, default = name.split("|")
-
-    value = os.getenv(name, default)
-    if value == NO_DEFAULT:
+    name, default = _split_default(name)
+    env_val = os.getenv(name, default)
+    if env_val == UNDEFINED:
         raise plugins.TagException(
             f"Env variable '{name}' not found when resolving node and no default set"
         )
 
-    return value
+    return env_val
 
 
 def env_secret(value: Any, dump: bool, node) -> str:
@@ -87,7 +94,7 @@ def cli(value: str):
     """Return a command line option argument.
 
     You can specify options using the :func:``gamma.config.cli.option`` decorator. They
-    can be referenced then using the `!cli <option_long_name>`.
+    can be referenced then using the `!cli <option_long_name>|<default>`.
 
     Examples:
 
@@ -109,7 +116,16 @@ def cli(value: str):
 
     from gamma.config.cli import get_option
 
-    opt_value = get_option(value)
+    value, default = _split_default(value)
+    try:
+        opt_value = get_option(value)
+    except KeyError:
+        opt_value = default
+
+    if opt_value == UNDEFINED:
+        raise plugins.TagException(
+            f"CLI param '{value}' not set and no default provided."
+        )
     return opt_value
 
 
