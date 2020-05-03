@@ -20,8 +20,8 @@ def test_cli_option():
     assert get_option("myarg") == "hello-world"
 
     content = """
-        myarg: !cli myarg
-        unset: !cli unset|mydefault
+        myarg: !option myarg
+        unset: !option unset|mydefault
     """
     config = create_config_from_string(content)
     assert config["myarg"] == "hello-world"

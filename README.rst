@@ -227,13 +227,13 @@ Example globals extending plugin implementation:
 
     plugins.plugin_manager.register(sys.modules[__name__])
 
-!cli
+!option
 ----
 
-Enables you to reference Click ``@options`` in your configuration.
+Enables you to reference Click ``@option``s in your configuration.
 
 To capture an option, use ``gamma.config.cli.option`` decorator as a drop-in replacement
-for ``click.option``
+for ``click.option``. This accept default values using the ``|`` (pipe) separator.
 
 Example:
 
@@ -251,7 +251,8 @@ And in the configuration
 .. code-block:: yaml
 
     sample_key:
-        my_arg: !cli myarg
+        my_arg: !option myarg
+        unset: !option unset|mydefault
 
 
 
