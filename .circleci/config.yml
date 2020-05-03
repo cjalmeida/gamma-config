@@ -52,7 +52,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - attach_workspace:
-        at: ./
+          at: ./
       - run:
           name: build and publish wheel
           command: ./publish.sh
