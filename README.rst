@@ -228,9 +228,9 @@ Example globals extending plugin implementation:
     plugins.plugin_manager.register(sys.modules[__name__])
 
 !option
-----
+-------
 
-Enables you to reference Click ``@option``s in your configuration.
+Enables you to reference Click ``@click.option`` in your configuration.
 
 To capture an option, use ``gamma.config.cli.option`` decorator as a drop-in replacement
 for ``click.option``. This accept default values using the ``|`` (pipe) separator.
@@ -238,6 +238,7 @@ for ``click.option``. This accept default values using the ``|`` (pipe) separato
 Example:
 
 .. code-block:: python
+
     import click
     from gamma.config.cli import option
 
