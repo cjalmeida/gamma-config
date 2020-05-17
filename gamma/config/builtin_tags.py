@@ -49,13 +49,15 @@ def env_secret(value: Any, dump: bool, node) -> str:
     return env(value)
 
 
-def expr(value: Any) -> Any:
+def expr(value: Any, root) -> Any:
     """Uses ``eval()`` to render arbitrary Python expressions.
+
+    By default, we add the root configuration as `c` variable.
 
     See ``expr_globals`` plugin hook to extend available globals.
     """
 
-    _locals = {}
+    _locals = {'c': root}
     _globals = {}
 
     for var in plugins.plugin_manager.hook.expr_globals():
@@ -123,6 +125,7 @@ def option(value: str):
         opt_value = default
 
     if opt_value == UNDEFINED:
+        import ipdb; ipdb.set_trace()
         raise plugins.TagException(
             f"CLI param '{value}' not set and no default provided."
         )

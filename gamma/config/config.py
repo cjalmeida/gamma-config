@@ -3,11 +3,12 @@ import os
 from abc import ABC, abstractproperty
 from collections import UserDict
 from typing import Callable, Dict, Iterable, List, Mapping, Optional, Set
-
+import copy
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedBase
+import threading
 
-from . import dict_merge, tags
+from . import dict_merge, tags, subprocess
 
 blacklist: Set[str] = set()
 
@@ -162,6 +163,28 @@ class Config(UserDict):
 
         return stream.getvalue()
 
+    def dump(self, *, resolve_tags=True) -> Dict:
+
+        if resolve_tags:
+            self._dump_mode = True
+            new = copy.deepcopy(self)
+            self._dump_mode = False
+            new._dump_mode = False
+            return new
+        else:
+            return copy.deepcopy(self)
+
+    def __deepcopy__(self, memo):
+        new = Config({}, parent=self.parent, tags=self.tags)
+        new._dump_mode = self._dump_mode
+
+        if self._dump_mode:
+            for k, v in self.items():
+                new.data[k] = copy.deepcopy(v, memo)
+        else:
+            new.data = copy.deepcopy(self.data, memo)
+        return new
+
     @staticmethod
     def _yaml_representer(dumper, data):
         return dumper.represent_dict(data)
@@ -251,8 +274,7 @@ class DefaultConfigLoader(ConfigLoader):
         return files
 
 
-_meta_config: Optional[Config] = None
-_config: Optional[Config] = None
+_config_store = threading.local()
 
 
 def get_project_home():
@@ -267,19 +289,22 @@ def get_project_home():
 
 
 def reset_config() -> Config:
-    global _config
-    _config = None
+    del _config_store.config
 
 
-def get_config() -> "Config":
-    global _config
-    if _config is None:
-        from . import tags
+def get_config() -> Config:
+    if not hasattr(_config_store, "config") is None:
+        # try serialized config
+        if subprocess.ENV_KEY in os.environ:
+            _config_store.config = subprocess.deserialize()
+        else:
+            from . import tags
 
-        yaml = YAML(typ="rt")
-        _config = Config(tags=tags.get_tags(blacklist=True))
-        DefaultConfigLoader(yaml=yaml).load(_config)
-    return _config
+            yaml = YAML(typ="rt")
+            _config = Config(tags=tags.get_tags(blacklist=True))
+            DefaultConfigLoader(yaml=yaml).load(_config)
+            _config_store.config = _config
+    return _config_store.config
 
 
 def create_config_from_string(yaml_str: str) -> "Config":
@@ -293,9 +318,8 @@ def create_config_from_string(yaml_str: str) -> "Config":
 
 
 def get_meta_config() -> "Config":
-    global _meta_config
-    if _meta_config is None:
+    if not hasattr(_config_store, "meta") is None:
         yaml = YAML(typ="rt")
-        _meta_config = Config(tags=tags.get_tags(blacklist=False))
-        MetaConfigLoader(yaml=yaml).load(_meta_config)
-    return _meta_config
+        _config_store.meta = Config(tags=tags.get_tags(blacklist=False))
+        MetaConfigLoader(yaml=yaml).load(_config_store.meta)
+    return _config_store.meta
