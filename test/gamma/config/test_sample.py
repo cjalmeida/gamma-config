@@ -59,6 +59,10 @@ def test_sample_dump(monkeypatch):
     assert not isinstance(loaded["environment"], str)
     assert hasattr(loaded["environment"], "tag")
 
+    # dump to dict
+    new_dict = config.to_dict()
+    assert type(new_dict) == dict
+    assert type(new_dict["sample_env"]) == dict
 
 def test_expression(monkeypatch):
     monkeypatch.setenv("USER", "dummy")

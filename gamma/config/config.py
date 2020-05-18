@@ -139,7 +139,7 @@ class Config(UserDict):
         return func(**args)
 
     def to_yaml(self, *, resolve_tags=True) -> str:
-        """Dumps the config object to string
+        """Dumps the config object to YAML string
 
         Keyword Args:
             resolve_tags: If True (default), will dump the rendered result of the
@@ -163,7 +163,21 @@ class Config(UserDict):
 
         return stream.getvalue()
 
-    def dump(self, *, resolve_tags=True) -> Dict:
+    def to_dict(self) -> Dict:
+        """Dumps the config object to a Python dict recursively
+        """
+
+        new = {}
+        self._dump_mode = True
+        for k, v in self.items():
+            if isinstance(v, Config):
+                v = v.to_dict()
+            new[k] = v
+        self._dump_mode = False
+
+        return new
+
+    def dump(self, *, resolve_tags=True) -> "Config":
 
         if resolve_tags:
             self._dump_mode = True
