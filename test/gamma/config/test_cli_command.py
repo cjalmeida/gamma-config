@@ -17,7 +17,7 @@ def test_cwd():
 
 
 def test_scaffold(test_cwd):
-    from gamma.config.cli_plugin import scaffold
+    from gamma.config.cli_command import scaffold
 
     runner = CliRunner()
 
@@ -36,7 +36,7 @@ def test_scaffold(test_cwd):
 
 
 def test_project_home_env(monkeypatch):
-    from gamma.config.cli_plugin import scaffold
+    from gamma.config.cli_command import scaffold
 
     with tempfile.TemporaryDirectory() as td:
         monkeypatch.setenv("PROJECT_HOME", td)

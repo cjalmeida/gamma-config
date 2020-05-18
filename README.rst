@@ -69,12 +69,9 @@ You should be able to install the latest released version using ``pip``.
 
     pip install gamma-config
 
-The dependency above install and extends the ``gamma`` CLI command. After installation
-you can "scaffold" a new config folder with samples using
-
-::
-
-    gamma config scaffold
+The package comes with "scaffolding" to help you get started. If you have ``gamma-cli``
+installed, you can run ``gamma config scaffold`` or ``python -m gamma.config scaffold``
+otherwise.
 
 Basic Usage
 ~~~~~~~~~~~
@@ -82,7 +79,7 @@ Basic Usage
 Configuration loading
 #####################
 
-The ``gamma config scaffold`` command will generate a ``config/`` folder with a couple
+The ``scaffold`` command will generate a ``config/`` folder with a couple
 of YAML files. The ``00-meta.yaml`` is a "eat your own dogfood" config file where we
 configure *gamma-config* itself. You mostly don't have to deal with it.
 
