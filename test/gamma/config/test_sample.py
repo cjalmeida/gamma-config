@@ -31,8 +31,6 @@ def test_load_sample(caplog, monkeypatch):
 
 
 def test_sample_dump(monkeypatch):
-    monkeypatch.setenv("USER", "dummy")
-
     from gamma.config import get_config
     from ruamel.yaml import YAML
 
@@ -63,6 +61,7 @@ def test_sample_dump(monkeypatch):
     new_dict = config.to_dict()
     assert type(new_dict) == dict
     assert type(new_dict["sample_env"]) == dict
+
 
 def test_expression(monkeypatch):
     monkeypatch.setenv("USER", "dummy")

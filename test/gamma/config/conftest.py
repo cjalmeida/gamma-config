@@ -8,3 +8,9 @@ def reset_config():
 
     config_mod._config = None
     config_mod._meta_config = None
+
+
+@pytest.fixture(autouse=True)
+def autoset_user(monkeypatch):
+    monkeypatch.setenv("USER", "dummy")
+    yield
