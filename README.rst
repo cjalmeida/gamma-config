@@ -224,6 +224,25 @@ Example globals extending plugin implementation:
 
     plugins.plugin_manager.register(sys.modules[__name__])
 
+!func
+-----
+
+Returns a reference to a function. Useful for lightweight dependency injection.
+
+Example usage:
+
+.. code-block:: python
+
+    # call using kwargs
+    func_3: !func
+    call: os:getenv                 # <module>:<func>
+    args: ["MISSING"]               # list of positional arguments
+    kwargs: {default: foo}          # map of keyword arguments
+
+The above will return a "partial" reference to ``os.getenv``. This is equivalent to
+``functools.partial(os.getenv, "MISSING", default="foo")``
+
+
 !option
 -------
 
@@ -252,6 +271,20 @@ And in the configuration
         my_arg: !option myarg
         unset: !option unset|mydefault
 
+!j2
+---
+
+Allow the use of Jinja2 expressions.  The context for rendering is shared with the
+``!expr`` and can be extended with the same ``expr_globals`` plugin hook.
+
+In practice, in the snippet bellow, ``foo1`` and ``foo2`` are equivalent
+
+    myvar: 100
+    foo1: !expr f"This is a number = {c.myvar}"
+    foo2: !j2 This is a number = {c.myvar}
+
+Note that  Jinja2 **is not installed by default**, you should install yourself by
+running `pip install jinja2`
 
 
 Developing

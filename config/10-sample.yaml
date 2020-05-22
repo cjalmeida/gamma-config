@@ -9,24 +9,44 @@ sample_scalar_1: hello world
 sample_scalar_2: this should be overriden by environment
 sample_list_1: [1, 2, 3]
 sample_env:
-    user: !env USER
-    secret_user: !env_secret USER
+  user: !env USER
+  secret_user: !env_secret USER
 
 sample_reference:
-    # return value of a config self reference using dot notation
-    self_1: !ref sample_env.user
+  # return value of a config self reference using dot notation
+  self_1: !ref sample_env.user
 
-    # names can be quoted using quotes, you need to quote the whole expression as well
-    self_2: !ref "'sample_expr'.expr_1"
-
+  # names can be quoted using quotes, you need to quote the whole expression as well
+  self_2: !ref "'sample_expr'.expr_1"
 
 sample_expr:
-    # note: using expressions is very powerful but may pose a security risk as it can
-    # execute any kind of code. We recommend blacklisting this tag if your config
-    # may come from unsecure sources.
+  # note: using expressions is very powerful but may pose a security risk as it can
+  # execute any kind of code. We recommend blacklisting this tag if your config
+  # may come from unsecure sources.
 
-    # simple expressions, evalutated using Python's eval rules.
-    expr_1: !expr 1 + 1
+  # simple expressions, evalutated using Python's eval rules.
+  expr_1: !expr 1 + 1
 
-    # using globals set by the plugins
-    expr_3: !expr env['USER']
+  expr_2: !j2 user={{ c.sample_env.user }}
+
+  # using globals set by the plugins
+  expr_3: !expr env['USER']
+
+sample_func:
+  # Sample returning a function reference
+
+  # call function without arg
+  func_1: !func
+    call: os:getcwd
+
+  # call using positional args
+  func_2: !func
+    call: os:getenv
+    args: ["USER"]
+
+  # call using kwargs
+  func_3: !func
+    call: os:getenv
+    kwargs:
+      key: MISSING
+      default: foo

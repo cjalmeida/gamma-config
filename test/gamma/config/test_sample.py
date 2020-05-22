@@ -21,6 +21,11 @@ def test_load_sample(caplog, monkeypatch):
     # assert env was loaded and override default
     assert config["sample_scalar_2"] == "foobar_dev"
 
+    # assert functions
+    assert config["sample_func"]["func_1"]() == os.getcwd()
+    assert config["sample_func"]["func_2"]() == os.getenv("USER")
+    assert config["sample_func"]["func_3"]() == os.getenv(key="MISSING", default="foo")
+
     # reset config and test other env
     config_mod._config = None
     config_mod._meta_config = None
@@ -71,6 +76,6 @@ def test_expression(monkeypatch):
     config = get_config()
 
     assert config["sample_expr"]["expr_1"] == 2
-
+    assert config["sample_expr"]["expr_2"] == "user=dummy"
     e3 = config["sample_expr"]["expr_3"]
     assert e3 == os.environ["USER"]
