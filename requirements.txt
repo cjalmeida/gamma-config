@@ -7,6 +7,7 @@
 frozendict==1.2           # via -r requirements.in
 importlib-metadata==1.6.0  # via pluggy
 pluggy==0.13.1            # via -r requirements.in
+python-dotenv==0.13.0     # via -r requirements.in
 ruamel.yaml.clib==0.2.0   # via ruamel.yaml
 ruamel.yaml==0.16.10      # via -r requirements.in
 zipp==3.1.0               # via importlib-metadata
