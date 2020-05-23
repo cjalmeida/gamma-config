@@ -190,26 +190,55 @@ class Config(UserDict):
 
         return stream.getvalue()
 
-    def to_dict(self, sort=False) -> Dict:
-        """Dumps the config object to a Python dict recursively
+    def to_dict(self, sort=False, _first=True) -> Dict:
+        """Dumps the resolved config object to a Python dict recursively
 
         Args:
             sort: If True, will sort by keys before returning
         """
 
-        new = {}
-        self._dump_mode = True
-        keys = self.keys()
-        if sort:
-            keys = sorted(keys)
-        for k in keys:
-            v = self[k]
-            if isinstance(v, Config):
-                v = v.to_dict(sort=sort)
-            new[k] = v
-        self._dump_mode = False
+        if isinstance(self, Mapping):
+            entries = [self]
+            return_single = True
+        elif isinstance(self, (str, bytes)):
+            return self
+        elif isinstance(self, Iterable):
+            entries = self
+            return_single = False
+        else:
+            return self
 
-        return new
+        if _first:
+            self._dump_mode = True
+
+        response = []
+        for entry in entries:
+
+            if isinstance(entry, (str, bytes)):
+                response.append(entry)
+            elif isinstance(entry, (Mapping, Iterable)):
+                new = {}
+
+                keys = entry.keys()
+                if sort:
+                    keys = sorted(keys)
+
+                for k in keys:
+                    v = entry[k]
+                    if isinstance(v, (Config, Iterable)):
+                        v = Config.to_dict(v, sort=sort, _first=False)
+                    new[k] = v
+
+                response.append(new)
+            else:
+                response.append(entry)
+
+        if _first:
+            self._dump_mode = False
+
+        if return_single:
+            return response[0]
+        return response
 
     def dump(self, *, resolve_tags=True) -> "Config":
 
