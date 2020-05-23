@@ -43,8 +43,10 @@ class Config(UserDict):
 
         if tags:
             self.tags = tags
-        else:
+        elif parent:
             self.tags = parent.tags
+        else:
+            self.tags = None
 
         # Holds a stack of config dicts (partial, rendered). The stack[0][1] entry
         # should always match self.data
@@ -150,6 +152,19 @@ class Config(UserDict):
 
         return func(**args)
 
+    def to_json(self, *, sort=False, **kwargs) -> str:
+        """Dumps the config object to YAML string
+
+        Keyword args are passed to the ``json.dumps`` function
+
+        Keyword Args:
+            sort: If True, will sort the keys before returning
+        """
+        import json
+
+        new = self.to_dict(sort=sort)
+        return json.dumps(new, **kwargs)
+
     def to_yaml(self, *, resolve_tags=True) -> str:
         """Dumps the config object to YAML string
 
@@ -175,15 +190,22 @@ class Config(UserDict):
 
         return stream.getvalue()
 
-    def to_dict(self) -> Dict:
+    def to_dict(self, sort=False) -> Dict:
         """Dumps the config object to a Python dict recursively
+
+        Args:
+            sort: If True, will sort by keys before returning
         """
 
         new = {}
         self._dump_mode = True
-        for k, v in self.items():
+        keys = self.keys()
+        if sort:
+            keys = sorted(keys)
+        for k in keys:
+            v = self[k]
             if isinstance(v, Config):
-                v = v.to_dict()
+                v = v.to_dict(sort=sort)
             new[k] = v
         self._dump_mode = False
 

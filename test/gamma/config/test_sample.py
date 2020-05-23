@@ -78,6 +78,31 @@ def test_sample_dump(monkeypatch):
     assert type(new_dict["sample_env"]) == dict
 
 
+def test_dict_sort():
+
+    from gamma.config import config
+    import json
+
+    # Python 3.6+ guarantees dict keys ordering
+    src = {"b": 1, "a": 2, "c": {"sub-b": 10, "sub-a": 20}}
+    src_sorted = {"a": 2, "b": 1, "c": {"sub-a": 20, "sub-b": 10}}
+    cfg = config.Config(src)
+
+    d1 = cfg.to_dict()
+    assert json.dumps(d1) == json.dumps(src)
+    assert json.dumps(d1) != json.dumps(src_sorted)
+
+    d2 = cfg.to_dict(sort=True)
+    assert json.dumps(d2) != json.dumps(src)
+    assert json.dumps(d2) == json.dumps(src_sorted)
+
+    d3 = cfg.to_json()
+    assert d3 == json.dumps(src)
+
+    d4 = cfg.to_json(sort=True)
+    assert d4 == json.dumps(src_sorted)
+
+
 def test_expression(monkeypatch):
     monkeypatch.setenv("USER", "dummy")
     from gamma.config import get_config
