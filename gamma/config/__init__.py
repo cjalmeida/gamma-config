@@ -1,6 +1,7 @@
 import dotenv
 
-dotenv.load_dotenv()
+dotenv.load_dotenv("config.env")
+dotenv.load_dotenv("config.local.env")
 
 from .config import get_config, get_meta_config, get_project_home  # NOQA
 

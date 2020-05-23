@@ -43,6 +43,9 @@ Core features
 * Round-trip dump of config dict back into YAML. Support for hiding sensitive data
   on dump.
 
+* Simplified key access via dot (``.``). Ie. for  ``config: {foo: {bar: 100}}``,
+  this is True: ``config.foo.bar == 100``
+
 
 Getting started
 ~~~~~~~~~~~~~~~
@@ -126,6 +129,16 @@ After loading the two files above, the result config will contain:
         }
     }
 
+Dotenv (.env) Support
+---------------------
+
+By default, config will try to load the files ``config.env`` and ``config.local.env``,
+one after another. The expected pattern is to commit ``config.env`` in your VCS (Git)
+and leave ``config.local.env`` for user specific configuration.
+
+Note the ``.env`` files are loaded by simply doing an ``import gamma.config`` even
+before the meta configuration loading.
+
 Using gamma-config in your code
 ###############################
 
@@ -139,6 +152,48 @@ function, like in the example below:
     config = get_config()
     assert config["sample_key"]["key_a"] == "bar"
     assert config["sample_key"]["key_c"] == [1, 2, 3]
+
+
+Attribute access
+----------------
+
+Most of the time, you can access the keys using dot ``.`` notation. For instance, given
+
+.. code-block:: yaml
+
+    sample_key:
+        key_b: old
+        key_c: [2, 3]
+        key_d: bar
+
+The following should not raise any errors:
+
+.. code-block:: python
+
+    from gamma.config import get_config
+
+    config = get_config()
+    assert config.sample_key.key_a == "bar"
+    assert config.sample_key.key_c == [1, 2, 3]
+
+    # default dict behavion
+    assert not config.sample_key.bogus
+    assert not config.sample_key.bogus.subkey
+
+Limitations:
+  * When using attribute access, non existing keys will always return an empty ``Config`` dict
+    allowing "safe" navigation. Thus, the ``is None`` check will fail, use the regular
+    dictionary access if you need more strict semantics.
+
+  * As expected, ``Config`` class methods, like `dump`, `pop`, `push`, `to_yaml`, etc.,
+    get preference. We don't guarantee we won't break your code in the future by
+    implementing new functionality.
+
+  * We don't support attribute access for keys starting with underscore (``_``) at all.
+
+  * The attribute access may interfere with some serialization algorithms or other
+    processes. If you see weird behavior, you can disable it by setting
+    ``config._allow_dot_access`` to ``False``.
 
 
 Advanced Usage

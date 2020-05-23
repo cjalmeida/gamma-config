@@ -38,7 +38,7 @@ class Config(UserDict):
         data = data or {}
         super().__init__(data)
 
-        self.parent = parent
+        self._parent = parent
         self._dump_mode = False
 
         if tags:
@@ -48,27 +48,29 @@ class Config(UserDict):
 
         # Holds a stack of config dicts (partial, rendered). The stack[0][1] entry
         # should always match self.data
-        self.stack = [(data, data)]
+        self._stack = [(data, data)]
+
+        self._allow_dot_access = True
 
     @property
-    def root(self):
+    def _root(self):
         """Pointer to the root config object."""
 
-        if self.parent is None:
+        if self._parent is None:
             return self
-        return self.parent.root
+        return self._parent._root
 
     def push(self, partial: Mapping):
         """Push and merge a partial config dict into the configuration stack"""
         self._check_root()
         self._merge_data(partial)
-        self.stack.insert(0, (partial, self.data))
+        self._stack.insert(0, (partial, self.data))
 
     def pop(self):
         """Pop the last pushed partial, reverting the config state"""
         self._check_root()
-        self.stack.pop()
-        _, self.data = self.stack[0]
+        self._stack.pop()
+        _, self.data = self._stack[0]
 
     def _merge_data(self, partial: Mapping):
         """Merge a partial with the current state"""
@@ -78,9 +80,19 @@ class Config(UserDict):
         val = self.data[key]
         return self._parse_value(val)
 
+    def __getattr__(self, key):
+
+        if key.startswith("_") or not self._allow_dot_access or self._dump_mode:
+            return object.__getattribute__(self, key)
+
+        if key not in self.data:
+            return self._parse_value({})
+
+        return self[key]
+
     def _check_root(self):
         """Check if we're the root config object"""
-        if self.parent is not None:
+        if self._parent is not None:
             raise Exception(
                 "Config stack push/pull only implemented for the root config object"
             )
@@ -126,7 +138,7 @@ class Config(UserDict):
         func_args = set(argspec.args) | set(argspec.kwonlyargs)
         args = {}
         if "root" in func_args:
-            args["root"] = self.root
+            args["root"] = self._root
         if "value" in func_args:
             args["value"] = node.value
         if "tag" in func_args:
@@ -189,7 +201,7 @@ class Config(UserDict):
             return copy.deepcopy(self)
 
     def __deepcopy__(self, memo):
-        new = Config({}, parent=self.parent, tags=self.tags)
+        new = Config({}, parent=self._parent, tags=self.tags)
         new._dump_mode = self._dump_mode
 
         if self._dump_mode:

@@ -26,6 +26,12 @@ def test_load_sample(caplog, monkeypatch):
     assert config["sample_func"]["func_2"]() == os.getenv("USER")
     assert config["sample_func"]["func_3"]() == os.getenv(key="MISSING", default="foo")
 
+    # assert dot access
+    assert config.sample_func.func_1() == os.getcwd()
+    assert config.sample_list_1 == [1, 2, 3]
+    assert not config.missing
+    assert not config.missing.subkey
+
     # reset config and test other env
     config_mod._config = None
     config_mod._meta_config = None
