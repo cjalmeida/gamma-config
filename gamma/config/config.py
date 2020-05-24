@@ -404,7 +404,37 @@ class DefaultConfigLoader(ConfigLoader):
         return files
 
 
-_config_store = threading.local()
+class LocalStore(threading.local):
+    def __init__(self):
+        self.__dict__["__pid"] = os.getpid()
+
+    def __getattribute__(self, name):
+        if not name.startswith("__"):
+            object.__getattribute__(self, "__check_pid__")()
+        return object.__getattribute__(self, name)
+
+    def __setattr__(self, name, value):
+        if not name.startswith("__"):
+            object.__getattribute__(self, "__check_pid__")()
+        self.__dict__[name] = value
+
+    def __delattr__(self, name):
+        if not name.startswith("__"):
+            object.__getattribute__(self, "__check_pid__")()
+        try:
+            del self.__dict__[name]
+        except KeyError:
+            raise AttributeError(name)
+
+    def __check_pid__(self):
+        d = self.__dict__
+
+        if d["__pid"] != os.getpid():
+            d.clear()
+            d["__pid"] = os.getpid()
+
+
+_config_store = LocalStore()
 
 
 def get_project_home():
@@ -419,7 +449,10 @@ def get_project_home():
 
 
 def reset_config() -> Config:
-    del _config_store.config
+    if hasattr(_config_store, "meta"):
+        del _config_store.meta
+    if hasattr(_config_store, "config"):
+        del _config_store.config
 
 
 def get_config() -> Config:

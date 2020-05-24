@@ -37,8 +37,7 @@ def test_load_sample(caplog, monkeypatch):
         assert not config._missing_underscore
 
     # reset config and test other env
-    config_mod._config = None
-    config_mod._meta_config = None
+    config_mod.reset_config()
     monkeypatch.setenv("ENVIRONMENT", "prod")
     config = get_config()
     assert config["environment"] == "prod"
