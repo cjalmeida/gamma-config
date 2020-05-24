@@ -16,14 +16,11 @@ def test_dump_raw():
     """
 
     config = config.create_config_from_string(src)
-
     assert config.normal.bar == os.getenv("USER")
     assert config.raw.bar == os.getenv("USER")
 
-    dump = config.to_yaml()
-    dump = yaml.load(dump)
+    dump = yaml.load(config.to_yaml())
     assert dump["normal"]["bar"] == os.getenv("USER")
     assert hasattr(dump["raw"]["bar"], "tag")
     assert dump["raw"]["bar"].tag.value == "!j2"
     assert dump["raw"]["bar"].value == "{{ env.USER }}"
-

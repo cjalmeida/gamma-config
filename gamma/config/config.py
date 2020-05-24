@@ -19,7 +19,7 @@ class EnvironmentFolderException(Exception):
 
 
 class Value:
-    """Value returned from the Tag.
+    """Represents a configuration value, potentially returned from resolving a tag.
 
     Here we implement most of the value parsing. Tags can return either a raw value
     or one instance of this for finer control of parsing.
@@ -423,7 +423,7 @@ def reset_config() -> Config:
 
 
 def get_config() -> Config:
-    if not hasattr(_config_store, "config") is None:
+    if not hasattr(_config_store, "config"):
         # try serialized config
         if subprocess.ENV_KEY in os.environ:
             _config_store.config = subprocess.deserialize()

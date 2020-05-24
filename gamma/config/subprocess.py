@@ -27,11 +27,7 @@ def propagate_subprocess(env: Optional[Dict[str, str]] = None) -> Tuple[str, str
     with tempfile.NamedTemporaryFile("wb") as tf:
         config = get_config()
         resolved = config.clone()
-        try:
-            pickle.dump(resolved, tf, pickle.HIGHEST_PROTOCOL)
-        except Exception as ex:
-            raise
-
+        pickle.dump(resolved, tf, pickle.HIGHEST_PROTOCOL)
         tf.flush()
         env[ENV_KEY] = tf.name
         yield ENV_KEY, tf.name

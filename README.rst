@@ -342,6 +342,34 @@ Note that  Jinja2 **is not installed by default**, you should install yourself b
 running `pip install jinja2`
 
 
+!dump_raw
+---------
+
+Instruct the dumper that the entire configuration block should not have the !tags
+resolved. This is useful if you have dynamic or expensive functions being called that
+you don't want rendered when dumping.
+
+Example. Given the config snippet below:
+
+.. code-block:: yaml
+
+    raw: !dump_raw
+        bar: !j2 "{{ env.USER }}"
+
+    normal:
+        bar: !j2 "{{ env.USER }}"
+
+Calling ``config.to_yaml()`` should output this:
+
+.. code-block:: yaml
+
+    raw: !dump_raw
+        bar: !j2 "{{ env.USER }}"
+
+    normal:
+        bar: myuser
+
+
 Developing
 ~~~~~~~~~~
 

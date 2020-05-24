@@ -224,9 +224,6 @@ def option(value: str):
         opt_value = default
 
     if opt_value == UNDEFINED:
-        import ipdb
-
-        ipdb.set_trace()
         raise plugins.TagException(
             f"CLI param '{value}' not set and no default provided."
         )
