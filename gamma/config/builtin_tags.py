@@ -3,7 +3,7 @@ import sys
 import threading
 from typing import Any, Dict
 
-from gamma.config.config import Config
+from gamma.config.config import Config, Value
 
 from . import plugins
 
@@ -40,6 +40,12 @@ def env(value: Any) -> str:
         )
 
     return env_val
+
+
+def dump_raw(dump: bool, node) -> str:
+    if dump:
+        return Value(node, no_parse=True)
+    return node
 
 
 def env_secret(value: Any, dump: bool, node) -> str:
@@ -234,6 +240,7 @@ def add_tags():
     return [
         plugins.TagSpec("!env", env),
         plugins.TagSpec("!env_secret", env_secret),
+        plugins.TagSpec("!dump_raw", dump_raw),
         plugins.TagSpec("!expr", expr),
         plugins.TagSpec("!func", func),
         plugins.TagSpec("!j2", j2),

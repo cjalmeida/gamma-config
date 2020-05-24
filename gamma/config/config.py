@@ -18,6 +18,110 @@ class EnvironmentFolderException(Exception):
         super().__init__(f"Environment folder '{folder}' not found.", **kwargs)
 
 
+class Value:
+    """Value returned from the Tag.
+
+    Here we implement most of the value parsing. Tags can return either a raw value
+    or one instance of this for finer control of parsing.
+
+    Args:
+        value: The value to render (usually the node)
+
+    Keyword Args:
+        config: The config instance to use. If ``None``, we will inject one before
+            parsing.
+        dump_mode: The dump mode. If ``None``, we'll get from the config
+        no_parse: If True, return the raw value as is, without further parsing.
+    """
+
+    def __init__(
+        self,
+        raw_value,
+        *,
+        dump_mode=None,
+        config: Optional["Config"] = None,
+        no_parse=False,
+    ):
+        self.raw_value = raw_value
+        self.config = config
+        self.no_parse = no_parse
+        self._dump_mode = dump_mode
+
+    def with_value(self, newval) -> "Value":
+        return Value(
+            newval,
+            dump_mode=self._dump_mode,
+            config=self.config,
+            no_parse=self.no_parse,
+        )
+
+    @property
+    def dump_mode(self):
+        return self._dump_mode or self.config._dump_mode
+
+    def parse(self):
+        """Parse a config entry value.
+
+        Return:
+            Any of a sub-config object, a scalar, a list, handling tags as needed.
+        """
+        val = self.raw_value
+
+        if self.no_parse:
+            return val
+
+        if (
+            isinstance(val, CommentedBase)
+            and hasattr(val, "tag")
+            and val.tag.value is not None
+        ):
+            val = self._process_tagged(val)
+
+        if isinstance(val, Value):
+            if val.config is None:
+                val.config = self.config
+            return val.parse()
+
+        if isinstance(val, Mapping):
+            sub = Config(val, self.config)
+            sub._dump_mode = self.dump_mode
+            return sub
+
+        if isinstance(val, (str, bytes)):
+            return val
+
+        if isinstance(val, Iterable):
+            return [self.with_value(x).parse() for x in val]
+
+        # anything else, return as is
+        return val
+
+    def _process_tagged(self, node):
+        """Proces tagged nodes"""
+
+        tag = node.tag.value
+        try:
+            func = self.config.tags[tag]
+        except KeyError:
+            raise KeyError(f"Handler function for tag {tag} was not found.")
+
+        argspec = inspect.getfullargspec(func)
+        func_args = set(argspec.args) | set(argspec.kwonlyargs)
+        args = {}
+        if "root" in func_args:
+            args["root"] = self.config._root
+        if "value" in func_args:
+            args["value"] = node.value
+        if "tag" in func_args:
+            args["tag"] = tag
+        if "dump" in func_args:
+            args["dump"] = self.dump_mode
+        if "node" in func_args:
+            args["node"] = node
+
+        return func(**args)
+
+
 class Config(UserDict):
     """The main config object.
 
@@ -80,7 +184,7 @@ class Config(UserDict):
 
     def __getitem__(self, key):
         val = self.data[key]
-        return self._parse_value(val)
+        return Value(val, config=self).parse()
 
     def __getattr__(self, key):
 
@@ -88,7 +192,7 @@ class Config(UserDict):
             return object.__getattribute__(self, key)
 
         if key not in self.data:
-            return self._parse_value({})
+            return Value({}, config=self).parse()
 
         return self[key]
 
@@ -98,59 +202,6 @@ class Config(UserDict):
             raise Exception(
                 "Config stack push/pull only implemented for the root config object"
             )
-
-    def _parse_value(self, val):
-        """Parse a config entry value.
-
-        Return:
-            Any of a sub-config object, a scalar, a list, handling tags as needed.
-        """
-
-        if (
-            isinstance(val, CommentedBase)
-            and hasattr(val, "tag")
-            and val.tag.value is not None
-        ):
-            val = self._process_tagged(val)
-
-        if isinstance(val, Mapping):
-            sub = Config(val, self)
-            sub._dump_mode = self._dump_mode
-            return sub
-
-        if isinstance(val, (str, bytes)):
-            return val
-
-        if isinstance(val, Iterable):
-            return [self._parse_value(x) for x in val]
-
-        # anything else, return as is
-        return val
-
-    def _process_tagged(self, node):
-        """Proces tagged nodes"""
-
-        tag = node.tag.value
-        try:
-            func = self.tags[tag]
-        except KeyError:
-            raise KeyError(f"Handler function for tag {tag} was not found.")
-
-        argspec = inspect.getfullargspec(func)
-        func_args = set(argspec.args) | set(argspec.kwonlyargs)
-        args = {}
-        if "root" in func_args:
-            args["root"] = self._root
-        if "value" in func_args:
-            args["value"] = node.value
-        if "tag" in func_args:
-            args["tag"] = tag
-        if "dump" in func_args:
-            args["dump"] = self._dump_mode
-        if "node" in func_args:
-            args["node"] = node
-
-        return func(**args)
 
     def to_json(self, *, sort=False, **kwargs) -> str:
         """Dumps the config object to YAML string
@@ -240,16 +291,18 @@ class Config(UserDict):
             return response[0]
         return response
 
-    def dump(self, *, resolve_tags=True) -> "Config":
+    def clone(self) -> "Config":
+        """Clone the config resolving the YAML tags.
 
-        if resolve_tags:
-            self._dump_mode = True
-            new = copy.deepcopy(self)
-            self._dump_mode = False
-            new._dump_mode = False
-            return new
-        else:
-            return copy.deepcopy(self)
+        This is aimed at serializing the configuration for sub/remote process
+        consumption. If you don't want this behavior, ``copy.deepcopy`` is your friend.
+        """
+
+        self._dump_mode = True
+        new = copy.deepcopy(self)
+        self._dump_mode = False
+        new._dump_mode = False
+        return new
 
     def __deepcopy__(self, memo):
         new = Config({}, parent=self._parent, tags=self.tags)

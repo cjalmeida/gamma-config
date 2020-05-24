@@ -7,19 +7,13 @@ import os
 
 from setuptools import find_namespace_packages, setup
 
-try:
-    import setupext_janitor  # NOQA
-except ModuleNotFoundError:
-    pass
-
-
 with open("README.rst") as readme_file:
     readme = readme_file.read()
 
 with open("requirements.in") as f:
     requirements = [x for x in f.read().splitlines() if x and x[0] not in "-# "]
 
-setup_requirements = ["pytest-runner", "setupext_janitor"]
+setup_requirements = ["pytest-runner"]
 
 test_requirements = [
     "pytest>=3",
