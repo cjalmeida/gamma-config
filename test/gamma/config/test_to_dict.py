@@ -23,7 +23,7 @@ def test_dict_sort():
     assert d4 == json.dumps(src_sorted)
 
 
-def test_to_dict():
+def test_to_dict_basic():
 
     from gamma.config import config
 

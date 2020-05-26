@@ -1,14 +1,23 @@
 import inspect
 import os
 from abc import ABC, abstractproperty
-from collections import UserDict
-from typing import Callable, Dict, Iterable, List, Mapping, Optional, Set
+from typing import (
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Set,
+    Type,
+    Any,
+)
 import copy
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedBase
 import threading
-
-from . import dict_merge, tags, subprocess
+from collections import UserDict
+from . import dict_merge, tags as tags_module, subprocess
 
 blacklist: Set[str] = set()
 
@@ -18,153 +27,67 @@ class EnvironmentFolderException(Exception):
         super().__init__(f"Environment folder '{folder}' not found.", **kwargs)
 
 
-class Value:
+class Config(UserDict):
     """Represents a configuration value, potentially returned from resolving a tag.
 
-    Here we implement most of the value parsing. Tags can return either a raw value
-    or one instance of this for finer control of parsing.
-
     Args:
-        value: The value to render (usually the node)
+        data: The underlying data to render
 
     Keyword Args:
-        config: The config instance to use. If ``None``, we will inject one before
-            parsing.
-        dump_mode: The dump mode. If ``None``, we'll get from the config
-        no_parse: If True, return the raw value as is, without further parsing.
+        parent: The parent Value in the configuration tree that originated this.
+            Should be None for the root value.
     """
 
     def __init__(
         self,
-        raw_value,
+        data,
         *,
-        dump_mode=None,
-        config: Optional["Config"] = None,
-        no_parse=False,
+        parent: Optional["Config"] = None,
+        _tags: Dict[str, Callable] = None,
     ):
-        self.raw_value = raw_value
-        self.config = config
-        self.no_parse = no_parse
-        self._dump_mode = dump_mode
+        super().__init__()
+        self.data = data
+        self.parent = parent
+        self._tags: Optional[Dict[str, Callable]] = _tags
 
-    def with_value(self, newval) -> "Value":
-        return Value(
-            newval,
-            dump_mode=self._dump_mode,
-            config=self.config,
-            no_parse=self.no_parse,
-        )
-
-    @property
-    def dump_mode(self):
-        return self._dump_mode or self.config._dump_mode
-
-    def parse(self):
-        """Parse a config entry value.
-
-        Return:
-            Any of a sub-config object, a scalar, a list, handling tags as needed.
-        """
-        val = self.raw_value
-
-        if self.no_parse:
-            return val
-
-        if (
-            isinstance(val, CommentedBase)
-            and hasattr(val, "tag")
-            and val.tag.value is not None
-        ):
-            val = self._process_tagged(val)
-
-        if isinstance(val, Value):
-            if val.config is None:
-                val.config = self.config
-            return val.parse()
-
-        if isinstance(val, Mapping):
-            sub = Config(val, self.config)
-            sub._dump_mode = self.dump_mode
-            return sub
-
-        if isinstance(val, (str, bytes)):
-            return val
-
-        if isinstance(val, Iterable):
-            return [self.with_value(x).parse() for x in val]
-
-        # anything else, return as is
-        return val
-
-    def _process_tagged(self, node):
-        """Proces tagged nodes"""
-
-        tag = node.tag.value
-        try:
-            func = self.config.tags[tag]
-        except KeyError:
-            raise KeyError(f"Handler function for tag {tag} was not found.")
-
-        argspec = inspect.getfullargspec(func)
-        func_args = set(argspec.args) | set(argspec.kwonlyargs)
-        args = {}
-        if "root" in func_args:
-            args["root"] = self.config._root
-        if "value" in func_args:
-            args["value"] = node.value
-        if "tag" in func_args:
-            args["tag"] = tag
-        if "dump" in func_args:
-            args["dump"] = self.dump_mode
-        if "node" in func_args:
-            args["node"] = node
-
-        return func(**args)
-
-
-class Config(UserDict):
-    """The main config object.
-
-    Act as a regular dict, with functionality to render custom tags.
-
-    Args:
-        data: The raw content.
-        parent: The parent Config object, for sub entries.
-        tags: The dict of (str, callable) with tag handlers.
-    """
-
-    def __init__(
-        self,
-        data: Mapping = None,
-        parent: "Config" = None,
-        tags: Dict[str, Callable] = None,
-    ):
-        data = data or {}
-        super().__init__(data)
-
-        self._parent = parent
-        self._dump_mode = False
-
-        if tags:
-            self.tags = tags
-        elif parent:
-            self.tags = parent.tags
+        if self.parent:
+            self._dump_mode = None
         else:
-            self.tags = None
+            self._dump_mode = False
 
-        # Holds a stack of config dicts (partial, rendered). The stack[0][1] entry
-        # should always match self.data
+            # load tags
+            if self._tags is None:
+                self._tags = tags_module.get_tags()
+                # we get raw_value from self.data
+
         self._stack = [(data, data)]
-
         self._allow_dot_access = True
 
     @property
     def _root(self):
-        """Pointer to the root config object."""
-
-        if self._parent is None:
+        """Pointer to the root config in the tree."""
+        if self.parent is None:
             return self
-        return self._parent._root
+        return self.parent._root
+
+    @property
+    def tags(self) -> Dict[str, Callable]:
+        if self._tags is None and self.parent is not None:
+            return self.parent.tags
+        if self._tags is None:
+            raise ValueError("tags not initialized")
+        return self._tags
+
+    @property
+    def dump_mode(self):
+        """The dump mode. If None, get from parent"""
+        if self._dump_mode is None:
+            return self.parent.dump_mode
+        return self._dump_mode
+
+    @dump_mode.setter
+    def dump_mode(self, value):
+        self._dump_mode = value
 
     def push(self, partial: Mapping):
         """Push and merge a partial config dict into the configuration stack"""
@@ -184,21 +107,20 @@ class Config(UserDict):
 
     def __getitem__(self, key):
         val = self.data[key]
-        return Value(val, config=self).parse()
+        return Renderer(config=self, dump=self.dump_mode, tags=self.tags).render(val)
 
     def __getattr__(self, key):
-
-        if key.startswith("_") or not self._allow_dot_access or self._dump_mode:
+        if key.startswith("_") or not self._allow_dot_access or self.dump_mode:
             return object.__getattribute__(self, key)
 
         if key not in self.data:
-            return Value({}, config=self).parse()
+            return Config({}, parent=self)
 
         return self[key]
 
     def _check_root(self):
         """Check if we're the root config object"""
-        if self._parent is not None:
+        if self.parent is not None:
             raise Exception(
                 "Config stack push/pull only implemented for the root config object"
             )
@@ -233,82 +155,29 @@ class Config(UserDict):
 
         stream = io.StringIO()
         if resolve_tags:
-            self._dump_mode = True
+            self.dump_mode = True
             yaml.dump(self, stream)
-            self._dump_mode = False
+            self.dump_mode = False
         else:
             yaml.dump(self.data, stream)
 
         return stream.getvalue()
 
-    def to_dict(self, sort=False, _first=True) -> Dict:
+    def to_dict(self: Any, sort=False, _first=True) -> Any:
         """Dumps the resolved config object to a Python dict recursively
 
         Args:
             sort: If True, will sort by keys before returning
         """
-
-        if isinstance(self, Mapping):
-            entries = [self]
-            return_single = True
-        elif isinstance(self, (str, bytes)):
-            return self
-        elif isinstance(self, Iterable):
-            entries = self
-            return_single = False
-        else:
-            return self
-
-        if _first:
-            self._dump_mode = True
-
-        response = []
-        for entry in entries:
-
-            if isinstance(entry, (str, bytes)):
-                response.append(entry)
-            elif isinstance(entry, (Mapping, Iterable)):
-                new = {}
-
-                keys = entry.keys()
-                if sort:
-                    keys = sorted(keys)
-
-                for k in keys:
-                    v = entry[k]
-                    if isinstance(v, (Config, Iterable)):
-                        v = Config.to_dict(v, sort=sort, _first=False)
-                    new[k] = v
-
-                response.append(new)
-            else:
-                response.append(entry)
-
-        if _first:
-            self._dump_mode = False
-
-        if return_single:
-            return response[0]
-        return response
-
-    def clone(self) -> "Config":
-        """Clone the config resolving the YAML tags.
-
-        This is aimed at serializing the configuration for sub/remote process
-        consumption. If you don't want this behavior, ``copy.deepcopy`` is your friend.
-        """
-
-        self._dump_mode = True
-        new = copy.deepcopy(self)
-        self._dump_mode = False
-        new._dump_mode = False
-        return new
+        return Renderer(config=self, dump=True, tags=self.tags, sort=sort).render(
+            self.data
+        )
 
     def __deepcopy__(self, memo):
-        new = Config({}, parent=self._parent, tags=self.tags)
-        new._dump_mode = self._dump_mode
+        new = Config({})
+        new.__dict__.update(self.__dict__)
 
-        if self._dump_mode:
+        if self.dump_mode:
             for k, v in self.items():
                 new.data[k] = copy.deepcopy(v, memo)
         else:
@@ -318,6 +187,110 @@ class Config(UserDict):
     @staticmethod
     def _yaml_representer(dumper, data):
         return dumper.represent_dict(data)
+
+
+class RenderContext:
+    def __init__(self, value, **kwargs):
+        self.value = value
+        self.kwargs = kwargs
+
+
+class Renderer:
+    def __init__(
+        self,
+        config: Config = None,
+        dump: bool = None,
+        tags=None,
+        render_tags=True,
+        render_recurse=True,
+        sort=False,
+    ):
+        self.tags = tags
+        self.config = config
+        self.dump = dump
+        self.render_tags = render_tags
+        self.render_recurse = render_recurse
+        self.sort = sort
+
+    def render(self, val):
+        """Render the data.
+
+        Return:
+            Any of a sub-config, a scalar, a list, handling tags as needed.
+        """
+        if (
+            self.render_tags
+            and isinstance(val, CommentedBase)
+            and hasattr(val, "tag")
+            and val.tag.value is not None
+        ):
+            return self.render_tag(val)
+
+        # sub mapping as config for lazy rendering
+        if isinstance(val, Mapping) and not self.dump:
+            sub = Config(val, parent=self.config)
+            return sub
+
+        # dump returns plain dict and render recursively
+        if isinstance(val, Mapping) and self.dump:
+
+            if not self.render_recurse:
+                return val
+
+            sub = {}
+            keys = list(val.keys())
+            if self.sort:
+                keys.sort()
+            for k in keys:
+                sub[k] = self.render(val[k])
+            return sub
+
+        if isinstance(val, (str, bytes)):
+            return val
+
+        if isinstance(val, Iterable):
+            if not self.render_recurse:
+                return val
+
+            # don't sort arrays as order matters
+            res = [self.render(x) for x in val]
+            return res
+
+        # anything else, return as is
+        return val
+
+    def render_tag(self, node):
+        """Proces tagged nodes"""
+
+        tag = node.tag.value
+        try:
+            func = self.tags[tag]
+        except KeyError:
+            raise KeyError(f"Handler function for tag {tag} was not found.")
+
+        argspec = inspect.getfullargspec(func)
+        func_args = set(argspec.args) | set(argspec.kwonlyargs)
+        args = {}
+        if "root" in func_args:
+            args["root"] = self.config._root
+        if "value" in func_args:
+            args["value"] = node.value
+        if "tag" in func_args:
+            args["tag"] = tag
+        if "dump" in func_args:
+            args["dump"] = self.dump
+        if "node" in func_args:
+            args["node"] = node
+
+        val = func(**args)
+        renderer = copy.copy(self)
+        renderer.render_tags = False  # force to avoid infinite loops
+
+        if isinstance(val, RenderContext):
+            renderer.__dict__.update(val.kwargs)
+            val = val.value
+
+        return renderer.render(val)
 
 
 class ConfigLoader(ABC):
@@ -371,7 +344,7 @@ class MetaConfigLoader(ConfigLoader):
     @property
     def entries(self) -> List[str]:
         home = get_project_home()
-        return {f"file://{home}/config/00-meta.yaml"}
+        return [f"file://{home}/config/00-meta.yaml"]
 
 
 class DefaultConfigLoader(ConfigLoader):
@@ -384,8 +357,8 @@ class DefaultConfigLoader(ConfigLoader):
         cfg_dir = Path(get_project_home()) / "config"
 
         # default
-        files: List[Path] = list(cfg_dir.glob(f"*.yaml"))
-        files += list(cfg_dir.glob(f"*.yml"))
+        files: List[Path] = list(cfg_dir.glob("*.yaml"))
+        files += list(cfg_dir.glob("*.yml"))
 
         # environment
         meta = get_meta_config()
@@ -400,8 +373,8 @@ class DefaultConfigLoader(ConfigLoader):
 
         # use the file name as sort key, regardless of folder
         files.sort(key=lambda f: f.name)
-        files = [str(f.absolute().as_uri()) for f in files]
-        return files
+        files_str = [str(f.absolute().as_uri()) for f in files]
+        return files_str
 
 
 class LocalStore(threading.local):
@@ -437,7 +410,7 @@ class LocalStore(threading.local):
 _config_store = LocalStore()
 
 
-def get_project_home():
+def get_project_home() -> str:
     """Return the location for project home.
 
     Overridable with the PROJECT_HOME environment variable.
@@ -448,7 +421,7 @@ def get_project_home():
     return os.getenv("PROJECT_HOME", os.path.abspath(os.path.dirname(os.curdir)))
 
 
-def reset_config() -> Config:
+def reset_config() -> None:
     if hasattr(_config_store, "meta"):
         del _config_store.meta
     if hasattr(_config_store, "config"):
@@ -464,7 +437,7 @@ def get_config() -> Config:
             from . import tags
 
             yaml = YAML(typ="rt")
-            _config = Config(tags=tags.get_tags(blacklist=True))
+            _config = Config({}, _tags=tags.get_tags(blacklist=True))
             DefaultConfigLoader(yaml=yaml).load(_config)
             _config_store.config = _config
     return _config_store.config
@@ -474,7 +447,7 @@ def create_config_from_string(yaml_str: str) -> "Config":
     """Simple Config factory that builds a config object from a YAML string"""
 
     yaml = YAML(typ="rt")
-    _config = Config(tags=tags.get_tags(blacklist=True))
+    _config = Config({}, _tags=tags_module.get_tags(blacklist=True))
     content = yaml.load(yaml_str)
     _config.push(content)
     return _config
@@ -483,6 +456,6 @@ def create_config_from_string(yaml_str: str) -> "Config":
 def get_meta_config() -> "Config":
     if not hasattr(_config_store, "meta") is None:
         yaml = YAML(typ="rt")
-        _config_store.meta = Config(tags=tags.get_tags(blacklist=False))
+        _config_store.meta = Config({}, _tags=tags_module.get_tags(blacklist=False))
         MetaConfigLoader(yaml=yaml).load(_config_store.meta)
     return _config_store.meta

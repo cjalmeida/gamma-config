@@ -1,5 +1,5 @@
 import os
-
+import pytest
 
 def test_dump_raw():
     from gamma.config import config
@@ -9,17 +9,40 @@ def test_dump_raw():
 
     src = """
     raw: !dump_raw
-        bar: !j2 "{{ env.USER }}"
+      bar: !j2 "{{ env.USER }}"
+      nested:
+        foo: !j2 "{{ env.USER }}"
 
     normal:
-        bar: !j2 "{{ env.USER }}"
+      bar: !j2 "{{ env.USER }}"
     """
 
-    config = config.create_config_from_string(src)
-    assert config.normal.bar == os.getenv("USER")
-    assert config.raw.bar == os.getenv("USER")
+    cfg = config.create_config_from_string(src)
+    assert cfg.normal.bar == os.getenv("USER")
+    assert cfg.raw.bar == os.getenv("USER")
 
-    dump = yaml.load(config.to_yaml())
+    # test to_dict
+    dump = cfg.to_dict()
+    assert dump["normal"]["bar"] == os.getenv("USER")
+    assert hasattr(dump["raw"]["bar"], "tag")
+    assert dump["raw"]["bar"].tag.value == "!j2"
+    assert dump["raw"]["bar"].value == "{{ env.USER }}"
+
+    # should affect nested when dumping parent or above
+    assert dump["raw"]["nested"]["foo"].tag.value == "!j2"
+    assert cfg.raw.to_dict()["nested"]["foo"].tag.value == "!j2"
+
+    # to_json should raise a type error because tags are not JSON serializable
+    with pytest.raises(TypeError):
+        dump = cfg.to_json()
+
+    # parent !dump_raw should not affect children if called directly on the
+    # nested mapping
+    dump = cfg.raw.nested.to_dict()
+    assert type(dump["foo"]) == str
+
+    # test yaml
+    dump = yaml.load(cfg.to_yaml())
     assert dump["normal"]["bar"] == os.getenv("USER")
     assert hasattr(dump["raw"]["bar"], "tag")
     assert dump["raw"]["bar"].tag.value == "!j2"

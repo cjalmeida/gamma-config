@@ -6,8 +6,7 @@ def reset_config():
     """Reset config singletons on each test"""
     from gamma.config import config as config_mod
 
-    config_mod._config = None
-    config_mod._meta_config = None
+    config_mod.reset_config()
 
 
 @pytest.fixture(autouse=True)

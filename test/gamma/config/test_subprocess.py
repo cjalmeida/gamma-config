@@ -3,7 +3,7 @@ import threading
 import pytest
 
 
-def test_mock_subprocess(caplog, monkeypatch):
+def test_mock_subprocess(caplog):
 
     from gamma.config import subprocess, get_config
 
@@ -11,8 +11,8 @@ def test_mock_subprocess(caplog, monkeypatch):
     env = {}
     with subprocess.propagate_subprocess(env):
         new = subprocess.deserialize(env)
-        assert not config._dump_mode
-        assert not new._dump_mode
+        assert not config.dump_mode
+        assert not new.dump_mode
         assert new["sample_env"]["user"] == config["sample_env"]["user"]
         assert new["sample_env"]["secret_user"] == config["sample_env"]["secret_user"]
 
@@ -26,7 +26,7 @@ def _run_sub():
     assert new["environment"] == new.data["environment"] == "dev"
 
 
-def test_actual_subprocess(caplog, monkeypatch):
+def test_actual_subprocess(monkeypatch, caplog):
 
     from gamma.config import subprocess, config as config_mod
 

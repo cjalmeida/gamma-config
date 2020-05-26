@@ -3,7 +3,7 @@ import sys
 import threading
 from typing import Any, Dict
 
-from gamma.config.config import Config, Value
+from gamma.config.config import Config, RenderContext
 
 from . import plugins
 
@@ -44,13 +44,12 @@ def env(value: Any) -> str:
 
 def dump_raw(dump: bool, node) -> str:
     if dump:
-        return Value(node, no_parse=True)
+        return RenderContext(node, render_recurse=False)
     return node
 
 
 def env_secret(value: Any, dump: bool, node) -> str:
     """Similar to !env, but never returns the value when dumping."""
-
     if dump:
         return node
     return env(value)
