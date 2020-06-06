@@ -112,8 +112,23 @@ def j2(value: Any, root) -> Any:
     if not hasattr(j2_cache, "env"):
         j2_cache.env = jinja2.Environment()
 
-    res = j2_cache.env.from_string(value).render(**_globals)
+    try:
+        # make sure we avoid infinite recursion when referencing nested arguments
+        # when dumping
+        prev_dump_mode = root.dump_mode
+        root.dump_mode = False
+        res = j2_cache.env.from_string(value).render(**_globals)
+    finally:
+        root.dump_mode = prev_dump_mode
+
     return res
+
+
+def j2_secret(value: Any, root, dump: bool, node) -> str:
+    """Similar to !j2, but never returns the value when dumping."""
+    if dump:
+        return node
+    return j2(value, root)
 
 
 def func(node: Any, dump):
@@ -240,6 +255,7 @@ def add_tags():
         plugins.TagSpec("!expr", expr),
         plugins.TagSpec("!func", func),
         plugins.TagSpec("!j2", j2),
+        plugins.TagSpec("!j2_secret", j2_secret),
         plugins.TagSpec("!ref", ref),
         plugins.TagSpec("!option", option),
     ]

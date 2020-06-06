@@ -286,13 +286,13 @@ Returns a reference to a function. Useful for lightweight dependency injection.
 
 Example usage:
 
-.. code-block:: python
+.. code-block:: yaml
 
     # call using kwargs
     func_3: !func
-    call: os:getenv                 # <module>:<func>
-    args: ["MISSING"]               # list of positional arguments
-    kwargs: {default: foo}          # map of keyword arguments
+      call: os:getenv                 # <module>:<func>
+      args: ["MISSING"]               # list of positional arguments
+      kwargs: {default: foo}          # map of keyword arguments
 
 The above will return a "partial" reference to ``os.getenv``. This is equivalent to
 ``functools.partial(os.getenv, "MISSING", default="foo")``
@@ -326,10 +326,10 @@ And in the configuration
         my_arg: !option myarg
         unset: !option unset|mydefault
 
-!j2
+!j2 / !j2_secret
 ---
 
-Allow the use of Jinja2 expressions.  The context for rendering is shared with the
+Allow the use of Jinja2 templates.  The context for rendering is shared with the
 ``!expr`` and can be extended with the same ``expr_globals`` plugin hook.
 
 In practice, in the snippet bellow, ``foo1`` and ``foo2`` are equivalent
@@ -338,8 +338,10 @@ In practice, in the snippet bellow, ``foo1`` and ``foo2`` are equivalent
     foo1: !expr f"This is a number = {c.myvar}"
     foo2: !j2 This is a number = {c.myvar}
 
+We also provide `!j2_secret` to be used when dealing with sensitive data
+
 Note that  Jinja2 **is not installed by default**, you should install yourself by
-running `pip install jinja2`
+running `pip install jinja2`.
 
 
 !dump_raw

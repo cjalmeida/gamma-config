@@ -63,6 +63,8 @@ def test_sample_dump(monkeypatch):
     # assert secret env was not dumped
     assert loaded["sample_env"]["user"] == os.environ["USER"]
     assert not isinstance(loaded["sample_env"]["secret_user"], str)
+    assert isinstance(loaded["nested"]["composite"], str)
+    assert not isinstance(loaded["nested"]["secret"], str)
 
     # dump again, with original tags
     dump = config.to_yaml(resolve_tags=False)

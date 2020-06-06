@@ -50,3 +50,14 @@ sample_func:
     kwargs:
       key: MISSING
       default: foo
+
+nested:
+  # in dev you should override those with a 21-db.local.yaml file
+  # in prod, you should override with a 90-db.yaml containing externally sourced
+  # credentials
+  foo: my_data
+  bar: my_other_data
+
+  # the SQLAlchemy URL to connect to the DB instance
+  composite: !j2 "composite:{{c.nested.foo}}:{{c.nested.bar}}"
+  secret: !j2_secret "composite:{{c.nested.foo}}:{{c.nested.bar}}"
