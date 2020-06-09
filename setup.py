@@ -2,7 +2,6 @@
 
 """The setup script."""
 
-import glob
 import os
 
 from setuptools import find_namespace_packages, setup

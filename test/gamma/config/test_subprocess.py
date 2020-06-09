@@ -1,5 +1,6 @@
 import multiprocessing as mp
 import threading
+
 import pytest
 
 
@@ -27,10 +28,7 @@ def _run_sub():
 
 
 def test_actual_subprocess(monkeypatch, caplog):
-
-    from gamma.config import subprocess, config as config_mod
-
-    print("local", config_mod._config_store)
+    from gamma.config import subprocess
 
     env = {}
     with subprocess.propagate_subprocess(env) as (env_key, env_val):
@@ -42,34 +40,37 @@ def test_actual_subprocess(monkeypatch, caplog):
     assert proc.exitcode == 0
 
 
+def _sub(_local_store):
+    assert not hasattr(_local_store, "foo")
+    _local_store.foo = 200
+    assert _local_store.foo == 200
+
+
 def test_local_store_thread():
     from gamma.config.config import LocalStore
+
+    # import ipdb; ipdb.set_trace()
 
     _local_store = LocalStore()
     # _local_store = threading.local()
     _local_store.foo = 100
 
-    def _sub():
-        assert not hasattr(_local_store, "foo")
-        _local_store.foo = 200
-        assert _local_store.foo == 200
-
     # expected single thread behavior
     assert _local_store.foo == 100
     with pytest.raises(AssertionError):
-        _sub()  # same thread
+        _sub(_local_store)  # same thread
 
     assert _local_store.foo == 100
 
     # expect behavior similar to threading.local for another thread
-    t = threading.Thread(target=_sub)
+    t = threading.Thread(target=_sub, args=[_local_store])
     t.start()
     t.join()
 
     assert _local_store.foo == 100
 
     # expect thread-local behavior but with forked process
-    p = mp.Process(target=_sub)
+    p = mp.Process(target=_sub, args=[_local_store])
     p.start()
     p.join()
     assert p.exitcode == 0  # this fails if you use threading.local as store

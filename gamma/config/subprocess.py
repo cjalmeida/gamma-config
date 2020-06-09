@@ -1,8 +1,9 @@
 import contextlib
-import tempfile
+import copy
 import os
 import pickle
-import copy
+import tempfile
+from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 ENV_KEY = "GAMMA_CONFIG_SERIALIZED"
@@ -25,12 +26,15 @@ def propagate_subprocess(env: Optional[Dict[str, str]] = None) -> Tuple[str, str
 
     env = os.environ if env is None else env
 
-    with tempfile.NamedTemporaryFile("wb") as tf:
-        config = get_config()
-        serialize(config, tf)
-        tf.flush()
-        env[ENV_KEY] = tf.name
-        yield ENV_KEY, tf.name
+    # Use temporary directory because windows locks files exclusively on open
+    with tempfile.TemporaryDirectory() as td:
+        tf = Path(td) / "config.pkl"
+        with tf.open("wb") as fo:
+            config = get_config()
+            serialize(config, fo)
+            fo.flush()
+        env[ENV_KEY] = str(tf)
+        yield ENV_KEY, str(tf)
         del env[ENV_KEY]
 
 

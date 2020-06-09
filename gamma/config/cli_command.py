@@ -20,12 +20,11 @@ def scaffold(target, force):
     """Initialize the config folder with samples"""
 
     import shutil
-    import os
     from pathlib import Path
     import gamma.config as root_mod
 
     if not target:
-        target = os.path.abspath(root_mod.get_project_home())
+        target = root_mod.get_project_home()
 
     target = Path(target)
     confdir: Path = target / "config"

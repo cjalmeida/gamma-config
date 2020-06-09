@@ -1,23 +1,18 @@
+import copy
 import inspect
 import os
+import threading
+import weakref
 from abc import ABC, abstractproperty
-from typing import (
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Mapping,
-    Optional,
-    Set,
-    Type,
-    Any,
-)
-import copy
+from collections import UserDict
+from pathlib import Path, WindowsPath
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Set
+
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedBase
-import threading
-from collections import UserDict
-from . import dict_merge, tags as tags_module, subprocess
+
+from . import dict_merge, subprocess
+from . import tags as tags_module
 
 blacklist: Set[str] = set()
 
@@ -298,6 +293,7 @@ class ConfigLoader(ABC):
 
     def __init__(self, yaml: YAML):
         self.yaml = yaml
+        self.is_windows_path = isinstance(Path(), WindowsPath)
 
     @abstractproperty
     def entries(self) -> List[str]:
@@ -327,7 +323,7 @@ class ConfigLoader(ABC):
         Args:
             entry: An entry URI, in whatever format returned by the ``entries`` method.
         """
-        from urllib.parse import urlsplit, unquote
+        from urllib.parse import urlsplit, unquote_plus
         from pathlib import Path
 
         url = urlsplit(entry)
@@ -335,7 +331,10 @@ class ConfigLoader(ABC):
         if not url.scheme == "file":
             raise Exception(f"Can't understand scheme '{url.scheme}' for URI '{entry}")
 
-        return Path(unquote(url.path)).read_text()
+        path = unquote_plus(url.path)
+        if self.is_windows_path:
+            path = path.lstrip("/")
+        return Path(path).read_text()
 
 
 class MetaConfigLoader(ConfigLoader):
@@ -344,7 +343,8 @@ class MetaConfigLoader(ConfigLoader):
     @property
     def entries(self) -> List[str]:
         home = get_project_home()
-        return [f"file://{home}/config/00-meta.yaml"]
+        meta: Path = home / "config/00-meta.yaml"
+        return [meta.as_uri()]
 
 
 class DefaultConfigLoader(ConfigLoader):
@@ -354,7 +354,7 @@ class DefaultConfigLoader(ConfigLoader):
     def entries(self) -> List[str]:
         from pathlib import Path
 
-        cfg_dir = Path(get_project_home()) / "config"
+        cfg_dir = get_project_home() / "config"
 
         # default
         files: List[Path] = list(cfg_dir.glob("*.yaml"))
@@ -377,40 +377,54 @@ class DefaultConfigLoader(ConfigLoader):
         return files_str
 
 
-class LocalStore(threading.local):
+class LocalStore:
     def __init__(self):
-        self.__dict__["__pid"] = os.getpid()
+        self.__dict__["__threadstore"] = {}
+
+    def __get_store(self):
+        store: dict = object.__getattribute__(self, "__threadstore")
+        key = (os.getpid(), threading.get_ident())
+        if key not in store:
+            store[key] = {}
+
+            def _remove():
+                del store[key]
+
+            weakref.finalize(threading.current_thread(), _remove)
+
+        return store[key]
 
     def __getattribute__(self, name):
         if not name.startswith("__"):
-            object.__getattribute__(self, "__check_pid__")()
+            try:
+                return object.__getattribute__(self, "_LocalStore__get_store")()[name]
+            except KeyError:
+                raise AttributeError(name)
+
         return object.__getattribute__(self, name)
 
     def __setattr__(self, name, value):
         if not name.startswith("__"):
-            object.__getattribute__(self, "__check_pid__")()
-        self.__dict__[name] = value
+            store = object.__getattribute__(self, "_LocalStore__get_store")()
+            store[name] = value
+        else:
+            self.__dict__[name] = value
 
     def __delattr__(self, name):
-        if not name.startswith("__"):
-            object.__getattribute__(self, "__check_pid__")()
         try:
-            del self.__dict__[name]
+            if not name.startswith("__"):
+                store = object.__getattribute__(self, "_LocalStore__get_store")()
+                del store[name]
+            else:
+                del self.__dict__[name]
         except KeyError:
             raise AttributeError(name)
-
-    def __check_pid__(self):
-        d = self.__dict__
-
-        if d["__pid"] != os.getpid():
-            d.clear()
-            d["__pid"] = os.getpid()
 
 
 _config_store = LocalStore()
 
 
-def get_project_home() -> str:
+def get_project_home() -> Path:
     """Return the location for project home.
 
     Overridable with the PROJECT_HOME environment variable.
@@ -418,7 +432,7 @@ def get_project_home() -> str:
     This can be used in scripts or tests to change the expected location of the
     project home without changing cwd.
     """
-    return os.getenv("PROJECT_HOME", os.path.abspath(os.path.dirname(os.curdir)))
+    return Path(os.getenv("PROJECT_HOME", os.path.abspath(os.path.dirname(os.curdir))))
 
 
 def reset_config() -> None:
