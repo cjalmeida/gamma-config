@@ -1,5 +1,5 @@
-from click.testing import CliRunner
 import click
+from click.testing import CliRunner
 
 
 def test_cli_option():

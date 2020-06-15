@@ -1,4 +1,5 @@
-from click import Option as ClickOption, option as click_option
+from click import Option as ClickOption
+from click import option as click_option
 
 
 class ConfigOption(ClickOption):

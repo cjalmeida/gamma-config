@@ -1,3 +1,4 @@
+# flake8: noqa
 from gamma.cli import plugins
 
 

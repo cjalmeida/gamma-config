@@ -1,5 +1,7 @@
 import os
+
 import pytest
+
 
 def test_dump_raw():
     from gamma.config import config
