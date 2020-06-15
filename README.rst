@@ -301,12 +301,15 @@ The above will return a "partial" reference to ``os.getenv``. This is equivalent
 !option
 -------
 
-Enables you to reference Click ``@click.option`` in your configuration.
+Enables you to reference a **Click** ``@click.option`` in your configuration.
 
 To capture an option, use ``gamma.config.cli.option`` decorator as a drop-in replacement
-for ``click.option``. This accept default values using the ``|`` (pipe) separator.
+for ``click.option``. This accept default values in config using the
+``|`` (pipe) separator.
 
 Example:
+
+Define your command line using **Click** as usual:
 
 .. code-block:: python
 
@@ -315,8 +318,10 @@ Example:
 
     @click.command()
     @option('-m', '--myarg')
-    def my_command(myarg):
-        ...
+    @option('-o', '--otherarg')
+    def my_command(myarg, otherarg):
+        """do something"""
+
 
 And in the configuration
 
@@ -324,10 +329,28 @@ And in the configuration
 
     sample_key:
         my_arg: !option myarg
+        other: !option otherarg|other
         unset: !option unset|mydefault
 
+
+When calling your script with ``myscript.py --myarg foo``, should result in:
+
+.. code-block:: python
+
+    from gamma.config import get_config
+
+    config = get_config()
+    assert config["sample_key"]["myarg"] == "foo"
+    assert config["sample_key"]["otherarg"] == "other"
+    assert config["sample_key"]["unset"] == "mydefault"
+
+Note: The ``@option`` default of ``None`` is handled as "unset value". This means that
+you must either provide a non-``None`` default to your option or provide a `|default`
+to your configuration.
+
+
 !j2 / !j2_secret
----
+----------------
 
 Allow the use of Jinja2 templates.  The context for rendering is shared with the
 ``!expr`` and can be extended with the same ``expr_globals`` plugin hook.

@@ -234,6 +234,8 @@ def option(value: str):
     value, default = _split_default(value)
     try:
         opt_value = get_option(value)
+        if opt_value is None:
+            opt_value = default
     except KeyError:
         opt_value = default
 

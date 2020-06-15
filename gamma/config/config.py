@@ -18,9 +18,11 @@ from ruamel.yaml.comments import CommentedBase
 import threading
 from collections import UserDict
 from . import dict_merge, tags as tags_module, subprocess
+import logging
 
 blacklist: Set[str] = set()
 
+logger = logging.getLogger(__name__)
 
 class EnvironmentFolderException(Exception):
     def __init__(self, folder, **kwargs):
@@ -310,9 +312,15 @@ class ConfigLoader(ABC):
         """Load YAML config entries into a Config object.
         """
 
-        entries = sorted(self.entries, key=lambda x: x[0])
+        def _sort_key(el: str):
+            splits = el.rsplit("/", 1)
+            return splits[0] if len(splits) == 1 else splits[1]
+
+        entries = sorted(self.entries, key=_sort_key)
         for entry in entries:
             content = self.get_content(entry)
+            if not content.strip():
+                logger.warning(f"Entry '{entry}' is empty. Skipping")
             data = self.yaml.load(content)
             config.push(data)
 
