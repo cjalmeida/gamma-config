@@ -345,7 +345,7 @@ When calling your script with ``myscript.py --myarg foo``, should result in:
     assert config["sample_key"]["unset"] == "mydefault"
 
 Note: The ``@option`` default of ``None`` is handled as "unset value". This means that
-you must either provide a non-``None`` default to your option or provide a `|default`
+you must either provide a non-``None`` default to your option or provide a ``|default``
 to your configuration.
 
 
