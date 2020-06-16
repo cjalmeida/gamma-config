@@ -7,4 +7,4 @@ dotenv.load_dotenv(f"{HOME}/config.local.env")
 dotenv.load_dotenv(f"{HOME}/config.env")
 
 
-__version__ = "0.1.12"
+__version__ = "0.1.13"
