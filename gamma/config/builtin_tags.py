@@ -182,7 +182,7 @@ def func(node: Any, dump):
         return curried
 
 
-def ref(value: Any, root: Config) -> Any:
+def ref(value: Any, root: Config, dump) -> Any:
     """References other entries in the config object.
 
     Navigate the object using the dot notation. Complex named keys can be accessed
@@ -201,7 +201,13 @@ def ref(value: Any, root: Config) -> Any:
         tokens.append(token)
         token = lex.get_token()
 
-    return functools.reduce(operator.getitem, tokens, root)
+    try:
+        root.dump_mode = False
+        parent = functools.reduce(operator.getitem, tokens[:-1], root)
+    finally:
+        root.dump_mode = dump
+
+    return parent[tokens[-1]]
 
 
 @plugins.hookimpl
