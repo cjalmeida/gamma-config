@@ -137,17 +137,22 @@ def func(node: Any, dump):
     Functions are provided as a mapping in the structure below:
 
         my_function: !func
-            call: <module>:<func_name>  # reference to the callable
+            ref: <module>:<func_name>   # reference to the callable
             args: [<arg1>, <arg2>]      # (optional) positional args
             kwargs:                     # (optional) keyword args
                 <param1>: <value1>
                 <param2>: <value2>
             dump: <dump>                # (optional) dump mode behavior
+            call: <call>                # (optional) call function instead of
+                                        #            returning partial
 
-    The function is resolved and a ``partial`` is returned. The ``dump`` arg defaults
-    to ``false`` and means the function is not resolved during serialization. If
-    ``true``, the function is called and it's content resolved - as expected this
-    won't work for partials that require extra configuration.
+    If ``call`` is ``false`` (the default), the config returns a ``partial`` on
+    access, otherwise, it will call the function and return the output value.
+
+    The ``dump`` arg defaults to ``false`` and means the function is not resolved
+    during serialization. If ``true``, the function is called and it's content
+    resolved - as expected this won't work for partials that require
+    extra configuration.
     """
 
     import importlib
@@ -156,15 +161,15 @@ def func(node: Any, dump):
     assert isinstance(node, Dict), "Value should be a mapping"
 
     param_keys = set(node.keys())
-    expected_keys = set(["call", "args", "kwargs", "dump"])
+    expected_keys = set(["ref", "args", "kwargs", "dump", "call"])
     extra = param_keys - expected_keys
     assert not extra, f"Extra keys found in !func configuration: {extra}"
 
     try:
-        module_name, func_name = node["call"].split(":")
+        module_name, func_name = node["ref"].split(":")
     except ValueError as ex:
         raise ValueError(
-            "Error parsing callable: '" + node["call"] + "'. Expecting <module>:<func>"
+            "Error parsing callable: '" + node["ref"] + "'. Expecting <module>:<func>"
         ) from ex
     module = importlib.import_module(module_name)
     _func = getattr(module, func_name)
@@ -173,11 +178,14 @@ def func(node: Any, dump):
     kwargs = node.get("kwargs", {})
     curried = partial(_func, *args, **kwargs)
 
+    to_call = node.get("call", False)
     to_dump = node.get("dump", False)
     if dump and to_dump:
         return curried()
     elif dump and not to_dump:
         return node
+    elif to_call:
+        return curried()
     else:
         return curried
 

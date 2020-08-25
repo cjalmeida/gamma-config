@@ -35,21 +35,26 @@ sample_expr:
 sample_func:
   # Sample returning a function reference
 
-  # call function without arg
+  # partial function without arg
   func_1: !func
-    call: os:getcwd
+    ref: os:getcwd
 
-  # call using positional args
+  # partial using positional args
   func_2: !func
-    call: os:getenv
+    ref: os:getenv
     args: ["USER"]
 
-  # call using kwargs
+  # partial using kwargs
   func_3: !func
-    call: os:getenv
+    ref: os:getenv
     kwargs:
       key: MISSING
       default: foo
+
+  # call func
+  func_4: !func
+    ref: os:getcwd
+    call: true
 
 nested:
   # in dev you should override those with a 21-db.local.yaml file

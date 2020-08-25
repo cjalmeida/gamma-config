@@ -27,6 +27,7 @@ def test_load_sample(caplog, monkeypatch):
     assert config["sample_func"]["func_1"]() == os.getcwd()
     assert config["sample_func"]["func_2"]() == os.getenv("USER")
     assert config["sample_func"]["func_3"]() == os.getenv(key="MISSING", default="foo")
+    assert config["sample_func"]["func_4"] == os.getcwd()
 
     # assert dot access
     assert config.sample_func.func_1() == os.getcwd()
