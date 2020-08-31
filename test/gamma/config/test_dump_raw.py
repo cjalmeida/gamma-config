@@ -17,6 +17,13 @@ def test_dump_raw():
 
     normal:
       bar: !j2 "{{ env.USER }}"
+
+    myfunc: !func
+      ref: os:getenv
+
+    deep:
+      nested:
+        value: !ref normal.bar
     """
 
     cfg = config.create_config_from_string(src)
@@ -25,6 +32,7 @@ def test_dump_raw():
 
     # test to_dict
     dump = cfg.to_dict()
+    assert not cfg._dump_mode
     assert dump["normal"]["bar"] == os.getenv("USER")
     assert hasattr(dump["raw"]["bar"], "tag")
     assert dump["raw"]["bar"].tag.value == "!j2"
@@ -33,6 +41,8 @@ def test_dump_raw():
     # should affect nested when dumping parent or above
     assert dump["raw"]["nested"]["foo"].tag.value == "!j2"
     assert cfg.raw.to_dict()["nested"]["foo"].tag.value == "!j2"
+    assert cfg.deep.nested.to_dict()["value"] == os.getenv("USER")
+    assert not cfg._dump_mode
 
     # to_json should raise a type error because tags are not JSON serializable
     with pytest.raises(TypeError):

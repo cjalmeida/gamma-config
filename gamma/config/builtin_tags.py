@@ -209,11 +209,12 @@ def ref(value: Any, root: Config, dump) -> Any:
         tokens.append(token)
         token = lex.get_token()
 
+    old_mode = root.dump_mode
     try:
         root.dump_mode = False
         parent = functools.reduce(operator.getitem, tokens[:-1], root)
     finally:
-        root.dump_mode = dump
+        root.dump_mode = old_mode
 
     return parent[tokens[-1]]
 
