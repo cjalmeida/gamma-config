@@ -42,6 +42,7 @@ def test_dump_raw():
     assert dump["raw"]["nested"]["foo"].tag.value == "!j2"
     assert cfg.raw.to_dict()["nested"]["foo"].tag.value == "!j2"
     assert cfg.deep.nested.to_dict()["value"] == os.getenv("USER")
+    assert dump["myfunc"].tag.value == "!func"
     assert not cfg._dump_mode
 
     # to_json should raise a type error because tags are not JSON serializable

@@ -224,6 +224,15 @@ class Renderer:
         ):
             return self.render_tag(val)
 
+        # return tags as is if we're in dump mode
+        if (
+            self.dump
+            and isinstance(val, CommentedBase)
+            and hasattr(val, "tag")
+            and val.tag.value is not None
+        ):
+            return val
+
         # sub mapping as config for lazy rendering
         if isinstance(val, Mapping) and not self.dump:
             sub = Config(val, parent=self.config)
