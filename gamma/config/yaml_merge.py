@@ -1,7 +1,9 @@
 """Implements the dictionary merging functionality"""
 
 from copy import deepcopy
-from typing import Mapping
+from typing import Mapping, Optional
+
+from ruamel.yaml.comments import CommentedBase
 
 
 def merge(target, patch):
@@ -10,10 +12,15 @@ def merge(target, patch):
     for key in patch:
         patch_val = patch[key]
         target_val = target.get(key)
+        hint = _get_hint(patch_val)
 
         # handle new keys
         if key not in target:
             target[key] = deepcopy(patch_val)
+
+        # check for any merge hints
+        elif hint and hint == "merge_replace":
+            target[key] = patch_val
 
         # handle list merge
         elif isinstance(target_val, list) and isinstance(patch_val, list):
@@ -29,3 +36,14 @@ def merge(target, patch):
 
         else:
             target[key] = deepcopy(patch_val)
+
+
+def _get_hint(val) -> Optional[str]:
+    if isinstance(val, CommentedBase):
+        if val.ca.comment and val.ca.comment[0] and val.ca.comment[0].value:
+            line = val.ca.comment[0].value.strip().lstrip("#").strip()
+            if line.startswith("@hint:"):
+                hint = line[6:].strip()
+                return hint
+
+    return None
