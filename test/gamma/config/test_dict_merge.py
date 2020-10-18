@@ -82,6 +82,17 @@ def test_hints():
     merge(target, patch)
     assert target == {"foo": {"b": 20, "c": 30}}
 
+    # test nested maps with tags
+    target = {"foo": {"args": [1]}}
+    patch = yaml.load(
+        """
+        foo: !bar # @hint: merge_replace
+          args: [2]
+        """
+    )
+    merge(target, patch)
+    assert target == {"foo": {"args": [2]}}
+
     # test some hint syntax variants - 1
     target = {"foo": {"a": 1, "b": 2}}
     patch = yaml.load(

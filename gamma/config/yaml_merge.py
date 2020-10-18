@@ -4,6 +4,7 @@ from copy import deepcopy
 from typing import Mapping, Optional
 
 from ruamel.yaml.comments import CommentedBase
+import itertools
 
 
 def merge(target, patch):
@@ -40,10 +41,24 @@ def merge(target, patch):
 
 def _get_hint(val) -> Optional[str]:
     if isinstance(val, CommentedBase):
-        if val.ca.comment and val.ca.comment[0] and val.ca.comment[0].value:
-            line = val.ca.comment[0].value.strip().lstrip("#").strip()
-            if line.startswith("@hint:"):
-                hint = line[6:].strip()
-                return hint
+        stack = [val.ca.comment]
+        comments = []
+
+        # flatten comment hierarchy. can't use itertools.chain here :(
+        while stack:
+            item = stack.pop(0)
+            if item and hasattr(item, "value"):
+                comments.append(item)
+            elif isinstance(item, list):
+                for sub in item:
+                    if sub:
+                        stack.append(sub)
+
+        for cm in comments:
+            if cm.value:
+                line = cm.value.strip().lstrip("#").strip()
+                if line.startswith("@hint:"):
+                    hint = line[6:].strip()
+                    return hint
 
     return None
