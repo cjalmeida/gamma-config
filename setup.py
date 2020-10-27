@@ -6,6 +6,8 @@ import os
 
 from setuptools import find_namespace_packages, setup
 
+VERSION=os.getenv("VERSION", "0.1.19")
+
 with open("README.rst") as readme_file:
     readme = readme_file.read()
 
@@ -55,7 +57,7 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/devex-br/gamma-config",
-    version="0.1.19",
+    version=VERSION,
     zip_safe=False,
     entry_points={"gamma.cli": ["config-cli = gamma.config.cli_plugin"]},
 )

@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import httpx
+import os
+import subprocess
+import dotenv
+import json
+
+dotenv.load_dotenv(".env")
+dotenv.load_dotenv(".local.env")
+
+BASE = "https://github.gamma.bcg.com/api/v3"
+REPO = "BCG/gamma-config"
+
+gh_user = os.getenv("GITHUB_USER")
+gh_token = os.getenv("GITHUB_TOKEN")
+
+
+def publish():
+    if not gh_token:
+        print("ERROR: Missing GITHUB_TOKEN. You need a Github personal access token.")
+        raise SystemExit(1)
+
+    if not gh_user:
+        print("ERROR: Missing GITHUB_USER. You need a Github personal access token.")
+        raise SystemExit(1)
+
+    cp = subprocess.run("git status -s", shell=True, check=True, stdout=subprocess.PIPE)
+    dirty = cp.stdout.strip() != b""
+
+    if dirty:
+        print("ERROR: Repository is dirty")
+        raise SystemExit(1)
+
+    cp = subprocess.run(
+        "git describe", shell=True, check=True, stdout=subprocess.PIPE
+    )
+    version = cp.stdout.strip().decode()
+
+    # build wheel
+    cmd = "rm dist/*.whl && python setup.py bdist_wheel"
+    env = {"VERSION": version}
+    subprocess.run(cmd, shell=True, check=True, env=env)
+
+    # create a release
+    auth = (gh_user, gh_token)
+    body = {"tag_name": version}
+    r = httpx.post(f"{BASE}/repos/{REPO}/releases", json=body, auth=auth)
+    r.raise_for_status()
+    upload_url = r.json()["upload_url"]
+    upload_url = upload_url[:upload_url.index("{")]  # get URL up to the first {
+
+    # upload releases
+    headers = {"content-type": "application/x-wheel+zip"}
+    for whl in Path("dist").glob("*.whl"):
+        print(f"Uploading: {whl}")
+        name = whl.name
+        url = upload_url + f"?name={name}"
+        with whl.open("rb") as fo:
+            r = httpx.post(url, content=fo, headers=headers, auth=auth)
+            r.raise_for_status()
+
+
+publish()
