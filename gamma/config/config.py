@@ -12,7 +12,7 @@ from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Set
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedBase
 
-from . import dict_merge, subprocess
+from . import yaml_merge, subprocess
 from . import tags as tags_module
 
 blacklist: Set[str] = set()
@@ -101,7 +101,7 @@ class Config(UserDict):
 
     def _merge_data(self, partial: Mapping):
         """Merge a partial with the current state"""
-        dict_merge.merge(self.data, partial)
+        yaml_merge.merge(self.data, partial)
 
     def __getitem__(self, key):
         val = self.data[key]

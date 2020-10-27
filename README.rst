@@ -96,6 +96,9 @@ environment overrides. We provide by default sample ``dev`` and ``prod`` environ
 The environment to use is set in the ``environment`` entry in the ``00-meta.yaml`` file.
 By default it tries to load from the ``ENVIRONMENT`` system environment variable.
 
+Strategic merging
+-----------------
+
 The YAML files are parsed and converted to Python dicts, then merged using a simple
 algorithm. It's important to note that the order of merge matters, so we sort the
 config files by name adn ensure proper ordering by prefixing them with two digits -
@@ -111,15 +114,21 @@ For example:
         key_a: foo
         key_b: old
         key_c: [1, 2]
+        key_d:
+          foo: 10
+          bar: 20
 
 **config/15-bar.yaml**
 
 .. code-block:: yaml
 
     sample_key:
-        key_b: old
+        key_b: new
         key_c: [2, 3]
-        key_d: bar
+        key_d:
+          foo: 15
+        key_e: inserted
+
 
 After loading the two files above, the result config will contain:
 
@@ -130,9 +139,59 @@ After loading the two files above, the result config will contain:
             "key_a: "bar",
             "key_b": "new,
             "key_c": [1, 2, 3],
-            "key_d": "bar"
+            "key_d": {"foo": 15, "bar": 20},
+            "key_e": "inserted"
         }
     }
+
+If you want change this behavior, you can pass special "parser hints" comments.
+Currently we implement the ``@hint: merge_replace`` hint to fully replace the key value
+instead of trying to merge lists/maps.
+
+The ``@hint`` comment must be placed on the same line of the key you want to it to act.
+
+Same example as above, but with the ``merge_replace`` hints:
+
+
+**config/10-foo.yaml**
+
+.. code-block:: yaml
+
+    sample_key:
+        key_a: foo
+        key_b: old
+        key_c: [1, 2]
+        key_d:
+          foo: 10
+          bar: 20
+
+**config/15-bar.yaml**
+
+.. code-block:: yaml
+
+    sample_key:
+        key_b: new
+        key_c: [2, 3]  # @hint: merge_replace
+        key_d:  # @hint: merge_replace
+          foo: 15
+        key_e: inserted
+
+And the output:
+
+.. code-block:: python
+
+    {
+        "sample_key": {
+            "key_a: "bar",
+            "key_b": "new,
+            "key_c": [2, 3],
+            "key_d": {"foo": 15},
+            "key_e": "inserted"
+        }
+    }
+
+
+
 
 Dotenv (.env) Support
 ---------------------
