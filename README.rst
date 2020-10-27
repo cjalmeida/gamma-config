@@ -3,10 +3,6 @@ Gamma Config
 ============
 
 
->> **Note**: This repository is archived. Please find it in the new home at 
-https://github.gamma.bcg.com/BCG/gamma-config
-
-
 Provides an opinionated way of setting up complex configuration for BCG Gamma pipelines.
 
 Why?
