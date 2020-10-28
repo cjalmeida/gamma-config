@@ -30,6 +30,14 @@ The value of ``config["sub"]`` is a *dict-like* data structure but due to it's d
 nature it's not a true Python ``dict`` and may fail in situations where dicts are
 expected - in particular in multiple serializaion scenarios.
 
+In those situations, you can call ``config.to_dict()`` to resolve the dynamic data
+structure to a plain Python ``dict``. Thus:
+
+.. code-block:: python
+
+    config.sub.to_dict() == {"key_a": "myuser", "key_b": [1, 2, 3]}
+
+
 
 
 
