@@ -6,7 +6,7 @@
 # You can safely remove/replace with your app configurations.
 
 sample_scalar_1: hello world
-sample_scalar_2: this should be overriden by environment
+sample_scalar_2: this should be overriden
 sample_list_1: [1, 2, 3]
 sample_env:
   user: !env USER

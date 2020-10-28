@@ -6,9 +6,10 @@
 # file, so you're not able to use expressions that references other configs here.
 ####
 
-# The environment to load, specified as subfolders of the 'config/' folder.
-# Can be overriden with the 'ENVIRONMENT' environment variable. Defaults to 'dev'
-environment: !env ENVIRONMENT|dev
+# Extra folders to load. By default we include a relative folder dynamically set
+# by the 'ENVIRONMENT' environment. variable
+include_folders:
+  - !env ENVIRONMENT|__unset__
 
 # List the names of any tag you want to disble in the configuration.
 # Note that all tags are enabled during for the 'meta' config.

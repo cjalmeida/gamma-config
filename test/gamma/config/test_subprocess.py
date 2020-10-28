@@ -24,7 +24,7 @@ def _run_sub():
     print("sub", config_mod._config_store)
     new = get_config()
     assert not new._dump_mode
-    assert new["environment"] == new.data["environment"] == "dev"
+    assert new["sample_scalar_1"] == new.data["sample_scalar_1"] == "hello world"
 
 
 def test_actual_subprocess(monkeypatch, caplog):

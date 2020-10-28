@@ -35,20 +35,20 @@ def test_scaffold(test_cwd):
         assert (Path(td) / "config/00-meta.yaml").exists()
 
 
-def test_project_home_env(monkeypatch):
+def test_config_root_env(monkeypatch):
     from gamma.config.cli_command import scaffold
 
     with tempfile.TemporaryDirectory() as td:
-        monkeypatch.setenv("PROJECT_HOME", td)
+        monkeypatch.setenv("GAMMA_CONFIG_ROOT", td + "/config")
 
         runner = CliRunner()
 
         # test scaffolding
-        runner.invoke(scaffold)
+        runner.invoke(scaffold, ["-t", td])
         assert (Path(td) / "config/00-meta.yaml").exists()
 
         # test loading
         from gamma.config import get_config
 
         config = get_config()
-        assert config["environment"] == "dev"
+        assert config["sample_scalar_1"] == "hello world"

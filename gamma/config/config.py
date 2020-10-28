@@ -20,11 +20,6 @@ blacklist: Set[str] = set()
 logger = logging.getLogger(__name__)
 
 
-class EnvironmentFolderException(Exception):
-    def __init__(self, folder, **kwargs):
-        super().__init__(f"Environment folder '{folder}' not found.", **kwargs)
-
-
 class Config(UserDict):
     """Represents a configuration value, potentially returned from resolving a tag.
 
@@ -360,8 +355,8 @@ class MetaConfigLoader(ConfigLoader):
 
     @property
     def entries(self) -> List[str]:
-        home = get_project_home()
-        meta: Path = home / "config/00-meta.yaml"
+        home = get_config_root()
+        meta: Path = home / "00-meta.yaml"
         return [meta.as_uri()]
 
 
@@ -372,7 +367,7 @@ class DefaultConfigLoader(ConfigLoader):
     def entries(self) -> List[str]:
         from pathlib import Path
 
-        cfg_dir = get_project_home() / "config"
+        cfg_dir = get_config_root()
 
         # default
         files: List[Path] = list(cfg_dir.glob("*.yaml"))
@@ -380,18 +375,17 @@ class DefaultConfigLoader(ConfigLoader):
 
         # environment
         meta = get_meta_config()
-        environment = meta["environment"]
-        env_dir = cfg_dir / environment
+        for entry in meta["include_folders"]:
+            include_dir = cfg_dir / entry
 
-        if env_dir.exists():
-            files += list(env_dir.glob("*.yaml"))
-            files += list(env_dir.glob("*.yml"))
-        else:
-            raise EnvironmentFolderException(env_dir)
+            if include_dir.exists():
+                files += list(include_dir.glob("*.yaml"))
+                files += list(include_dir.glob("*.yml"))
 
         # use the file name as sort key, regardless of folder
         files.sort(key=lambda f: f.name)
         files_str = [str(f.absolute().as_uri()) for f in files]
+
         return files_str
 
 
@@ -442,15 +436,35 @@ class LocalStore:
 _config_store = LocalStore()
 
 
-def get_project_home() -> Path:
-    """Return the location for project home.
+def load_dotenv(root: Path = None):
+    """Load dotenv files located in:
 
-    Overridable with the PROJECT_HOME environment variable.
+        {config_root}/../config.local.env
+        {config_root}/../config.env
+    """
+
+    import dotenv
+
+    if root is None:
+        get_config_root()
+    else:
+        home = root.parent
+        dotenv.load_dotenv(f"{home}/config.local.env")
+        dotenv.load_dotenv(f"{home}/config.env")
+
+
+def get_config_root() -> Path:
+    """Return the location for config root path.
+
+    Overridable with the GAMMA_CONFIG_ROOT environment variable.
 
     This can be used in scripts or tests to change the expected location of the
-    project home without changing cwd.
+    project home without changing the current working folder.
     """
-    return Path(os.getenv("PROJECT_HOME", os.path.abspath(os.path.dirname(os.curdir))))
+
+    root = Path(os.getenv("GAMMA_CONFIG_ROOT", Path("config").absolute()))
+    load_dotenv(root)
+    return root
 
 
 def reset_config() -> None:

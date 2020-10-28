@@ -14,7 +14,7 @@ def test_load_sample(caplog, monkeypatch):
     config = get_config()
 
     # assert meta was loaded
-    assert config["environment"] == "dev"
+    assert len(config["include_folders"])
 
     # assert default was loaded
     assert config["sample_scalar_1"] == "hello world"
@@ -42,7 +42,6 @@ def test_load_sample(caplog, monkeypatch):
     config_mod.reset_config()
     monkeypatch.setenv("ENVIRONMENT", "prod")
     config = get_config()
-    assert config["environment"] == "prod"
     assert config["sample_scalar_2"] == "foobar_prod"
 
 
@@ -52,7 +51,7 @@ def test_sample_dump(monkeypatch):
 
     # load default config
     config = get_config()
-    assert config["environment"] == "dev"
+    assert config["sample_scalar_1"] == "hello world"
 
     # dump resolving tags
     dump = config.to_yaml(resolve_tags=True)
@@ -60,7 +59,7 @@ def test_sample_dump(monkeypatch):
     # load in a regular yaml loader
     yaml = YAML(typ="rt")
     loaded = yaml.load(dump)
-    assert loaded["environment"] == "dev"
+    assert loaded["sample_scalar_1"] == "hello world"
 
     # assert secret env was not dumped
     assert loaded["sample_env"]["user"] == os.environ["USER"]
@@ -72,8 +71,8 @@ def test_sample_dump(monkeypatch):
     dump = config.to_yaml(resolve_tags=False)
     yaml = YAML(typ="rt")
     loaded = yaml.load(dump)
-    assert not isinstance(loaded["environment"], str)
-    assert hasattr(loaded["environment"], "tag")
+    assert not isinstance(loaded["sample_env"]["user"], str)
+    assert hasattr(loaded["sample_env"]["user"], "tag")
 
     # dump to dict
     new_dict = config.to_dict()

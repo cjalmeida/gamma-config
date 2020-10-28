@@ -2,7 +2,6 @@
 Gamma Config
 ============
 
-
 Provides an opinionated way of setting up complex configuration for BCG Gamma pipelines.
 
 Why?
@@ -51,153 +50,64 @@ Core features
 Getting started
 ~~~~~~~~~~~~~~~
 
-Currently the release packages are installed under the `devex-br` private Artifactory
-repository. To configure your access to it:
+Currently the recommended way of installing gamma-config is downloading the *whl*
+asset file in the `Releases <https://github.gamma.bcg.com/BCG/gamma-config/releases>`_
+and install it using ``pip``.
 
-1. Open your `Artifactor Profile Page <https://artifactory.gamma.bcg.com/artifactory/webapp/#/profile>`_
-2. Generate or copy your API Key
-3. Update your `pip` installation if needed
-   ::
+::  code-block: bash
 
-       pip install --upgrade pip
+    pip install ./gamma_config-<release>-py3-none-any.whl
 
-4. Run the command below to configure `pip` to use the repo. Replace `<name>` with the
-   first part of your BCG email.
-   ::
+To use it in your project, you can place the *whl* files in a ``wheels`` folder and
+reference it either via pip's ``-f`` flag or by setting ``PIP_FIND_LINKS`` env var:
 
-       pip config --user set global.extra-index-url https://<name>%40bcg.com:<api_key>@artifactory.gamma.bcg.com/artifactory/api/pypi/local-pypi-8999823-devex-br-01/simple
+:: code-block: bash
 
-You should be able to install the latest released version using ``pip``.
+    # explicity set -f (--find-links) flag
+    pip install gamma-config -f ./wheels
 
-::
-
-    pip install gamma-config
-
-The package comes with "scaffolding" to help you get started. If you have ``gamma-cli``
-installed, you can run ``gamma config scaffold`` or ``python -m gamma.config scaffold``
-otherwise.
 
 Basic Usage
 ~~~~~~~~~~~
 
-Configuration loading
-#####################
+The package comes with "scaffolding" to help you get started. In your project folder:
 
-The ``scaffold`` command will generate a ``config/`` folder with a couple
-of YAML files. The ``00-meta.yaml`` is a "eat your own dogfood" config file where we
-configure *gamma-config* itself. You mostly don't have to deal with it.
+.. code-block:: bash
 
-After the "meta" phase of config loading, any other YAML file is loaded, including
-environment overrides. We provide by default sample ``dev`` and ``prod`` environments.
-The environment to use is set in the ``environment`` entry in the ``00-meta.yaml`` file.
-By default it tries to load from the ``ENVIRONMENT`` system environment variable.
+   python -m gamma.config scaffold
 
-Strategic merging
------------------
-
-The YAML files are parsed and converted to Python dicts, then merged using a simple
-algorithm. It's important to note that the order of merge matters, so we sort the
-config files by name adn ensure proper ordering by prefixing them with two digits -
-a common UNIX convention.
-
-For example:
-
-**config/10-foo.yaml**
+Then create yourself a ``config/20-myconfig.yaml`` file with the contents:
 
 .. code-block:: yaml
 
-    sample_key:
-        key_a: foo
-        key_b: old
-        key_c: [1, 2]
-        key_d:
-          foo: 10
-          bar: 20
+   foo: 1
+   user: !env USER
 
-**config/15-bar.yaml**
-
-.. code-block:: yaml
-
-    sample_key:
-        key_b: new
-        key_c: [2, 3]
-        key_d:
-          foo: 15
-        key_e: inserted
-
-
-After loading the two files above, the result config will contain:
+To access the config from within your Python program:
 
 .. code-block:: python
 
-    {
-        "sample_key": {
-            "key_a: "bar",
-            "key_b": "new,
-            "key_c": [1, 2, 3],
-            "key_d": {"foo": 15, "bar": 20},
-            "key_e": "inserted"
-        }
-    }
+    import os
+    from gamma.config import get_config
 
-If you want change this behavior, you can pass special "parser hints" comments.
-Currently we implement the ``@hint: merge_replace`` hint to fully replace the key value
-instead of trying to merge lists/maps.
+    def run():
 
-The ``@hint`` comment must be placed on the same line of the key you want to it to act.
+        # it's safe and efficient to call this multiple times
+        config = get_config()
 
-Same example as above, but with the ``merge_replace`` hints:
+        # get static value using the dict interface
+        assert config["foo"] == 1
 
+        # or using attribute access
+        assert config.foo == 1
 
-**config/10-foo.yaml**
+        # get dynamic variables
+        assert config["user"] == os.getenv("USER")
+        assert config.user == os.getenv("USER")
 
-.. code-block:: yaml
+Most of the magic is done using. Look at the documentation for info on the tags
+available.
 
-    sample_key:
-        key_a: foo
-        key_b: old
-        key_c: [1, 2]
-        key_d:
-          foo: 10
-          bar: 20
-
-**config/15-bar.yaml**
-
-.. code-block:: yaml
-
-    sample_key:
-        key_b: new
-        key_c: [2, 3]  # @hint: merge_replace
-        key_d:  # @hint: merge_replace
-          foo: 15
-        key_e: inserted
-
-And the output:
-
-.. code-block:: python
-
-    {
-        "sample_key": {
-            "key_a: "bar",
-            "key_b": "new,
-            "key_c": [2, 3],
-            "key_d": {"foo": 15},
-            "key_e": "inserted"
-        }
-    }
-
-
-
-
-Dotenv (.env) Support
----------------------
-
-By default, config will try to load the files ``config.env`` and ``config.local.env``,
-one after another. The expected pattern is to commit ``config.env`` in your VCS (Git)
-and leave ``config.local.env`` for user specific configuration.
-
-Note the ``.env`` files are loaded by simply doing an ``import gamma.config`` even
-before the meta configuration loading.
 
 Using gamma-config in your code
 ###############################
@@ -454,16 +364,3 @@ Calling ``config.to_yaml()`` should output this:
     normal:
         bar: myuser
 
-
-Developing
-~~~~~~~~~~
-
-Relevant environment variables
-##############################
-
-PROJECT_HOME
-------------
-
-You can set the ``PROJECT_HOME`` environment variable to define the "home" location
-where the default config loaders should expect the ``config/`` folder to be. This is
-useful in testing and scripts.

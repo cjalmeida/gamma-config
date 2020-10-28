@@ -24,7 +24,7 @@ def scaffold(target, force):
     import gamma.config as root_mod
 
     if not target:
-        target = root_mod.get_project_home()
+        target = Path(".").absolute()
 
     target = Path(target)
     confdir: Path = target / "config"
