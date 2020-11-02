@@ -32,14 +32,18 @@ def publish():
         print("ERROR: Repository is dirty")
         raise SystemExit(1)
 
-    cp = subprocess.run(
-        "git describe", shell=True, check=True, stdout=subprocess.PIPE
-    )
-    version = cp.stdout.strip().decode()
+    if 'VERSION' not in os.environ:
+        cp = subprocess.run(
+            "git describe", shell=True, check=True, stdout=subprocess.PIPE
+        )
+        version = cp.stdout.strip().decode()
+    else:
+        version = os.getenv("VERSION")
 
     # build wheel
-    cmd = "rm dist/*.whl && python setup.py bdist_wheel"
-    env = {"VERSION": version}
+    cmd = "(rm dist/*.whl || true) && python setup.py bdist_wheel"
+    env = os.environ.copy()
+    env["VERSION"] = version
     subprocess.run(cmd, shell=True, check=True, env=env)
 
     # create a release
