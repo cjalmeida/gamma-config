@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Plugins and Custom Tags &mdash; gamma-config  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Dynamic configs with YAML !tags" href="tags.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> gamma-config
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="meta-config.html">Configuring gamma-config itself</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loading-merging.html">Loading and merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using-your-app.html">Using gamma-config in your code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tags.html">Dynamic configs with YAML !tags</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Plugins and Custom Tags</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-application-tags">Custom application tags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-plugin-subsystem">Using the plugin subsystem</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gamma-config</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Plugins and Custom Tags</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/pages/plugins.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="plugins-and-custom-tags">
+<span id="plugins"></span><h1>Plugins and Custom Tags<a class="headerlink" href="#plugins-and-custom-tags" title="Permalink to this headline">¶</a></h1>
+<p>While you can do a lot with the built-in tags, most of the time you’ll want to augment
+them with custom tags or extra variables in your <code class="docutils literal notranslate"><span class="pre">expr/j2</span></code> evaluation context. In
+this section we’ll see some ways to achieve this.</p>
+<p>We leverage the <a class="reference external" href="https://pluggy.readthedocs.io/en/latest/">Pluggy</a> plugin system to
+provide a structured approach to extending <em>gamma-config</em>.</p>
+<div class="section" id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
+<p>When we read your YAML files, <code class="docutils literal notranslate"><span class="pre">!tag</span></code> nodes are like regular nodes except their
+values (along with some context) are passed through <em>tag handler functions</em>. Those tag
+handler are functions that accept a particular set of arguments and return a value.</p>
+<p>Those functions are called <strong>at the time of key/attribute</strong> access, not when loading
+the config files.</p>
+</div>
+<div class="section" id="custom-application-tags">
+<span id="plugins-custom-app-tags"></span><h2>Custom application tags<a class="headerlink" href="#custom-application-tags" title="Permalink to this headline">¶</a></h2>
+<p>Adding custom tags to your applicaiton (also called <em>application tags</em>) requires:</p>
+<ol class="loweralpha simple">
+<li><p>Creating a <em>tag handler</em> function;</p></li>
+<li><p>Adding the function as a <code class="docutils literal notranslate"><span class="pre">TagSpec</span></code> in the <code class="docutils literal notranslate"><span class="pre">application_tags</span></code> global;</p></li>
+<li><p>Modifying your <code class="docutils literal notranslate"><span class="pre">00-meta.yaml</span></code> to auto-load the module;</p></li>
+</ol>
+<p>In your application code (we’ll call it <code class="docutils literal notranslate"><span class="pre">myapp</span></code>) create a <code class="docutils literal notranslate"><span class="pre">myplugin.py</span></code> file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># file: myapp/myplugin.py</span>
+
+<span class="c1"># let&#39;s load the gamma-config plugins module</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">gamma.config</span> <span class="kn">import</span> <span class="n">plugins</span>
+
+
+<span class="c1"># create a tag handler for !myenv</span>
+<span class="k">def</span> <span class="nf">myenv</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simplified !env tag without default handling&quot;&quot;&quot;</span>
+
+    <span class="n">env_val</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">env_val</span>
+
+<span class="c1"># register in application_tags global</span>
+<span class="n">plugins</span><span class="o">.</span><span class="n">application_tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plugins</span><span class="o">.</span><span class="n">TagSpec</span><span class="p">(</span><span class="s2">&quot;!myenv&quot;</span><span class="p">,</span> <span class="n">myenv</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>And in the <code class="docutils literal notranslate"><span class="pre">00-meta.yaml</span></code> file just add:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">plugins</span><span class="p">:</span>
+  <span class="nt">modules</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&quot;myapp.myplugin&quot;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>You should then be able to use <code class="docutils literal notranslate"><span class="pre">!myenv</span></code> in your config files.</p>
+</div>
+<div class="section" id="using-the-plugin-subsystem">
+<h2>Using the plugin subsystem<a class="headerlink" href="#using-the-plugin-subsystem" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://pluggy.readthedocs.io/en/latest/">Pluggy</a> plugin system is aimed at
+library developers that want to extend gamma-config and automatically load your
+custom tags.</p>
+<p>In summary, the steps are:</p>
+<ol class="loweralpha simple">
+<li><p>Creating a <em>tag handler</em> function inside a custom plugin Python module;</p></li>
+<li><p>Mapping the function to a tag by creating a <em>plugin hook implementation</em> function;</p></li>
+<li><p>Call <code class="docutils literal notranslate"><span class="pre">plugin_manager.register</span></code> to register your Python module as a plugin
+implementation;</p></li>
+<li><p>Setup an entrypoint to your package.</p></li>
+</ol>
+<p>For example, in your application code (we’ll call it <code class="docutils literal notranslate"><span class="pre">myapp</span></code>) create a
+<code class="docutils literal notranslate"><span class="pre">myplugin.py</span></code> file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># file: myapp/myplugin.py</span>
+
+<span class="c1"># let&#39;s load the gamma-config plugins module</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">gamma.config</span> <span class="kn">import</span> <span class="n">plugins</span>
+
+<span class="c1"># create a tag handler for !myenv</span>
+<span class="k">def</span> <span class="nf">myenv</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simplified !env tag without default handling&quot;&quot;&quot;</span>
+
+    <span class="n">env_val</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">env_val</span>
+
+
+<span class="c1"># Create a &quot;hookimpl&quot; to register the tag. The hookimpl *must* be named &quot;add_tags&quot;</span>
+<span class="nd">@plugins</span><span class="o">.</span><span class="n">hookimpl</span>
+<span class="k">def</span> <span class="nf">add_tags</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Add custom tags to gamma-config&quot;&quot;&quot;</span>
+
+    <span class="c1"># you can have multiple &quot;TagSpec&quot; here.</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">plugins</span><span class="o">.</span><span class="n">TagSpec</span><span class="p">(</span><span class="s2">&quot;!myenv&quot;</span><span class="p">,</span> <span class="n">myenv</span><span class="p">),</span>
+    <span class="p">]</span>
+
+<span class="c1"># register the current module as a plugin source</span>
+<span class="n">plugins</span><span class="o">.</span><span class="n">plugin_manager</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>There are many ways to setup an entrypoint, here you can find the full <a class="reference external" href="https://packaging.python.org/specifications/entry-points/">Entry points specification</a>
+from official <em>Python Packaging</em> docs. If you’re using <em>setuptoools</em> a typical
+configuration would be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span>
+    <span class="o">...</span><span class="p">,</span>                                <span class="c1"># the rest of your setup spec</span>
+    <span class="n">entry_points</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;gamma.config&quot;</span><span class="p">:</span> <span class="p">[</span>               <span class="c1"># the &quot;group&quot; must be &#39;gamma.config&#39;</span>
+            <span class="s2">&quot;myapp = myapp.myplugin&quot;</span><span class="p">,</span>   <span class="c1"># the &quot;object reference&quot; must be the plugin module</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="tags.html" class="btn btn-neutral float-left" title="Dynamic configs with YAML !tags" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Boston Consulting Group
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting started &mdash; gamma-config  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuring gamma-config itself" href="meta-config.html" />
+    <link rel="prev" title="Welcome to gamma-config’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> gamma-config
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="meta-config.html">Configuring gamma-config itself</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loading-merging.html">Loading and merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using-your-app.html">Using gamma-config in your code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tags.html">Dynamic configs with YAML !tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins and Custom Tags</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gamma-config</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Getting started</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/pages/getting-started.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>Currently the recommended way of installing gamma-config is downloading the <em>whl</em>
+asset file in the <a class="reference external" href="https://github.gamma.bcg.com/BCG/gamma-config/releases">Releases</a>
+and install it using <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install ./gamma_config-&lt;release&gt;-py3-none-any.whl
+</pre></div>
+</div>
+<p>To use it in your project, you can place the <em>whl</em> files in a <code class="docutils literal notranslate"><span class="pre">wheels</span></code> folder and
+reference it either via pip’s <code class="docutils literal notranslate"><span class="pre">-f</span></code> flag or by setting <code class="docutils literal notranslate"><span class="pre">PIP_FIND_LINKS</span></code> env var:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># explicity set -f (--find-links) flag</span>
+pip install gamma-config -f ./wheels
+</pre></div>
+</div>
+<p>The package comes with “scaffolding” to help you get started. If you have <code class="docutils literal notranslate"><span class="pre">gamma-cli</span></code>
+installed, you can run <code class="docutils literal notranslate"><span class="pre">gamma</span> <span class="pre">config</span> <span class="pre">scaffold</span></code> or <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">gamma.config</span> <span class="pre">scaffold</span></code>
+otherwise.</p>
+<div class="section" id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>The package comes with “scaffolding” to help you get started. In your project folder:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m gamma.config scaffold
+</pre></div>
+</div>
+<p>Then create yourself a <code class="docutils literal notranslate"><span class="pre">config/20-myconfig.yaml</span></code> file with the contents:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">foo</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="nt">user</span><span class="p">:</span> <span class="kt">!env</span> <span class="l l-Scalar l-Scalar-Plain">USER</span>
+</pre></div>
+</div>
+<p>To access the config from within your Python program:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">gamma.config</span> <span class="kn">import</span> <span class="n">get_config</span>
+
+<span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+
+    <span class="c1"># it&#39;s safe and efficient to call this multiple times</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+
+    <span class="c1"># get static value using the dict interface</span>
+    <span class="k">assert</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+
+    <span class="c1"># or using attribute access</span>
+    <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">foo</span> <span class="o">==</span> <span class="mi">1</span>
+
+    <span class="c1"># get dynamic variables</span>
+    <span class="k">assert</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;USER&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">user</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;USER&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Most of the magic is done using YAML tags like <code class="docutils literal notranslate"><span class="pre">!env</span></code> above. Look at the
+<a class="reference internal" href="tags.html#tags"><span class="std std-ref">Dynamic configs with YAML !tags</span></a> section for info on the tags available.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="meta-config.html" class="btn btn-neutral float-right" title="Configuring gamma-config itself" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to gamma-config’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Boston Consulting Group
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

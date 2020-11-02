@@ -1,0 +1,400 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dynamic configs with YAML !tags &mdash; gamma-config  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Plugins and Custom Tags" href="plugins.html" />
+    <link rel="prev" title="Using gamma-config in your code" href="using-your-app.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> gamma-config
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="meta-config.html">Configuring gamma-config itself</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loading-merging.html">Loading and merging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using-your-app.html">Using gamma-config in your code</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dynamic configs with YAML !tags</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#built-in-tags">Built-in Tags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#env">!env</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#env-secret">!env_secret</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ref">!ref</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#expr">!expr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#func">!func</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#option">!option</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#j2-j2-secret">!j2 / !j2_secret</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dump-raw">!dump_raw</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins and Custom Tags</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gamma-config</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Dynamic configs with YAML !tags</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/pages/tags.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dynamic-configs-with-yaml-tags">
+<span id="tags"></span><h1>Dynamic configs with YAML !tags<a class="headerlink" href="#dynamic-configs-with-yaml-tags" title="Permalink to this headline">¶</a></h1>
+<p>We believe <em>gamma-config</em> is a good step in the direction of achieving proper
+separation of concerns in data science applications. The way it does is by
+providing a rich set of directives (ie. YAML tags) that allows engineers to specify
+high-level abstractions to data scientists, allowing DS to focus on solving the
+core modeling problems while worring less about the underlying infrastructure.</p>
+<p>We provide a core set of built-in tags to make your config files more dynamic, but
+we allow you to extend it in your own application, check the <a class="reference internal" href="plugins.html#plugins"><span class="std std-ref">Plugins and Custom Tags</span></a> section
+for more info.</p>
+<div class="section" id="built-in-tags">
+<h2>Built-in Tags<a class="headerlink" href="#built-in-tags" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="env">
+<h3>!env<a class="headerlink" href="#env" title="Permalink to this headline">¶</a></h3>
+<p>References a system environment variable. <strong>Do not use this tag to load secrets</strong> as
+the contents are dumped by default on the <code class="docutils literal notranslate"><span class="pre">to_yaml()</span></code> call. You can use the <code class="docutils literal notranslate"><span class="pre">|</span></code>
+(pipe) character to provide a default if a value is missing.</p>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">sample_key</span><span class="p">:</span>
+    <span class="nt">my_var</span><span class="p">:</span> <span class="kt">!env</span> <span class="l l-Scalar l-Scalar-Plain">VAR|my_default</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="env-secret">
+<h3>!env_secret<a class="headerlink" href="#env-secret" title="Permalink to this headline">¶</a></h3>
+<p>Similar to <code class="docutils literal notranslate"><span class="pre">!env</span></code> but won’t dump the variable contents.</p>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">sample_key</span><span class="p">:</span>
+    <span class="nt">my_var</span><span class="p">:</span> <span class="kt">!env_secret</span> <span class="l l-Scalar l-Scalar-Plain">SECRET|my_secret</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ref">
+<h3>!ref<a class="headerlink" href="#ref" title="Permalink to this headline">¶</a></h3>
+<p>References another entry in the config object, even if it’s in another file or
+overriden by an environment specific entry.</p>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">key_a</span><span class="p">:</span>
+  <span class="nt">sub_key</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">100</span>
+
+<span class="c1"># use dot notation to access nested entries</span>
+<span class="c1"># will be the same as key_a -&gt; subkey == 100</span>
+<span class="nt">key_b</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">key_a.sub_key</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="expr">
+<h3>!expr<a class="headerlink" href="#expr" title="Permalink to this headline">¶</a></h3>
+<p>Allows you to evalute arbitrary Python expressions, using the <code class="docutils literal notranslate"><span class="pre">eval()</span></code> builtin. The
+objects available in the expression evaluation context can extended using a plugin
+hook implementation.</p>
+<p>Example usage:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">sample_key</span><span class="p">:</span>
+    <span class="c1"># we may need to enclose the whole expression in quotes</span>
+    <span class="nt">my_var</span><span class="p">:</span> <span class="kt">!expr</span> <span class="s">&#39;&quot;This</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">env</span><span class="nv"> </span><span class="s">variable&quot;</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">env[&quot;USER&quot;]&#39;</span>
+</pre></div>
+</div>
+<p>Example globals extending plugin implementation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">gamma.config</span> <span class="kn">import</span> <span class="n">plugins</span>
+
+<span class="nd">@plugins</span><span class="o">.</span><span class="n">hookimpl</span>
+<span class="k">def</span> <span class="nf">expr_globals</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">}</span>
+
+<span class="n">plugins</span><span class="o">.</span><span class="n">plugin_manager</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="func">
+<h3>!func<a class="headerlink" href="#func" title="Permalink to this headline">¶</a></h3>
+<p>Returns a reference to a function. Useful for lightweight dependency injection.</p>
+<p>Example usage:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># call using kwargs</span>
+<span class="nt">func_3</span><span class="p">:</span> <span class="kt">!func</span>
+  <span class="nt">call</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">os:getenv</span>                 <span class="c1"># &lt;module&gt;:&lt;func&gt;</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&quot;MISSING&quot;</span><span class="p p-Indicator">]</span>               <span class="c1"># list of positional arguments</span>
+  <span class="nt">kwargs</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">foo</span><span class="p p-Indicator">}</span>          <span class="c1"># map of keyword arguments</span>
+</pre></div>
+</div>
+<p>The above will return a “partial” reference to <code class="docutils literal notranslate"><span class="pre">os.getenv</span></code>. This is equivalent to
+<code class="docutils literal notranslate"><span class="pre">functools.partial(os.getenv,</span> <span class="pre">&quot;MISSING&quot;,</span> <span class="pre">default=&quot;foo&quot;)</span></code></p>
+</div>
+<div class="section" id="option">
+<h3>!option<a class="headerlink" href="#option" title="Permalink to this headline">¶</a></h3>
+<p>Enables you to reference a <strong>Click</strong> <code class="docutils literal notranslate"><span class="pre">&#64;click.option</span></code> in your configuration.</p>
+<p>To capture an option, use <code class="docutils literal notranslate"><span class="pre">gamma.config.cli.option</span></code> decorator as a drop-in replacement
+for <code class="docutils literal notranslate"><span class="pre">click.option</span></code>. This accept default values in config using the
+<code class="docutils literal notranslate"><span class="pre">|</span></code> (pipe) separator.</p>
+<p>Example:</p>
+<p>Define your command line using <strong>Click</strong> as usual:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">from</span> <span class="nn">gamma.config.cli</span> <span class="kn">import</span> <span class="n">option</span> <span class="k">as</span> <span class="n">config_option</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@config_option</span><span class="p">(</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;--myarg&#39;</span><span class="p">)</span>
+<span class="nd">@config_option</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--otherarg&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_command</span><span class="p">(</span><span class="n">myarg</span><span class="p">,</span> <span class="n">otherarg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;do something&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>And in the configuration</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">sample_key</span><span class="p">:</span>
+    <span class="nt">my_arg</span><span class="p">:</span> <span class="kt">!option</span> <span class="l l-Scalar l-Scalar-Plain">myarg</span>
+    <span class="nt">other</span><span class="p">:</span> <span class="kt">!option</span> <span class="l l-Scalar l-Scalar-Plain">otherarg|other</span>
+    <span class="nt">unset</span><span class="p">:</span> <span class="kt">!option</span> <span class="l l-Scalar l-Scalar-Plain">unset|mydefault</span>
+</pre></div>
+</div>
+<p>When calling your script with <code class="docutils literal notranslate"><span class="pre">myscript.py</span> <span class="pre">--myarg</span> <span class="pre">foo</span></code>, should result in:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gamma.config</span> <span class="kn">import</span> <span class="n">get_config</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_key&quot;</span><span class="p">][</span><span class="s2">&quot;myarg&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;foo&quot;</span>
+<span class="k">assert</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_key&quot;</span><span class="p">][</span><span class="s2">&quot;otherarg&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;other&quot;</span>
+<span class="k">assert</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_key&quot;</span><span class="p">][</span><span class="s2">&quot;unset&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;mydefault&quot;</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&#64;config_option</span></code> default of <code class="docutils literal notranslate"><span class="pre">None</span></code> is handled as “unset value”. This means that
+you must either provide a non-<code class="docutils literal notranslate"><span class="pre">None</span></code> default to your option or provide a <code class="docutils literal notranslate"><span class="pre">|default</span></code>
+to your configuration.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The way we implement it is by setting a special <code class="docutils literal notranslate"><span class="pre">GAMMA_CONFIG_OPTIONS</span></code> environment
+variable. If you’re relying on passing down <code class="docutils literal notranslate"><span class="pre">gamma-config</span></code> to child processes
+(eg. when using <code class="docutils literal notranslate"><span class="pre">subprocess</span></code> module) make sure to pass down at least this
+environment variable.</p>
+</div>
+</div>
+<div class="section" id="j2-j2-secret">
+<h3>!j2 / !j2_secret<a class="headerlink" href="#j2-j2-secret" title="Permalink to this headline">¶</a></h3>
+<p>Allow the use of Jinja2 templates.  The context for rendering is shared with the
+<code class="docutils literal notranslate"><span class="pre">!expr</span></code> and can be extended with the same <code class="docutils literal notranslate"><span class="pre">expr_globals</span></code> plugin hook.</p>
+<p>In practice, in the snippet bellow, <code class="docutils literal notranslate"><span class="pre">foo1</span></code> and <code class="docutils literal notranslate"><span class="pre">foo2</span></code> are equivalent</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">myvar</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="nt">foo1</span><span class="p">:</span> <span class="kt">!expr</span> <span class="l l-Scalar l-Scalar-Plain">f&quot;This is a number = {c.myvar}&quot;</span>
+<span class="nt">foo2</span><span class="p">:</span> <span class="kt">!j2</span> <span class="l l-Scalar l-Scalar-Plain">This is a number = {c.myvar}</span>
+</pre></div>
+</div>
+<p>We also provide <code class="docutils literal notranslate"><span class="pre">!j2_secret</span></code> to be used when dealing with sensitive data</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Jinja2 <strong>is not installed by default</strong>, you should install yourself by
+running <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">jinja2</span></code>.</p>
+</div>
+</div>
+<div class="section" id="dump-raw">
+<h3>!dump_raw<a class="headerlink" href="#dump-raw" title="Permalink to this headline">¶</a></h3>
+<p>Instruct the dumper that the entire configuration block should not have the <strong>!tags</strong>
+resolved. This is useful if you have dynamic or expensive functions being called that
+you don’t want rendered when dumping.</p>
+<p>Example. Given the config snippet below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">raw</span><span class="p">:</span> <span class="kt">!dump_raw</span>
+    <span class="nt">bar</span><span class="p">:</span> <span class="kt">!j2</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">env.USER</span><span class="nv"> </span><span class="s">}}&quot;</span>
+
+<span class="nt">normal</span><span class="p">:</span>
+    <span class="nt">bar</span><span class="p">:</span> <span class="kt">!j2</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">env.USER</span><span class="nv"> </span><span class="s">}}&quot;</span>
+</pre></div>
+</div>
+<p>Calling <code class="docutils literal notranslate"><span class="pre">config.to_yaml()</span></code> should output this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">raw</span><span class="p">:</span> <span class="kt">!dump_raw</span>
+    <span class="nt">bar</span><span class="p">:</span> <span class="kt">!j2</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">env.USER</span><span class="nv"> </span><span class="s">}}&quot;</span>
+
+<span class="nt">normal</span><span class="p">:</span>
+    <span class="nt">bar</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">myuser</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plugins.html" class="btn btn-neutral float-right" title="Plugins and Custom Tags" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="using-your-app.html" class="btn btn-neutral float-left" title="Using gamma-config in your code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Boston Consulting Group
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

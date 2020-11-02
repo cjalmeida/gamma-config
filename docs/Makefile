@@ -57,7 +57,7 @@ help:
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
 clean:
-	-rm -rf $(BUILDDIR)/*
+	-rm -rf $(BUILDDIR)/
 	-rm -rf api/*
 
 apidoc:
@@ -70,9 +70,9 @@ autobuild: html
 	$(AUTOBUILD) . $(BUILDDIR) --host $(SERVE_HOST) --port $(PORT)
 
 html:
-	$(SPHINXBUILD) -a -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -a -b html $(ALLSPHINXOPTS) latest
 	@echo
-	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+	@echo "Build finished. The HTML pages are in 'latest/' folder."
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml

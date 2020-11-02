@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Using gamma-config in your code &mdash; gamma-config  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dynamic configs with YAML !tags" href="tags.html" />
+    <link rel="prev" title="Loading and merging" href="loading-merging.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> gamma-config
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="meta-config.html">Configuring gamma-config itself</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loading-merging.html">Loading and merging</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using gamma-config in your code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-raw-dicts">Getting raw dicts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#attribute-access">Attribute access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tags.html">Dynamic configs with YAML !tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins and Custom Tags</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gamma-config</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Using gamma-config in your code</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/pages/using-your-app.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="using-gamma-config-in-your-code">
+<h1>Using gamma-config in your code<a class="headerlink" href="#using-gamma-config-in-your-code" title="Permalink to this headline">¶</a></h1>
+<p>To use the loaded config in your code simply import and call the <code class="docutils literal notranslate"><span class="pre">get_config</span></code>
+function, like in the example below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gamma.config</span> <span class="kn">import</span> <span class="n">get_config</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_key&quot;</span><span class="p">][</span><span class="s2">&quot;key_a&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;bar&quot;</span>
+<span class="k">assert</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;sample_key&quot;</span><span class="p">][</span><span class="s2">&quot;key_c&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="getting-raw-dicts">
+<h2>Getting raw dicts<a class="headerlink" href="#getting-raw-dicts" title="Permalink to this headline">¶</a></h2>
+<p>Assume the configuration below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">root</span><span class="p">:</span>
+  <span class="nt">sub</span><span class="p">:</span>
+    <span class="nt">key_a</span><span class="p">:</span> <span class="kt">!env</span> <span class="l l-Scalar l-Scalar-Plain">USER</span>
+    <span class="nt">key_b</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span> <span class="nv">2</span><span class="p p-Indicator">,</span> <span class="nv">3</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>The value of <code class="docutils literal notranslate"><span class="pre">config[&quot;sub&quot;]</span></code> is a <em>dict-like</em> data structure but due to it’s dynamic
+nature it’s not a true Python <code class="docutils literal notranslate"><span class="pre">dict</span></code> and may fail in situations where dicts are
+expected - in particular in multiple serializaion scenarios.</p>
+<p>In those situations, you can call <code class="docutils literal notranslate"><span class="pre">config.to_dict()</span></code> to resolve the dynamic data
+structure to a plain Python <code class="docutils literal notranslate"><span class="pre">dict</span></code>. Thus:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">sub</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;key_a&quot;</span><span class="p">:</span> <span class="s2">&quot;myuser&quot;</span><span class="p">,</span> <span class="s2">&quot;key_b&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="attribute-access">
+<h2>Attribute access<a class="headerlink" href="#attribute-access" title="Permalink to this headline">¶</a></h2>
+<p>Most of the time, you can access the keys using dot <code class="docutils literal notranslate"><span class="pre">.</span></code> notation. For instance, given</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">sample_key</span><span class="p">:</span>
+    <span class="nt">key_b</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">old</span>
+    <span class="nt">key_c</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">,</span> <span class="nv">3</span><span class="p p-Indicator">]</span>
+    <span class="nt">key_d</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">bar</span>
+</pre></div>
+</div>
+<p>The following should not raise any errors:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gamma.config</span> <span class="kn">import</span> <span class="n">get_config</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">sample_key</span><span class="o">.</span><span class="n">key_a</span> <span class="o">==</span> <span class="s2">&quot;bar&quot;</span>
+<span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">sample_key</span><span class="o">.</span><span class="n">key_c</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="c1"># default dict behavion</span>
+<span class="k">assert</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">sample_key</span><span class="o">.</span><span class="n">bogus</span>
+<span class="k">assert</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">sample_key</span><span class="o">.</span><span class="n">bogus</span><span class="o">.</span><span class="n">subkey</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Limitations:</dt><dd><ul class="simple">
+<li><p>When using attribute access, non existing keys will always return an empty <code class="docutils literal notranslate"><span class="pre">Config</span></code> dict
+allowing “safe” navigation. Thus, the <code class="docutils literal notranslate"><span class="pre">is</span> <span class="pre">None</span></code> check will fail, use the regular
+dictionary access if you need more strict semantics.</p></li>
+<li><p>As expected, <code class="docutils literal notranslate"><span class="pre">Config</span></code> class methods, like <cite>dump</cite>, <cite>pop</cite>, <cite>push</cite>, <cite>to_yaml</cite>, etc.,
+get preference. We don’t guarantee we won’t break your code in the future by
+implementing new functionality.</p></li>
+<li><p>We don’t support attribute access for keys starting with underscore (<code class="docutils literal notranslate"><span class="pre">_</span></code>) at all.</p></li>
+<li><p>The attribute access may interfere with some serialization algorithms or other
+processes. If you see weird behavior, you can disable it by setting
+<code class="docutils literal notranslate"><span class="pre">config._allow_dot_access</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tags.html" class="btn btn-neutral float-right" title="Dynamic configs with YAML !tags" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="loading-merging.html" class="btn btn-neutral float-left" title="Loading and merging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Boston Consulting Group
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
