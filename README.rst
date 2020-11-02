@@ -115,5 +115,5 @@ Most of the magic is done using. Look at the documentation for info on the tags
 available.
 
 
-.. |badge_python| image:: https://img.shields.io/badge/python-3.6%203.7%203.7-blue
+.. |badge_python| image:: https://img.shields.io/badge/python-3.6%2B-blue
   :alt: python version
