@@ -2,6 +2,8 @@
 Gamma Config
 ============
 
+|badge_python|
+
 Provides an opinionated way of setting up complex configuration for BCG Gamma pipelines.
 
 Why?
@@ -46,6 +48,10 @@ Core features
 * Simplified key access via dot (``.``). Ie. for  ``config: {foo: {bar: 100}}``,
   this is True: ``config.foo.bar == 100``
 
+Documentation
+~~~~~~~~~~~~~
+
+Link: https://github.gamma.bcg.com/pages/BCG/gamma-config/latest/
 
 Getting started
 ~~~~~~~~~~~~~~~
@@ -107,3 +113,7 @@ To access the config from within your Python program:
 
 Most of the magic is done using. Look at the documentation for info on the tags
 available.
+
+
+.. |badge_python| image:: https://img.shields.io/badge/python-3.6%203.7%203.7-blue
+  :alt: python version
