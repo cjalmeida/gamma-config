@@ -359,6 +359,12 @@ class MetaConfigLoader(ConfigLoader):
         meta: Path = home / "00-meta.yaml"
         return [meta.as_uri()]
 
+    def load_plugins(self, meta) -> None:
+        import importlib
+
+        for modname in meta.get("plugins", {}).get("modules", []):
+            importlib.import_module(modname)
+
 
 class DefaultConfigLoader(ConfigLoader):
     """A ConfigLoader for the ``config/`` folder, supporting environments"""
@@ -375,7 +381,7 @@ class DefaultConfigLoader(ConfigLoader):
 
         # environment
         meta = get_meta_config()
-        for entry in meta["include_folders"]:
+        for entry in meta.get("include_folders", []):
             include_dir = cfg_dir / entry
 
             if include_dir.exists():
@@ -467,11 +473,21 @@ def get_config_root() -> Path:
     return root
 
 
+def set_config_root(path: str) -> None:
+    """Shortcut to set the GAMMA_CONFIG_ROOT env variable.
+
+    Do not use in tests, prefer ``monkeypatch.setenv``
+    """
+    os.environ["GAMMA_CONFIG_ROOT"] = path
+
+
 def reset_config() -> None:
     if hasattr(_config_store, "meta"):
         del _config_store.meta
     if hasattr(_config_store, "config"):
         del _config_store.config
+    if hasattr(_config_store, "tags"):
+        del _config_store.tags
 
 
 def get_config() -> Config:
@@ -503,5 +519,11 @@ def get_meta_config() -> "Config":
     if not hasattr(_config_store, "meta") is None:
         yaml = YAML(typ="rt")
         _config_store.meta = Config({}, _tags=tags_module.get_tags(blacklist=False))
-        MetaConfigLoader(yaml=yaml).load(_config_store.meta)
+        loader = MetaConfigLoader(yaml=yaml)
+        loader.load(_config_store.meta)
+
+        # reset tags to ensure extra modules are available
+        tags_module.reset_tags()
+        loader.load_plugins(_config_store.meta)
+
     return _config_store.meta

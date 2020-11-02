@@ -49,8 +49,6 @@ def _sub(_local_store):
 def test_local_store_thread():
     from gamma.config.config import LocalStore
 
-    # import ipdb; ipdb.set_trace()
-
     _local_store = LocalStore()
     # _local_store = threading.local()
     _local_store.foo = 100

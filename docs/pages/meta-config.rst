@@ -7,8 +7,6 @@ Configuring gamma-config itself
 Root config folder
 ------------------
 
-.. todo:: fix config loading
-
 When ``get_config()`` is first called, it initializes the configuration loading by
 looking for a ``00-meta.yaml`` file in the so-called "root" folder. By default, the
 root folder is resolved from these locations:
@@ -33,8 +31,8 @@ Dotenv support
 After finding the "root" as described above, the code tries to some specific "dotenv"
 files:
 
-*  ``{root}/../config.local.env``
-*  ``{root}/../config.env``
+*  ``{config_root}/../config.local.env``
+*  ``{config_root}/../config.env``
 
 The variables loaded in this fashion can be used anywhere in the code, in particular
 using the ``!env`` config tag.
@@ -48,7 +46,7 @@ using the ``!env`` config tag.
     in "vault" systems like *Hashicorp Vault* or *Azure Key Vault*.
 
 
-The "00-meta" YAML file
+The "00-meta.yaml" file
 -----------------------
 
 The ``00-meta.yaml`` is a "eat your own dogfood" config file where we
@@ -62,9 +60,9 @@ Check the next sessions for details on the meta parameters.
 Include extra folders
 ++++++++++++++++++++++
 
-.. todo:: implement include_folder
+Meta parameter: ``include_folders``
 
-All YAML files in the root folder and entries in the ``include_folder`` parameter
+All YAML files in the root folder and entries in the ``include_folders`` parameter
 are marked for loading. The default ``00-meta.yaml`` file provides by default a
 dynamic entry resolving to the ``ENVIRONMENT`` variable. We use this to (optionally)
 override the default configuration with environment specific parameters.
@@ -72,3 +70,12 @@ override the default configuration with environment specific parameters.
 .. note::
     The final loading order is determined by the file **name**, all other path parts are
     stripped out.
+
+Plugin modules auto-import
+++++++++++++++++++++++++++
+
+Meta parameters: ``plugins.modules``
+
+Modules names here will be automatically import. The common use-case is to use this to
+automatically add application tags to ``gamma.config.plugins:applications_tags`` list.
+See :ref:`plugins-custom-app-tags` for more details.

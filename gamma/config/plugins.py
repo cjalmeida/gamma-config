@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Callable, Dict, Iterable
+from typing import Any, Callable, Dict, Iterable, List
 
 import pluggy
 
@@ -40,6 +40,9 @@ def expr_globals() -> Dict[str, Any]:
 class TagException(Exception):
     pass
 
+
+# store application tags that do no require a full-blown plugin
+application_tags: List[TagSpec] = []
 
 # create a manager and add the spec
 plugin_manager = pluggy.PluginManager(PROJECT_NAME)

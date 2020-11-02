@@ -58,6 +58,7 @@ Core features
    pages/loading-merging
    pages/using-your-app
    pages/tags
+   pages/plugins
 
 Indices and tables
 ==================

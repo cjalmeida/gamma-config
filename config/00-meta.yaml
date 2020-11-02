@@ -18,3 +18,7 @@ blacklist_tags:
     # - "!ref"          # Config self referencing
     # - "!env"          # References environment variables
     # - "!env_secret"   # References secret environment variables
+
+# Extra modules to load looking for plugins. We expect these to be in your PYTHONPATH
+plugins:
+  modules: []
