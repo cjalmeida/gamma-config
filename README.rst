@@ -60,14 +60,14 @@ Currently the recommended way of installing gamma-config is downloading the *whl
 asset file in the `Releases <https://github.gamma.bcg.com/BCG/gamma-config/releases>`_
 and install it using ``pip``.
 
-::  code-block:: bash
+.. code-block:: bash
 
     pip install ./gamma_config-<release>-py3-none-any.whl
 
 To use it in your project, you can place the *whl* files in a ``wheels`` folder and
 reference it either via pip's ``-f`` flag or by setting ``PIP_FIND_LINKS`` env var:
 
-:: code-block:: bash
+.. code-block:: bash
 
     # explicity set -f (--find-links) flag
     pip install gamma-config -f ./wheels
