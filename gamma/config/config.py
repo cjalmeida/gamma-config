@@ -468,9 +468,48 @@ def get_config_root() -> Path:
     project home without changing the current working folder.
     """
 
-    root = Path(os.getenv("GAMMA_CONFIG_ROOT", Path("config").absolute()))
+    root: Optional[Path] = Path(
+        os.getenv("GAMMA_CONFIG_ROOT", Path("config").absolute())
+    )
+
+    if not root or not (root / "00-meta.yaml").exists():
+        root = _try_jupyter_config_root()
+
+    if root is None:
+        raise Exception("Cannot locate a gamma config root in any expected location.")
+
     load_dotenv(root)
     return root
+
+
+def _try_jupyter_config_root() -> Optional[Path]:
+    """Try to find a ``config/00-meta.yaml`` file under current directory parents
+    if we detect we're operating inside Jupyter."""
+
+    if not _isnotebook():
+        return None
+
+    path = Path(".").absolute()
+    while path != path.parent:
+        candidate = path / "config"
+        if (candidate / "00-meta.yaml").exists():
+            return candidate
+        path = path.parent
+
+    return None
+
+
+def _isnotebook():
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == "ZMQInteractiveShell":
+            return True  # Jupyter notebook or qtconsole
+        elif shell == "TerminalInteractiveShell":
+            return True  # Terminal running IPython
+        else:
+            return True  # Other type of IPython kernel (?)
+    except NameError:
+        return False  # Probably standard Python interpreter
 
 
 def set_config_root(path: str) -> None:
