@@ -1,7 +1,7 @@
 import sys
 import os
 import click
-
+import shutil
 
 @click.group()
 def config():
@@ -25,6 +25,7 @@ def scaffold(target, force):
     if not target:
         target = Path(".").absolute()
 
+    print(f"TARGET: {target}")
     target = Path(target)
     confdir: Path = target / "config"
     meta: Path = confdir / "00-meta.yaml"
@@ -48,6 +49,7 @@ def scaffold(target, force):
         )
         raise SystemExit(1)
 
+    confdir.mkdir(exist_ok=True)
     _recursive_copy(src, confdir)
     click.secho("Copied config samples to: ", fg="yellow", nl=False)
     click.secho(str(confdir), fg="cyan")
@@ -68,4 +70,4 @@ def _recursive_copy(src, dest):
         elif os.path.isdir(file_path):
             new_dest = os.path.join(dest, item)
             os.mkdir(new_dest)
-            recursive_copy(file_path, new_dest)
+            _recursive_copy(file_path, new_dest)

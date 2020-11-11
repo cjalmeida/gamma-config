@@ -22,7 +22,7 @@ def test_scaffold(test_cwd):
     runner = CliRunner()
 
     # test cwd
-    runner.invoke(scaffold)
+    scaffold.callback(target=None, force=False)
     assert (Path(test_cwd) / "config/00-meta.yaml").exists()
 
     # test exists meta fail
@@ -31,24 +31,5 @@ def test_scaffold(test_cwd):
 
     # test target folder
     with tempfile.TemporaryDirectory() as td:
-        runner.invoke(scaffold, args=["-t", td])
+        res = scaffold.callback(target=td, force=False)
         assert (Path(td) / "config/00-meta.yaml").exists()
-
-
-def test_config_root_env(monkeypatch):
-    from gamma.config.cli_command import scaffold
-
-    with tempfile.TemporaryDirectory() as td:
-        monkeypatch.setenv("GAMMA_CONFIG_ROOT", td + "/config")
-
-        runner = CliRunner()
-
-        # test scaffolding
-        runner.invoke(scaffold, ["-t", td])
-        assert (Path(td) / "config/00-meta.yaml").exists()
-
-        # test loading
-        from gamma.config import get_config
-
-        config = get_config()
-        assert config["sample_scalar_1"] == "hello world"
