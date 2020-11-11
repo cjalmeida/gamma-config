@@ -1,5 +1,5 @@
 import sys
-
+import os
 import click
 
 
@@ -19,7 +19,6 @@ def config():
 def scaffold(target, force):
     """Initialize the config folder with samples"""
 
-    import shutil
     from pathlib import Path
     import gamma.config as root_mod
 
@@ -49,6 +48,24 @@ def scaffold(target, force):
         )
         raise SystemExit(1)
 
-    shutil.copytree(src, confdir)
+    _recursive_copy(src, confdir)
     click.secho("Copied config samples to: ", fg="yellow", nl=False)
     click.secho(str(confdir), fg="cyan")
+
+
+def _recursive_copy(src, dest):
+    """
+    Copy each file from src dir to dest dir, including sub-directories.
+    """
+    for item in os.listdir(src):
+        file_path = os.path.join(src, item)
+
+        # if item is a file, copy it
+        if os.path.isfile(file_path):
+            shutil.copy(file_path, dest)
+
+        # else if item is a folder, recurse
+        elif os.path.isdir(file_path):
+            new_dest = os.path.join(dest, item)
+            os.mkdir(new_dest)
+            recursive_copy(file_path, new_dest)

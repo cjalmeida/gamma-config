@@ -41,7 +41,7 @@ def publish():
         version = os.getenv("VERSION")
 
     # build wheel
-    cmd = "(rm dist/*.whl || true) && python setup.py bdist_wheel"
+    cmd = "(rm -rf build dist/*.whl || true) && python setup.py bdist_wheel"
     env = os.environ.copy()
     env["VERSION"] = version
     subprocess.run(cmd, shell=True, check=True, env=env)
