@@ -13,7 +13,8 @@ root folder is resolved from these locations:
 
 *  The absolute path in ``GAMMA_CONFIG_ROOT`` env var if set.
 *  ``$PWD/config``.
-*  Any parent folder that may have a ``config/00-meta.yaml`` file.
+*  When running under a IPython kernel (ie. Jupyter), any parent folder that may
+   have a ``config/00-meta.yaml`` file.
 
 If you have specific packaging needs, we recommend you set the ``GAMMA_CONFIG_ROOT``
 environment variable in your application entrypoint script using ``os.setenv``.

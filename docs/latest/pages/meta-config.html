@@ -174,7 +174,8 @@ root folder is resolved from these locations:</p>
 <ul class="simple">
 <li><p>The absolute path in <code class="docutils literal notranslate"><span class="pre">GAMMA_CONFIG_ROOT</span></code> env var if set.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">$PWD/config</span></code>.</p></li>
-<li><p>Any parent folder that may have a <code class="docutils literal notranslate"><span class="pre">config/00-meta.yaml</span></code> file.</p></li>
+<li><p>When running under a IPython kernel (ie. Jupyter), any parent folder that may
+have a <code class="docutils literal notranslate"><span class="pre">config/00-meta.yaml</span></code> file.</p></li>
 </ul>
 <p>If you have specific packaging needs, we recommend you set the <code class="docutils literal notranslate"><span class="pre">GAMMA_CONFIG_ROOT</span></code>
 environment variable in your application entrypoint script using <code class="docutils literal notranslate"><span class="pre">os.setenv</span></code>.</p>
