@@ -104,12 +104,18 @@ Example usage:
 
     # call using kwargs
     func_3: !func
-      call: os:getenv                 # <module>:<func>
-      args: ["MISSING"]               # list of positional arguments
-      kwargs: {default: foo}          # map of keyword arguments
+      ref: os:getenv                # <module>:<callable>
+      args: ["MISSING"]             # list of positional arguments
+      kwargs: {default: foo}        # map of keyword arguments
+      call: true                    # run function on access
 
-The above will return a "partial" reference to ``os.getenv``. This is equivalent to
-``functools.partial(os.getenv, "MISSING", default="foo")``
+Argument reference:
+
+-   ``ref``, a reference to a callable in the form ``<module>:<callable>``
+-   ``args``, optional positional args
+-   ``kwargs``, optional keyword args
+-   ``call``, if false (default) accessing the config entry returns a "partial",
+    otherwise it calls the function and returns the result
 
 
 !option

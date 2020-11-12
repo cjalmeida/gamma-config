@@ -243,13 +243,20 @@ hook implementation.</p>
 <p>Example usage:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># call using kwargs</span>
 <span class="nt">func_3</span><span class="p">:</span> <span class="kt">!func</span>
-  <span class="nt">call</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">os:getenv</span>                 <span class="c1"># &lt;module&gt;:&lt;func&gt;</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&quot;MISSING&quot;</span><span class="p p-Indicator">]</span>               <span class="c1"># list of positional arguments</span>
-  <span class="nt">kwargs</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">foo</span><span class="p p-Indicator">}</span>          <span class="c1"># map of keyword arguments</span>
+  <span class="nt">ref</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">os:getenv</span>                <span class="c1"># &lt;module&gt;:&lt;callable&gt;</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&quot;MISSING&quot;</span><span class="p p-Indicator">]</span>             <span class="c1"># list of positional arguments</span>
+  <span class="nt">kwargs</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">foo</span><span class="p p-Indicator">}</span>        <span class="c1"># map of keyword arguments</span>
+  <span class="nt">call</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>                    <span class="c1"># run function on access</span>
 </pre></div>
 </div>
-<p>The above will return a “partial” reference to <code class="docutils literal notranslate"><span class="pre">os.getenv</span></code>. This is equivalent to
-<code class="docutils literal notranslate"><span class="pre">functools.partial(os.getenv,</span> <span class="pre">&quot;MISSING&quot;,</span> <span class="pre">default=&quot;foo&quot;)</span></code></p>
+<p>Argument reference:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ref</span></code>, a reference to a callable in the form <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;:&lt;callable&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">args</span></code>, optional positional args</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kwargs</span></code>, optional keyword args</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">call</span></code>, if false (default) accessing the config entry returns a “partial”,
+otherwise it calls the function and returns the result</p></li>
+</ul>
 </div>
 <div class="section" id="option">
 <h3>!option<a class="headerlink" href="#option" title="Permalink to this headline">¶</a></h3>
