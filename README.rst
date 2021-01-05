@@ -56,7 +56,7 @@ Link: https://github.gamma.bcg.com/pages/BCG/gamma-config/latest/
 Getting started
 ~~~~~~~~~~~~~~~
 
-Currently the recommended way of installing gamma-config is downloading the *whl*
+Currently the recommended way of installing ``gamma-config`` is downloading the *whl*
 asset file in the `Releases <https://github.gamma.bcg.com/BCG/gamma-config/releases>`_
 and install it using ``pip``.
 
@@ -72,6 +72,12 @@ reference it either via pip's ``-f`` flag or by setting ``PIP_FIND_LINKS`` env v
     # explicity set -f (--find-links) flag
     pip install gamma-config -f ./wheels
 
+In most cases, you'll want to use the ``!j2`` tag to interpolate values using Jinja2.
+This requires manually installing the ``jinja2`` package
+
+.. code-block:: bash
+
+    pip install "jinja2==2.*"
 
 Basic Usage
 ~~~~~~~~~~~
@@ -82,7 +88,8 @@ The package comes with "scaffolding" to help you get started. In your project fo
 
    python -m gamma.config scaffold
 
-Then create yourself a ``config/20-myconfig.yaml`` file with the contents:
+Remove the sample files, then create yourself a ``config/20-myconfig.yaml`` file
+with the contents:
 
 .. code-block:: yaml
 
