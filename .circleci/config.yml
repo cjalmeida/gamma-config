@@ -39,7 +39,7 @@ jobs:
           command: |
             . venv/bin/activate
             export PYTHONPATH=$PWD
-            pytest --junitxml=test-results/junit.xml --cov-report xml --cov=gamma test/
+            pytest --junitxml=test-reports/junit.xml --cov-report xml --cov=gamma test/
 
       - store_artifacts:
           path: test-reports
