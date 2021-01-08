@@ -69,7 +69,11 @@ apidoc:
 autobuild: html
 	$(AUTOBUILD) . $(BUILDDIR) --host $(SERVE_HOST) --port $(PORT)
 
-html:
+nojekyll:
+	mkdir -p $(BUILDDIR)/html/
+	touch $(BUILDDIR)/html/.nojekyll
+
+html: nojekyll
 	$(SPHINXBUILD) -a -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in '$(BUILDDIR)/html' folder."
