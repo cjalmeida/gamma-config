@@ -7,7 +7,6 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6.10
-    working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
@@ -52,7 +51,6 @@ jobs:
   doc:
     docker:
       - image: circleci/python:3.6.10
-    working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
