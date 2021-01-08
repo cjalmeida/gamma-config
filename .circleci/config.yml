@@ -56,6 +56,7 @@ jobs:
             tar xf node-${NODE_VER}-linux-x64.tar.xz
             ln -s node-${NODE_VER}-linux-x64/bin/node bin/node
             ln -s node-${NODE_VER}-linux-x64/bin/npm bin/npm
+            ls -l bin/*
 
       - run:
           name: build docs
