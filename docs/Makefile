@@ -70,9 +70,9 @@ autobuild: html
 	$(AUTOBUILD) . $(BUILDDIR) --host $(SERVE_HOST) --port $(PORT)
 
 html:
-	$(SPHINXBUILD) -a -b html $(ALLSPHINXOPTS) latest
+	$(SPHINXBUILD) -a -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
-	@echo "Build finished. The HTML pages are in 'latest/' folder."
+	@echo "Build finished. The HTML pages are in '$(BUILDDIR)/html' folder."
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
