@@ -125,6 +125,6 @@ workflows:
           filters:
             tags:
               only: /^v.*/
-          branches:
+            branches:
               ignore: /.*/
 
