@@ -6,7 +6,7 @@ import os
 
 from setuptools import find_namespace_packages, setup
 
-VERSION=os.getenv("VERSION", "0.2.10")
+VERSION=os.getenv("VERSION", "0.2.11")
 
 with open("README.rst") as readme_file:
     readme = readme_file.read()
