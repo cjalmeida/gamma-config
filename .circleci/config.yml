@@ -109,7 +109,7 @@ workflows:
       - build:
           filters:
             tags:
-              only: /.*/
+              only: /^v.*/
             branches:
               only: [master]
       - doc:
@@ -119,14 +119,14 @@ workflows:
             branches:
               only: [master]
             tags:
-              only: /.*/
+              only: /^v.*/
 
       - publish:
           requires:
             - build
           filters:
             tags:
-              only: /.*/
+              only: /^v.*/
             branches:
-              only: [master]
+              ignore: /.*/
 
