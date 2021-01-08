@@ -110,8 +110,8 @@ workflows:
           filters:
             tags:
               only: /^v.*/
-            branches:
-              only: [master]
+            # branches:
+            #   only: [master]
       - doc:
           requires:
             - build
@@ -129,4 +129,4 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
-#
+
