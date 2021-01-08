@@ -34,6 +34,18 @@ jobs:
             export PYTHONPATH=$PWD
             pytest --junitxml=test-results/junit.xml --cov-report xml --cov=gamma test/
 
+      - run:
+          name: build wheel
+          command: |
+            . venv/bin/activate
+            (rm -rf build dist || true) && python setup.py bdist_wheel
+            (rm -rf build dist || true) && python setup.py sdist
+
+      - persist_to_workspace:
+          root: ./dist
+          paths:
+            - "*"
+
       - store_test_results:
           path: test-results
 
@@ -46,7 +58,6 @@ jobs:
       - restore_cache:
           keys:
             - v1-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
-            - v1-
       - run:
           name: install nodejs
           command: |
@@ -69,6 +80,29 @@ jobs:
             git config user.name "Cloves Almeida"
             sudo npm install -g gh-pages@2.0.1
             sudo gh-pages -d docs/_build/html -t -r https://$github_pat@github.gamma.bcg.com/bcg/gamma-config.git
+
+  publish:
+    docker:
+      - image: circleci/python:3.6.10
+    steps:
+      - restore_cache:
+          keys:
+            - v1-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
+
+      - attach_workspace:
+          at: ./dist
+
+      - run:
+          name: publish dist
+          command: |
+            export NOBUILD=1
+            export GITHUB_USER=almeida-cloves
+            export GITHUB_TOKEN=${github_pat}
+
+            . venv/bin/activate
+            python ./publish
+
+
 
 workflows:
   version: 2

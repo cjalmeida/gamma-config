@@ -4,7 +4,6 @@ import httpx
 import os
 import subprocess
 import dotenv
-import json
 
 dotenv.load_dotenv(".env")
 dotenv.load_dotenv(".local.env")
@@ -32,7 +31,7 @@ def publish():
         print("ERROR: Repository is dirty")
         raise SystemExit(1)
 
-    if 'VERSION' not in os.environ:
+    if "VERSION" not in os.environ:
         cp = subprocess.run(
             "git describe", shell=True, check=True, stdout=subprocess.PIPE
         )
@@ -41,10 +40,11 @@ def publish():
         version = os.getenv("VERSION")
 
     # build wheel
-    cmd = "(rm -rf build dist/*.whl || true) && python setup.py bdist_wheel"
-    env = os.environ.copy()
-    env["VERSION"] = version
-    subprocess.run(cmd, shell=True, check=True, env=env)
+    if os.getenv("NOBUILD", "0") == "0":
+        cmd = "(rm -rf build dist/*.whl || true) && python setup.py bdist_wheel"
+        env = os.environ.copy()
+        env["VERSION"] = version
+        subprocess.run(cmd, shell=True, check=True, env=env)
 
     # create a release
     auth = (gh_user, gh_token)
@@ -52,15 +52,15 @@ def publish():
     r = httpx.post(f"{BASE}/repos/{REPO}/releases", json=body, auth=auth)
     r.raise_for_status()
     upload_url = r.json()["upload_url"]
-    upload_url = upload_url[:upload_url.index("{")]  # get URL up to the first {
+    upload_url = upload_url[: upload_url.index("{")]  # get URL up to the first {
 
     # upload releases
     headers = {"content-type": "application/x-wheel+zip"}
-    for whl in Path("dist").glob("*.whl"):
-        print(f"Uploading: {whl}")
-        name = whl.name
+    for item in Path("dist").iterdir():
+        print(f"Uploading: {item}")
+        name = item.name
         url = upload_url + f"?name={name}"
-        with whl.open("rb") as fo:
+        with item.open("rb") as fo:
             r = httpx.post(url, content=fo, headers=headers, auth=auth)
             r.raise_for_status()
 
