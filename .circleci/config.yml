@@ -110,15 +110,13 @@ workflows:
           tags:
             only: /^v.*/
           branches:
-            only:
-              - master
+            only: [master]
       - doc:
           requires:
             - build
           filters:
             branches:
-              only:
-                - master
+              only: [master]
             tags:
               only: /^v.*/
 
