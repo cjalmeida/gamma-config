@@ -56,21 +56,24 @@ Link: https://github.gamma.bcg.com/pages/BCG/gamma-config/
 Getting started
 ~~~~~~~~~~~~~~~
 
-Currently the recommended way of installing ``gamma-config`` is downloading the *whl*
+Currently the recommended way of installing ``gamma-config`` is downloading the ``tar.gz``
 asset file in the `Releases <https://github.gamma.bcg.com/BCG/gamma-config/releases>`_
 and install it using ``pip``.
 
 .. code-block:: bash
 
-    pip install ./gamma_config-<release>-py3-none-any.whl
+    pip install ./gamma-config-<release>.tar.gz
 
-To use it in your project, you can place the *whl* files in a ``wheels`` folder and
+To use it in your project, you can place the *tar.gz* files in a ``vendor`` folder and
 reference it either via pip's ``-f`` flag or by setting ``PIP_FIND_LINKS`` env var:
 
 .. code-block:: bash
 
     # explicity set -f (--find-links) flag
-    pip install gamma-config -f ./wheels
+    pip install gamma-config -f ./vendor
+
+This technique is called "vendoring" the dependency. For client work this also
+provides the library source should they wish to modify it later.
 
 In most cases, you'll want to use the ``!j2`` tag to interpolate values using Jinja2.
 This requires manually installing the ``jinja2`` package

@@ -41,7 +41,7 @@ def publish():
 
     # build wheel
     if os.getenv("NOBUILD", "0") == "0":
-        cmd = "(rm -rf build dist/*.whl || true) && python setup.py bdist_wheel"
+        cmd = "(rm -rf build dist/* || true) && python setup.py sdist"
         env = os.environ.copy()
         env["VERSION"] = version
         subprocess.run(cmd, shell=True, check=True, env=env)
@@ -55,7 +55,7 @@ def publish():
     upload_url = upload_url[: upload_url.index("{")]  # get URL up to the first {
 
     # upload releases
-    headers = {"content-type": "application/x-wheel+zip"}
+    headers = {"content-type": "application/tar+gzip"}
     for item in Path("dist").iterdir():
         print(f"Uploading: {item}")
         name = item.name

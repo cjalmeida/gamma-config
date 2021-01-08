@@ -37,7 +37,7 @@ jobs:
           name: build wheel
           command: |
             . venv/bin/activate
-            (rm -rf build dist || true) && python setup.py sdist bdist_wheel
+            (rm -rf build dist || true) && python setup.py sdist
 
       - persist_to_workspace:
           root: ./dist
