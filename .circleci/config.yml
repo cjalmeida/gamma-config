@@ -51,11 +51,11 @@ jobs:
           name: install nodejs
           command: |
             NODE_VER=v14.15.4
-            mkdir ~/bin
+            mkdir bin
             wget https://nodejs.org/dist/$NODE_VER/node-$NODE_VER-linux-x64.tar.xz
-            tar xf node-$NODE_VER-linux-x64.tar.xz
-            ln -s node-$NODE_VER-linux-x64/bin/node ~/bin/node
-            ln -s node-$NODE_VER-linux-x64/bin/npm ~/bin/npm
+            tar xf node-${NODE_VER}-linux-x64.tar.xz
+            ln -s node-${NODE_VER}-linux-x64/bin/node bin/node
+            ln -s node-${NODE_VER}-linux-x64/bin/npm bin/npm
 
       - run:
           name: build docs
@@ -69,7 +69,7 @@ jobs:
           command: |
             git config user.email "almeida.cloves@bcg.com"
             git config user.name "Cloves Almeida"
-            ~/bin/npm install -g gh-pages@2.0.1
+            bin/npm install -g gh-pages@2.0.1
             gh-pages -d docs/_build/html -t -r https://$github_pat@github.gamma.bcg.com/bcg/gamma-config.git
 
 workflows:
