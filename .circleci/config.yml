@@ -11,8 +11,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
-            - v1-
+            - v2-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
+            - v2-
 
       - run:
           name: install dependencies
@@ -24,7 +24,7 @@ jobs:
       - save_cache:
           paths:
             - ./venv
-          key: v1-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
+          key: v2-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
 
       - run:
           name: run tests
@@ -55,7 +55,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
+            - v2-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
       - run:
           name: install nodejs
           command: |
@@ -86,7 +86,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
+            - v2-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
 
       - attach_workspace:
           at: ./dist
