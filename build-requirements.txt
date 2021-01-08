@@ -9,14 +9,19 @@ appdirs==1.4.4            # via black
 attrs==20.3.0             # via black, pytest
 babel==2.9.0              # via sphinx
 black==19.10b0            # via -r build-requirements.in
-certifi==2020.12.5        # via requests
+certifi==2020.12.5        # via httpx, requests
 chardet==4.0.0            # via requests
 click==7.1.2              # via black
+contextvars==2.4          # via sniffio
 coverage==4.5.4           # via -r build-requirements.in, pytest-cov
 docutils==0.16            # via sphinx
 flake8==3.8.1             # via -r build-requirements.in
-idna==2.10                # via requests
+h11==0.12.0               # via httpcore
+httpcore==0.12.2          # via httpx
+httpx==0.16.1             # via -r build-requirements.in
+idna==2.10                # via requests, rfc3986
 imagesize==1.2.0          # via sphinx
+immutables==0.14          # via contextvars
 importlib-metadata==1.6.0  # via -c requirements.txt, flake8, pluggy, pytest
 jinja2==2.11.2            # via -r build-requirements.in, sphinx
 livereload==2.6.3         # via sphinx-autobuild
@@ -37,7 +42,9 @@ pytest==5.4.2             # via -r build-requirements.in, pytest-cov
 pytz==2020.5              # via babel
 regex==2020.11.13         # via black
 requests==2.25.1          # via sphinx
+rfc3986[idna2008]==1.4.0  # via httpx
 six==1.15.0               # via livereload
+sniffio==1.2.0            # via httpcore, httpx
 snowballstemmer==2.0.0    # via sphinx
 sphinx-autobuild==2020.9.1  # via -r build-requirements.in
 sphinx-rtd-theme==0.5.1   # via -r build-requirements.in
