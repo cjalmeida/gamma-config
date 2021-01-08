@@ -102,13 +102,16 @@ jobs:
             . venv/bin/activate
             python ./publish
 
-
-
 workflows:
   version: 2
   build_and_test_publish:
     jobs:
-      - build
+      - build:
+          tags:
+            only: /^v.*/
+          branches:
+            only:
+              - master
       - doc:
           requires:
             - build
@@ -127,4 +130,3 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
-
