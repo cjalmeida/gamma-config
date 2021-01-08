@@ -52,8 +52,8 @@ jobs:
           command: |
             NODE_VER=v14.15.4
             mkdir bin
-            wget https://nodejs.org/dist/$NODE_VER/node-$NODE_VER-linux-x64.tar.xz
-            sudo tar -C /usr/local --strip-components=1 -xf node-${NODE_VER}-linux-x64.tar.gz
+            wget https://nodejs.org/dist/$NODE_VER/node-${NODE_VER}-linux-x64.tar.xz
+            sudo tar -C /usr/local --strip-components=1 -xf node-${NODE_VER}-linux-x64.tar.xz
 
       - run:
           name: build docs
