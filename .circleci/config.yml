@@ -54,9 +54,8 @@ jobs:
             mkdir bin
             wget https://nodejs.org/dist/$NODE_VER/node-$NODE_VER-linux-x64.tar.xz
             tar xf node-${NODE_VER}-linux-x64.tar.xz
-            ln -s $PWD/node-${NODE_VER}-linux-x64/bin/node $PWD/bin/node
-            ln -s $PWD/node-${NODE_VER}-linux-x64/bin/npm $PWD/bin/npm
-            ls -l bin/*
+            sudo ln -s $PWD/node-${NODE_VER}-linux-x64/bin/node /usr/local/bin
+            sudo ln -s $PWD/node-${NODE_VER}-linux-x64/bin/npm /usr/local/bin
 
       - run:
           name: build docs
@@ -71,7 +70,7 @@ jobs:
             git config user.email "almeida.cloves@bcg.com"
             git config user.name "Cloves Almeida"
             ls -l bin/*
-            bin/npm install -g gh-pages@2.0.1
+            npm install -g gh-pages@2.0.1
             gh-pages -d docs/_build/html -t -r https://$github_pat@github.gamma.bcg.com/bcg/gamma-config.git
 
 workflows:
