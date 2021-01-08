@@ -68,7 +68,7 @@ jobs:
             git config user.email "almeida.cloves@bcg.com"
             git config user.name "Cloves Almeida"
             sudo npm install -g gh-pages@2.0.1
-            gh-pages -d docs/_build/html -t -r https://$github_pat@github.gamma.bcg.com/bcg/gamma-config.git
+            sudo gh-pages -d docs/_build/html -t -r https://$github_pat@github.gamma.bcg.com/bcg/gamma-config.git
 
 workflows:
   version: 2
