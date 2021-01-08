@@ -110,19 +110,19 @@ workflows:
   build_and_test_publish:
     jobs:
       - build
-      # - doc:
-      #     requires:
-      #       - build
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
-      #       tags:
-      #         only: /^v.*/
+      - doc:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
+            tags:
+              only: /^v.*/
 
       - publish:
           requires:
             - build
-          # filters:
-          #   tags:
-          #     only: /^v.*/
+          filters:
+            tags:
+              only: /^v.*/

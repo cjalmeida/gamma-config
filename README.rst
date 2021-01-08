@@ -51,7 +51,7 @@ Core features
 Documentation
 ~~~~~~~~~~~~~
 
-Link: https://github.gamma.bcg.com/pages/BCG/gamma-config/latest/
+Link: https://github.gamma.bcg.com/pages/BCG/gamma-config/
 
 Getting started
 ~~~~~~~~~~~~~~~
