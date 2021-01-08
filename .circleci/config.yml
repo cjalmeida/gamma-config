@@ -6,20 +6,13 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
       - image: circleci/python:3.6.10
-
     working_directory: ~/repo
-
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
             - v1-
 
       - run:
@@ -44,3 +37,53 @@ jobs:
       - store_test_results:
           path: test-results
 
+  doc:
+    docker:
+      - image: circleci/python:3.6.10
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
+            - v1-
+      - run:
+          name: install nodejs
+          command: sudo apt update && sudo apt install -y nodejs npm
+
+      - run:
+          name: build docs
+          command: |
+            . venv/bin/activate
+            cd docs
+            make html
+
+      - run:
+          name: push docs
+          command: |
+            git config user.email "almeida.cloves@bcg.com"
+            git config user.name "Cloves Almeida"
+            sudo npm install -g gh-pages@2.0.1
+            gh-pages -d docs/_build/html -t -r https://$github_pat@github.gamma.bcg.com/bcg/gamma-config.git
+
+workflows:
+  version: 2
+  build_and_test_publish:
+    jobs:
+      - build
+      - doc:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
+            tags:
+              only: /^v.*/
+
+      - publish:
+          requires:
+            - doc
+          filters:
+            tags:
+              only: /^v.*/
