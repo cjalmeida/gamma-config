@@ -85,6 +85,7 @@ jobs:
     docker:
       - image: circleci/python:3.6.10
     steps:
+      - checkout
       - restore_cache:
           keys:
             - v1-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
@@ -109,19 +110,19 @@ workflows:
   build_and_test_publish:
     jobs:
       - build
-      - doc:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
-            tags:
-              only: /^v.*/
+      # - doc:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only:
+      #           - master
+      #       tags:
+      #         only: /^v.*/
 
       - publish:
           requires:
-            - doc
-          filters:
-            tags:
-              only: /^v.*/
+            - build
+          # filters:
+          #   tags:
+          #     only: /^v.*/
