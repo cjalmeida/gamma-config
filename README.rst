@@ -69,8 +69,20 @@ reference it either via pip's ``-f`` flag or by setting ``PIP_FIND_LINKS`` env v
 
 .. code-block:: bash
 
-    # explicity set -f (--find-links) flag
-    pip install gamma-config -f ./vendor
+    # requirements.txt:
+    gamma-config
+
+    # then explicity set -f (--find-links) flag
+    pip install -r requirements.txt -f ./vendor
+
+Poetry currently does not support the equivalent of ``--find-links`` so you may need to
+explicity add the path/version to ``pyproject.toml``
+
+.. code-block:: toml
+
+    [tool.poetry.dependencies]
+    gamma-config = { path = "./vendor/gamma-config-0.2.14.tar.gz" }
+
 
 This technique is called "vendoring" the dependency. For client work this also
 provides the library source should they wish to modify it later.
