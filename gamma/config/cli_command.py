@@ -1,7 +1,7 @@
-import sys
 import os
 import click
 import shutil
+
 
 @click.group()
 def config():
@@ -20,7 +20,6 @@ def scaffold(target, force):
     """Initialize the config folder with samples"""
 
     from pathlib import Path
-    import gamma.config as root_mod
 
     if not target:
         target = Path(".").absolute()
@@ -30,15 +29,8 @@ def scaffold(target, force):
     confdir: Path = target / "config"
     meta: Path = confdir / "00-meta.yaml"
 
-    # find source in either the local folder or under the sys.prefix
-    src = Path(root_mod.__file__).parents[2] / "config"
-    if not src.exists():
-        src = Path(sys.prefix) / "etc/gamma-config/config"
-
-    if not src.exists():
-        raise Exception(
-            f"Could not find template config in either ./config or under {src}"
-        )
+    # find source under sample folder
+    src = Path(__file__).parent / "sample"
 
     # Check if config/00-meta.yaml already exists
     if not force and meta.exists():

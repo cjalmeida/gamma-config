@@ -1,4 +1,0 @@
-pluggy==0.13.*
-ruamel.yaml==0.16.10
-frozendict==1.2
-python-dotenv==0.13.0

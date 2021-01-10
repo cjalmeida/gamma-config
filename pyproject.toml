@@ -1,0 +1,28 @@
+[tool.poetry]
+authors = ["Cloves Almeida <almeida.cloves@bcg.com>"]
+description = "Opinionated config handling for BCG Gamma projects"
+name = "gamma-config"
+packages = [
+  {include = "gamma"},
+]
+version = "0.2.11"
+
+[tool.poetry.dependencies]
+pluggy = "0.13.*"
+python = "^3.6"
+python-dotenv = "0.13.*"
+"ruamel.yaml" = "0.16.*"
+
+[tool.poetry.dev-dependencies]
+# python = "^3.6"
+black = "19.10b0"
+coverage = "4.5.*"
+flake8 = "3.8.*"
+httpx = "0.16.*"
+jinja2 = "2.11.*"
+pytest = "5.4.2"
+pytest-cov = "2.8.*"
+pytest-runner = "5.1.*"
+sphinx = "3.2.*"
+sphinx-autobuild = "2020.9.*"
+sphinx-rtd-theme = "0.5.*"
