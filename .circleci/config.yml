@@ -11,32 +11,35 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v2-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
-            - v2-
+            - v3-{{ checksum "poetry.lock" }}
+            - v3-
 
       - run:
           name: install dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt -r build-requirements.txt
+            pip install --user poetry
+            poetry config virtualenvs.in-project true
+            poetry env use python3 -n
+            . .venv/bin/activate
+            poetry install -v -n
 
       - save_cache:
           paths:
-            - ./venv
-          key: v2-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
+            - .poetry
+            - .venv
+          key: v3-{{ checksum "poetry.lock" }}
 
       - run:
           name: run tests
           command: |
-            . venv/bin/activate
+            . .venv/bin/activate
             export PYTHONPATH=$PWD
             pytest --junitxml=test-results/junit.xml --cov-report xml --cov=gamma test/
 
       - run:
           name: build wheel
           command: |
-            . venv/bin/activate
+            . .venv/bin/activate
             (rm -rf build dist || true) && python setup.py sdist
 
       - persist_to_workspace:
@@ -54,7 +57,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v2-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
+            - v3-{{ checksum "poetry.lock" }}
       - run:
           name: install nodejs
           command: |
@@ -66,7 +69,7 @@ jobs:
       - run:
           name: build docs
           command: |
-            . venv/bin/activate
+            . .venv/bin/activate
             cd docs
             make html
 
@@ -85,7 +88,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v2-{{ checksum "requirements.txt" }}-{{ checksum "build-requirements.txt" }}
+            - v3-{{ checksum "poetry.lock" }}
 
       - attach_workspace:
           at: ./dist
@@ -99,7 +102,7 @@ jobs:
 
             echo $PWD
             ls -l
-            . venv/bin/activate
+            . .venv/bin/activate
             python ./publish
 
 workflows:
@@ -111,13 +114,13 @@ workflows:
             tags:
               only: /^v.*/
             branches:
-              only: [master]
+              only: [master, poetry]
       - doc:
           requires:
             - build
           filters:
             branches:
-              only: [master]
+              only: [master, poetry]
             tags:
               only: /^v.*/
 
