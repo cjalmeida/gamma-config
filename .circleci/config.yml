@@ -39,8 +39,7 @@ jobs:
       - run:
           name: build wheel
           command: |
-            . .venv/bin/activate
-            (rm -rf build dist || true) && python setup.py sdist
+            poetry build
 
       - persist_to_workspace:
           root: ./dist
