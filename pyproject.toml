@@ -5,7 +5,7 @@ name = "gamma-config"
 packages = [
   {include = "gamma"},
 ]
-0.2.12
+version = "0.2.12"
 
 [tool.poetry.dependencies]
 pluggy = "0.13.*"
