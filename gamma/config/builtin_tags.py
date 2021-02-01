@@ -3,21 +3,28 @@ import sys
 import threading
 from typing import Any, Dict
 
+from ruamel.yaml import YAML
+
 from gamma.config.config import Config, RenderContext
 
 from . import plugins
 
 UNDEFINED = "~~UNDEFINED~~"
+yaml = YAML(typ="safe")
 
 
 def _split_default(value):
     """Get a value optional default, using the content after the last "|"
-    (pipe) as convention"""
+    (pipe) as convention.
+
+    The default will be parsed as a YAML value.
+    """
 
     default = UNDEFINED
     parsed = value
     if "|" in value:
         parsed, default = value.rsplit("|", 1)
+        default = yaml.load(default)
     return parsed, default
 
 
@@ -197,9 +204,9 @@ def ref(value: Any, root: Config, dump) -> Any:
     using quotes.
     """
 
-    import shlex
-    import operator
     import functools
+    import operator
+    import shlex
 
     lex = shlex.shlex(instream=value, posix=True)
     lex.whitespace = "."
@@ -219,7 +226,6 @@ def ref(value: Any, root: Config, dump) -> Any:
     return parent[tokens[-1]]
 
 
-@plugins.hookimpl
 def option(value: str):
     """Return a command line option argument.
 

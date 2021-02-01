@@ -1,6 +1,7 @@
 # flake8: noqa
 from gamma.cli import plugins
-
+from .cli_command import config
+import sys
 
 @plugins.hookimpl
 def add_commands():

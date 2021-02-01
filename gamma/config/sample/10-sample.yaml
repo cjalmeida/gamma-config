@@ -11,6 +11,8 @@ sample_list_1: [1, 2, 3]
 sample_env:
   user: !env USER
   secret_user: !env_secret USER
+  default_1: !env USER|foo
+  default_2: !env USER|null
 
 sample_reference:
   # return value of a config self reference using dot notation

@@ -45,7 +45,21 @@ def test_load_sample(caplog, monkeypatch):
     assert config["sample_scalar_2"] == "foobar_prod"
 
 
-def test_sample_dump(monkeypatch):
+def test_env_default(monkeypatch):
+    from gamma.config import get_config
+
+    config = get_config()
+
+    # unset USER env to test default
+    monkeypatch.delenv("USER", None)
+
+    with pytest.raises(Exception):
+        assert config["sample_env"]["user"]
+    assert config["sample_env"]["default_1"] == "foo"
+    assert config["sample_env"]["default_2"] is None
+
+
+def test_sample_dump():
     from gamma.config import get_config
     from ruamel.yaml import YAML
 
@@ -61,8 +75,10 @@ def test_sample_dump(monkeypatch):
     loaded = yaml.load(dump)
     assert loaded["sample_scalar_1"] == "hello world"
 
-    # assert secret env was not dumped
+    # test env
     assert loaded["sample_env"]["user"] == os.environ["USER"]
+
+    # assert secret env was not dumped
     assert not isinstance(loaded["sample_env"]["secret_user"], str)
     assert isinstance(loaded["nested"]["composite"], str)
     assert not isinstance(loaded["nested"]["secret"], str)

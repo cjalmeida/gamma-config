@@ -1,6 +1,8 @@
 from click import Option as ClickOption
 from click import option as click_option
 
+__all__ = ["option"]
+
 
 class ConfigOption(ClickOption):
 
