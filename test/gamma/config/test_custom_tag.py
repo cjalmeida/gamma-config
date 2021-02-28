@@ -5,14 +5,9 @@ import os
 import sys
 import pytest
 
-META_STR = """
-plugins:
-    modules: ['foo.plugin']
-"""
-
 CONFIG_STR = """
 test: !myenv USER
-test2: !simple_env USER
+test2: !env USER
 """
 
 
@@ -26,7 +21,7 @@ def folder_fixture(monkeypatch):
         root = base / "config"
         root.mkdir()
         meta = root / "00-meta.yaml"
-        meta.write_text(META_STR)
+        meta.write_text("include_folders: []")
 
         # create config/10-test.yaml
         test_cfg = root / "10-test.yaml"
@@ -37,9 +32,9 @@ def folder_fixture(monkeypatch):
         foo.mkdir()
 
         # copy plugin contents
-        plugin = foo / "plugin.py"
+        plugin = foo / "custom_tag.py"
         here = Path(__file__).parent
-        src = here / "custom_plugin.py"
+        src = here / "custom_tag.py"
         plugin.write_text(src.read_text())
 
         # set config root
@@ -55,9 +50,15 @@ def folder_fixture(monkeypatch):
 
 
 def test_custom_plugins(folder_fixture):
+    import foo.custom_tag
+    from gamma.config import render_node, Node, Tag
+
+
+    # check dispatch correctly added the custom renderer
+    assert render_node[Node, Tag["!myenv"]] is not None
 
     # load config
     config = get_config()
 
-    assert config.test == os.getenv("USER")
-    assert config.test2 == os.getenv("USER")
+    assert config["test"] == os.getenv("USER")
+    assert config["test2"] == os.getenv("USER")

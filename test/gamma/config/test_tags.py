@@ -1,23 +1,23 @@
+from gamma.config import render_node, RootConfig, ScalarNode
+from gamma.config.builtin_tags import RefTag
+
+
 def test_ref():
-    from gamma.config import builtin_tags, Config
 
     # simple access
-    config = Config({"foo": {"bar": 100}})
-    val = builtin_tags.ref(value="foo.bar", root=config, dump=False)
+    root = RootConfig("dummy", {"foo": {"bar": 100}})
+    node = ScalarNode("!ref", "foo.bar")
+    val = render_node(node, RefTag(), root=root)
     assert val == 100
 
     # quoted access
-    config = Config({"hello.world": {"bar": 100}})
-    val = builtin_tags.ref(value="'hello.world'.bar", root=config, dump=False)
+    root = RootConfig("dummy", {"hello.world": {"bar": 100}})
+    node = ScalarNode("!ref", "'hello.world'.bar")
+    val = render_node(node, RefTag(), root=root)
     assert val == 100
 
 
 def test_ref_sibling():
-    from gamma.config import config
-    from ruamel.yaml import YAML
-
-    yaml = YAML()
-
     src = """
     a: foo
     b:
@@ -25,10 +25,7 @@ def test_ref_sibling():
       sib: !ref b.ref_a
     """
 
-    cfg = config.create_config_from_string(src)
-    assert cfg.a == "foo"
+    cfg = RootConfig("dummy", src)
     assert cfg.b.ref_a == "foo"
+    assert cfg.a == "foo"
     assert cfg.b.sib == "foo"
-
-    dump = yaml.load(cfg.to_yaml())
-    assert dump["b"]["ref_a"] == "foo"

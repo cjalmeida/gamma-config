@@ -1,34 +1,32 @@
 import os
-import sys
 import threading
-from typing import Any, Dict
+from typing import Any
 
 from ruamel.yaml import YAML
-
-from gamma.config.config import Config, RenderContext
-
-from . import plugins
+from ruamel.yaml.nodes import Node
+from .tags import Tag, TagException
+from gamma.dispatch import dispatch
+from .render import render_node
+from .render_context import get_render_context
 
 UNDEFINED = "~~UNDEFINED~~"
 yaml = YAML(typ="safe")
 
 
-def _split_default(value):
-    """Get a value optional default, using the content after the last "|"
-    (pipe) as convention.
-
-    The default will be parsed as a YAML value.
-    """
-
-    default = UNDEFINED
-    parsed = value
-    if "|" in value:
-        parsed, default = value.rsplit("|", 1)
-        default = yaml.load(default)
-    return parsed, default
+RefTag = Tag["!ref"]
+EnvTag = Tag["!env"]
+EnvSecretTag = Tag["!env_secret"]
+ExprTag = Tag["!expr"]
+J2Tag = Tag["!j2"]
+J2SecretTag = Tag["!j2_secret"]
 
 
-def env(value: Any) -> str:
+j2_cache = threading.local()
+
+
+# render !env
+@dispatch
+def render_node(node: Node, tag: EnvTag, **ctx) -> str:
     """Maps the value to an environment variable of the same name.
 
     You can provide a default using the ``|`` (pipe) character after the variable
@@ -38,58 +36,49 @@ def env(value: Any) -> str:
 
         my_var: !env MYVAR|my_default
     """
-    name = value
+    name = node.value
     name, default = _split_default(name)
     env_val = os.getenv(name, default)
     if env_val == UNDEFINED:
-        raise plugins.TagException(
+        raise TagException(
             f"Env variable '{name}' not found when resolving node and no default set"
         )
 
     return env_val
 
 
-def dump_raw(dump: bool, node) -> str:
-    if dump:
-        return RenderContext(node, render_recurse=False)
-    return node
-
-
-def env_secret(value: Any, dump: bool, node) -> str:
+# process: !env_secret
+@dispatch
+def render_node(node: Node, tag: EnvSecretTag, dump=False, **ctx) -> str:
     """Similar to !env, but never returns the value when dumping."""
     if dump:
         return node
-    return env(value)
+    return render_node(node, EnvTag(), dump=dump, **ctx)
 
 
-def expr(value: Any, root) -> Any:
+# process: !expr
+@dispatch
+def render_node(node: Node, tag: EnvSecretTag, **ctx) -> Any:
     """Uses ``eval()`` to render arbitrary Python expressions.
 
     By default, we add the root configuration as `c` variable.
 
-    See ``expr_globals`` plugin hook to extend available globals.
+    See ``gamma.config.render_context.context_providers`` documentation to add your
+    own variables to the context.
     """
 
-    _locals = {"c": root}
-    _globals = {}
-
-    for var in plugins.plugin_manager.hook.expr_globals():
-        for k, v in var.items():
-            if k in _globals:
-                raise Exception(f"Global key `{k}` defined twice in plugins.")
-            _globals[k] = v
-
-    return eval(value, _globals, _locals)
+    _locals = {}
+    _globals = get_render_context()
+    return eval(node.value, _globals, _locals)
 
 
-j2_cache = threading.local()
-
-
-def j2(value: Any, root) -> Any:
+# process: !expr
+@dispatch
+def render_node(node: Node, tag: J2Tag, **ctx) -> Any:
     """Treats the value a Jinj2 Template
 
-    The context for rendering is shared with the ``!expr`` and can be extended with
-    the same ``expr_globals`` plugin hook.
+    See ``gamma.config.render_context.context_providers`` documentation to add your
+    own variables to the context.
 
     In practice, in the snippet bellow, ``foo1`` and ``foo2`` are equivalent
 
@@ -108,96 +97,27 @@ def j2(value: Any, root) -> Any:
             "`pip install jinja2` if you want to use the !j2 tag"
         )
 
-    _globals = {"c": root}
-
-    for var in plugins.plugin_manager.hook.expr_globals():
-        for k, v in var.items():
-            if k in _globals:
-                raise Exception(f"Global key `{k}` defined twice in plugins.")
-            _globals[k] = v
-
+    render_ctx = get_render_context()
     if not hasattr(j2_cache, "env"):
         j2_cache.env = jinja2.Environment()
 
-    try:
-        # make sure we avoid infinite recursion when referencing nested arguments
-        # when dumping
-        prev_dump_mode = root.dump_mode
-        root.dump_mode = False
-        res = j2_cache.env.from_string(value).render(**_globals)
-    finally:
-        root.dump_mode = prev_dump_mode
-
+    res = j2_cache.env.from_string(node.value).render(**render_ctx)
     return res
 
 
-def j2_secret(value: Any, root, dump: bool, node) -> str:
+# process: !j2_secret
+@dispatch
+def render_node(node: Node, tag: J2SecretTag, dump=False, **ctx) -> Any:
     """Similar to !j2, but never returns the value when dumping."""
+
     if dump:
         return node
-    return j2(value, root)
+    return render_node(node, J2Tag(), dump=dump, **ctx)
 
 
-def func(node: Any, dump):
-    """Returns a reference to a function.
-
-    Functions are provided as a mapping in the structure below:
-
-        my_function: !func
-            ref: <module>:<func_name>   # reference to the callable
-            args: [<arg1>, <arg2>]      # (optional) positional args
-            kwargs:                     # (optional) keyword args
-                <param1>: <value1>
-                <param2>: <value2>
-            dump: <dump>                # (optional) dump mode behavior
-            call: <call>                # (optional) call function instead of
-                                        #            returning partial
-
-    If ``call`` is ``false`` (the default), the config returns a ``partial`` on
-    access, otherwise, it will call the function and return the output value.
-
-    The ``dump`` arg defaults to ``false`` and means the function is not resolved
-    during serialization. If ``true``, the function is called and it's content
-    resolved - as expected this won't work for partials that require
-    extra configuration.
-    """
-
-    import importlib
-    from functools import partial
-
-    assert isinstance(node, Dict), "Value should be a mapping"
-
-    param_keys = set(node.keys())
-    expected_keys = set(["ref", "args", "kwargs", "dump", "call"])
-    extra = param_keys - expected_keys
-    assert not extra, f"Extra keys found in !func configuration: {extra}"
-
-    try:
-        module_name, func_name = node["ref"].split(":")
-    except ValueError as ex:
-        raise ValueError(
-            "Error parsing callable: '" + node["ref"] + "'. Expecting <module>:<func>"
-        ) from ex
-    module = importlib.import_module(module_name)
-    _func = getattr(module, func_name)
-
-    args = node.get("args", [])
-    kwargs = node.get("kwargs", {})
-    curried = partial(_func, *args, **kwargs)
-
-    to_call = node.get("call", False)
-    to_dump = node.get("dump", False)
-    if dump and to_dump:
-        return curried()
-    elif dump and not to_dump:
-        return node
-    elif to_call:
-        return curried()
-    else:
-        return curried
-
-
-def ref(value: Any, root: Config, dump) -> Any:
+# process: !ref
+@dispatch
+def render_node(node: Node, tag: RefTag, root=None, **ctx) -> Any:
     """References other entries in the config object.
 
     Navigate the object using the dot notation. Complex named keys can be accessed
@@ -208,7 +128,7 @@ def ref(value: Any, root: Config, dump) -> Any:
     import operator
     import shlex
 
-    lex = shlex.shlex(instream=value, posix=True)
+    lex = shlex.shlex(instream=node.value, posix=True)
     lex.whitespace = "."
     tokens = []
     token = lex.get_token()
@@ -216,82 +136,73 @@ def ref(value: Any, root: Config, dump) -> Any:
         tokens.append(token)
         token = lex.get_token()
 
-    old_mode = root.dump_mode
+    # old_mode = root.dump_mode
     try:
-        root.dump_mode = False
+        # root.dump_mode = False
         parent = functools.reduce(operator.getitem, tokens[:-1], root)
     finally:
-        root.dump_mode = old_mode
+        1
+        # root.dump_mode = old_mode
 
     return parent[tokens[-1]]
 
 
-def option(value: str):
-    """Return a command line option argument.
+# def option(value: str):
+#     """Return a command line option argument.
 
-    You can specify options using the :func:``gamma.config.cli.option`` decorator. They
-    can be referenced then using the `!option <option_long_name>|<default>`.
+#     You can specify options using the :func:``gamma.config.cli.option`` decorator. They
+#     can be referenced then using the `!option <option_long_name>|<default>`.
 
-    Examples:
+#     Examples:
 
-        Given a command::
+#         Given a command::
 
-        @click.command()
-        @option('-a', '--myarg')
-        def foo(myarg):
-            ...
+#         @click.command()
+#         @option('-a', '--myarg')
+#         def foo(myarg):
+#             ...
 
-        You can reference the value of `--myarg` as::
+#         You can reference the value of `--myarg` as::
 
-        args:
-            myarg: !option myarg
+#         args:
+#             myarg: !option myarg
 
-    See:
-        :func:``gamma.config.cli.option``
+#     See:
+#         :func:``gamma.config.cli.option``
+#     """
+
+#     from gamma.config.cli import get_option
+
+#     value, default = _split_default(value)
+#     try:
+#         opt_value = get_option(value)
+#         if opt_value is None:
+#             opt_value = default
+#     except KeyError:
+#         opt_value = default
+
+#     if opt_value == UNDEFINED:
+#         raise plugins.TagException(
+#             f"CLI param '{value}' not set and no default provided."
+#         )
+#     return opt_value
+
+
+###
+# Utilities
+###
+
+
+def _split_default(value):
+    """Get a value optional default, using the content after the last "|"
+    (pipe) as convention.
+
+    The default will be parsed as a YAML value.
     """
 
-    from gamma.config.cli import get_option
-
-    value, default = _split_default(value)
-    try:
-        opt_value = get_option(value)
-        if opt_value is None:
-            opt_value = default
-    except KeyError:
-        opt_value = default
-
-    if opt_value == UNDEFINED:
-        raise plugins.TagException(
-            f"CLI param '{value}' not set and no default provided."
-        )
-    return opt_value
-
-
-@plugins.hookimpl
-def add_tags():
-    """Add builtin tags to the YAML parsers"""
-
-    return [
-        plugins.TagSpec("!env", env),
-        plugins.TagSpec("!env_secret", env_secret),
-        plugins.TagSpec("!dump_raw", dump_raw),
-        plugins.TagSpec("!expr", expr),
-        plugins.TagSpec("!func", func),
-        plugins.TagSpec("!j2", j2),
-        plugins.TagSpec("!j2_secret", j2_secret),
-        plugins.TagSpec("!ref", ref),
-        plugins.TagSpec("!option", option),
-    ]
-
-
-@plugins.hookimpl
-def expr_globals():
-    """Add the ``os.environ`` dict to !expr globals.
-
-    Mostly an example.
-    """
-
-    return {"env": os.environ}
-
-
-plugins.plugin_manager.register(sys.modules[__name__])
+    default = UNDEFINED
+    parsed = value
+    if "|" in value:
+        parsed, default = value.rsplit("|", 1)
+        default = yaml.load(default)
+    return parsed, default

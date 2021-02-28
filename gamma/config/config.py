@@ -1,27 +1,84 @@
 import copy
 import inspect
+from io import StringIO
 import logging
 import os
 import threading
 import weakref
 from abc import ABC, abstractproperty
-from collections import UserDict
 from pathlib import Path, WindowsPath
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Set
-
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    NamedTuple,
+    Optional,
+    Set,
+)
+from functools import reduce
 from ruamel.yaml import YAML
-from ruamel.yaml.comments import CommentedBase
+from ruamel.yaml.constructor import Constructor
+from ruamel.yaml.nodes import Node
 
 from . import yaml_merge, subprocess
-from . import tags as tags_module
+from .tags import Tag, render_node
+from .merge import merge_nodes
 
 blacklist: Set[str] = set()
 
 logger = logging.getLogger(__name__)
 
 
-class Config(UserDict):
-    """Represents a configuration value, potentially returned from resolving a tag.
+class RootKey(NamedTuple):
+    name: str
+
+    def __repr__(self) -> str:
+        return f"RootKey({self.name})"
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class RootConfig(Mapping):
+    def __init__(self) -> None:
+        self._root_nodes: Dict[str, ConfigNode] = dict()
+
+    def push_entry(self, entry_key: str, node: Node) -> None:
+        self._root_nodes[entry_key] = ConfigNode(node)
+
+    def __getitem__(self, key: str):
+        # search recursily on root nodes for an item matching
+
+        matches = []
+        key: str
+        node: Node
+
+        for entry_key, node in self._root_nodes.items():
+            if key in node:
+                matches.append((RootKey(entry_key), key, node))
+
+        if len(matches) > 0:
+            key, node = reduce(merge_nodes, matches)
+
+        return render_node(node, Tag[node.tag], key, self, False)
+
+    def __iter__(self):
+        return iter(self.__getitem__(k) for k in self._root_nodes.keys())
+
+    def __len__(self):
+        return len(self._root_nodes)
+
+
+class ConfigNode(Mapping):
+    def __init__(self, node: Node) -> None:
+        self.node = node
+
+
+class Config(Mapping):
+    """Represents a configuration tree, optionally from multiple files
 
     Args:
         data: The underlying data to render
@@ -31,29 +88,16 @@ class Config(UserDict):
             Should be None for the root value.
     """
 
-    def __init__(
-        self,
-        data,
-        *,
-        parent: Optional["Config"] = None,
-        _tags: Dict[str, Callable] = None,
-    ):
+    def __init__(self, *, parent: Optional["Config"] = None):
         super().__init__()
-        self.data = data
         self.parent = parent
-        self._tags: Optional[Dict[str, Callable]] = _tags
+        self._nodes = OrderedDict()
 
         if self.parent:
             self._dump_mode = None
         else:
             self._dump_mode = False
 
-            # load tags
-            if self._tags is None:
-                self._tags = tags_module.get_tags()
-                # we get raw_value from self.data
-
-        self._stack = [(data, data)]
         self._allow_dot_access = True
 
     @property
@@ -62,14 +106,6 @@ class Config(UserDict):
         if self.parent is None:
             return self
         return self.parent._root
-
-    @property
-    def tags(self) -> Dict[str, Callable]:
-        if self._tags is None and self.parent is not None:
-            return self.parent.tags
-        if self._tags is None:
-            raise ValueError("tags not initialized")
-        return self._tags
 
     @property
     def dump_mode(self):
@@ -201,7 +237,7 @@ class Renderer:
         self.tags = tags
         self.config = config
         self.dump = dump
-        self.render_tags = render_tags
+        self.render_tags: bool = render_tags
         self.render_recurse = render_recurse
         self.sort = sort
 
@@ -309,21 +345,27 @@ class ConfigLoader(ABC):
         Each entry is loaded in order and merged into the config
         """
 
-    def load(self, config: Config):
+    def load(self, config: RootConfig):
         """Load YAML config entries into a Config object.
         """
 
-        def _sort_key(el: str):
-            splits = el.rsplit("/", 1)
-            return splits[0] if len(splits) == 1 else splits[1]
+        entries = []
+        for entry in self.entries:
+            splits = entry.rsplit("/", 1)
+            key = splits[0] if len(splits) == 1 else splits[1]
+            entries.append((key, entry))
 
-        entries = sorted(self.entries, key=_sort_key)
-        for entry in entries:
+        entries = sorted(self.entries)
+
+        for key, entry in entries:
             content = self.get_content(entry)
             if not content.strip():
                 logger.warning(f"Entry '{entry}' is empty. Skipping")
-            data = self.yaml.load(content)
-            config.push(data)
+            stream = StringIO(content)
+            constructor: Constructor
+            constructor, _ = self.yaml.get_constructor_parser(stream)
+            node = constructor.composer.get_single_node()
+            config.push_node(key, node)
 
         return config
 
@@ -538,7 +580,7 @@ def get_config() -> Config:
             from . import tags
 
             yaml = YAML(typ="rt")
-            _config = Config({}, _tags=tags.get_tags(blacklist=True))
+            _config = RootConfig()
             DefaultConfigLoader(yaml=yaml).load(_config)
             _config_store.config = _config
     return _config_store.config
@@ -548,7 +590,7 @@ def create_config_from_string(yaml_str: str) -> "Config":
     """Simple Config factory that builds a config object from a YAML string"""
 
     yaml = YAML(typ="rt")
-    _config = Config({}, _tags=tags_module.get_tags(blacklist=True))
+    _config = Config({})
     content = yaml.load(yaml_str)
     _config.push(content)
     return _config
@@ -557,12 +599,11 @@ def create_config_from_string(yaml_str: str) -> "Config":
 def get_meta_config() -> "Config":
     if not hasattr(_config_store, "meta") is None:
         yaml = YAML(typ="rt")
-        _config_store.meta = Config({}, _tags=tags_module.get_tags(blacklist=False))
+        _config_store.meta = Config({})
         loader = MetaConfigLoader(yaml=yaml)
         loader.load(_config_store.meta)
 
         # reset tags to ensure extra modules are available
-        tags_module.reset_tags()
         loader.load_plugins(_config_store.meta)
 
     return _config_store.meta
