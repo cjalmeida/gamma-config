@@ -1,11 +1,13 @@
-from .confignode import ConfigNode, RootConfig, push_entry
-from typing import Any, List, Tuple
-from gamma.dispatch import dispatch, Val
-import multiprocessing
 import logging
-from .load import load_node
-from pathlib import Path
 import os
+from pathlib import Path
+import pdb
+from typing import Any, List, Tuple
+
+from gamma.dispatch import Val, dispatch
+
+from .confignode import ConfigNode
+from .load import load_node
 
 logger = logging.getLogger(__name__)
 
@@ -15,62 +17,6 @@ FindJupyter = Val["jupyter"]
 
 CONFIG_FIND_ORDER = [FindEnv, FindLocal, FindJupyter]
 CONFIG_ROOT_ENV = "GAMMA_CONFIG_ROOT"
-
-
-class _GlobalStore:
-    def __init__(self) -> None:
-        self.root = None
-        self.load_thread_id = None
-        self.load_thread_name = None
-        self.load_pid = None
-
-    def set(self, root, force=False):
-        """Set the new root config.
-
-        To avoid unwanted suprises, by defaul we allow updating the global root config
-        only by the same thread that created it.
-
-        Args:
-            root: the RootConfig to store
-            force: if True, do not check for thread safety
-        """
-        import threading
-
-        thread = threading.current_thread()
-        if force or self.root is None or self.load_thread_id == thread.ident:
-            self.root = root
-            self.load_thread_id = thread.ident
-            self.load_thread_name = thread.name
-            self.load_pid = multiprocessing.current_process().pid
-            return
-
-        raise Exception(
-            f"Current thread {thread.name}(id={thread.ident}) tried to update "
-            f"the global config that was originally loaded from thread "
-            f"{self.load_thread_name}({self.load_thread_id})"
-        )
-
-    def get(self) -> RootConfig:
-        return self.root
-
-    def empty(self) -> bool:
-        return self.root is None
-
-
-_global_store = _GlobalStore()
-
-
-def get_config():
-    if _global_store.empty():
-        entries = sorted(get_entries())
-        root = RootConfig()
-        for entry_key, entry in entries:
-            node = load_node(entry)
-            if node:
-                push_entry(root, entry_key, node)
-
-        _global_store.set(root)
-    return _global_store.get()
 
 
 @dispatch
@@ -91,7 +37,8 @@ def get_entries(folder: Path, meta_include_folders=True):
             if subfolder is None:
                 continue
             subpath = folder / subfolder
-            paths += get_entries(subpath, meta_include_folders=False)
+            for k, e in get_entries(subpath, meta_include_folders=False):
+                entries.append((k, e))
 
     return entries
 
@@ -137,7 +84,7 @@ def get_config_root(_: FindEnv):
 @dispatch
 def get_config_root(_: FindLocal):
     root = Path("config").absolute()
-    if has_meta(root).exists():
+    if has_meta(root):
         return root
     return None
 

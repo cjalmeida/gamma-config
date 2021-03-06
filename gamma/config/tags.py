@@ -6,7 +6,7 @@ from typing import Union
 class Tag:
     @property
     def name(self):
-        return self.__value__
+        return str(self.__values__[0])
 
 
 Map = Tag.of("tag:yaml.org,2002:map")

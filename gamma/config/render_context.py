@@ -1,3 +1,4 @@
+from gamma import dispatch
 from typing import Dict, List, Optional, NamedTuple, Callable, Any
 from .cache import cache
 
@@ -29,7 +30,7 @@ def default_context_provider():
     - c -> the global RootConfig
     """
     import os
-    from .locate import get_config
+    from .globalconfig import get_config
 
     return [ContextVar("env", os.environ), ContextVar("c", function=get_config)]
 

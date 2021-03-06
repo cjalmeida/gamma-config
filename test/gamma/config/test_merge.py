@@ -1,6 +1,6 @@
 from gamma.config.load import load_node
 from gamma.config.merge import merge_nodes
-from gamma.config.confignode import RootConfig, RootKey, push_entry
+from gamma.config.confignode import RootConfig, push_entry
 from gamma.config.render import render_node
 
 
@@ -18,8 +18,8 @@ def test_merge():
 
     # test simple
     def _test(a, b, expect):
-        left = RootKey("target"), load_node(a)
-        right = RootKey("patch"), load_node(b)
+        left = "target", load_node(a)
+        right = "patch", load_node(b)
         _, node = merge_nodes(*left, *right)
         got = render_node(node)
         assert got == expect

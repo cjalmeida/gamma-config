@@ -7,13 +7,13 @@ def test_ref():
     # simple access
     root = RootConfig("dummy", {"foo": {"bar": 100}})
     node = ScalarNode("!ref", "foo.bar")
-    val = render_node(node, RefTag(), root=root)
+    val = render_node(node, RefTag(), config=root)
     assert val == 100
 
     # quoted access
     root = RootConfig("dummy", {"hello.world": {"bar": 100}})
     node = ScalarNode("!ref", "'hello.world'.bar")
-    val = render_node(node, RefTag(), root=root)
+    val = render_node(node, RefTag(), config=root)
     assert val == 100
 
 

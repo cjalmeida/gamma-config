@@ -4,7 +4,6 @@ from gamma.config.render import render_node
 
 def test_scalar_str():
     node_a = load_node("foo: bar")
-    pdb.set_trace()
     got = render_node(node_a)
     want = {"foo": "bar"}
     assert got == want

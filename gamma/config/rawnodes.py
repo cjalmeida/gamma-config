@@ -1,3 +1,5 @@
+import collections
+import pdb
 from typing import Iterable, Optional, Tuple
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 from ruamel.yaml.tokens import CommentToken
@@ -53,8 +55,27 @@ def is_equal(a, b: ScalarNode):
 
 
 @dispatch
-def as_node(a: str):
-    return ScalarNode("tag:yaml.org,2002:str", value=a)
+def as_node(a: Node):
+    return a
+
+
+@dispatch
+def as_node(a):
+
+    # handle base types
+    if isinstance(a, str):
+        return ScalarNode("tag:yaml.org,2002:str", value=a)
+    elif isinstance(a, int):
+        return ScalarNode("tag:yaml.org,2002:int", value=str(a))
+    elif isinstance(a, float):
+        return ScalarNode("tag:yaml.org,2002:float", value=str(a))
+    elif isinstance(a, bool):
+        return ScalarNode("tag:yaml.org,2002:bool", value=str(a))
+    elif a is None:
+        return ScalarNode("tag:yaml.org,2002:null", value="null")
+    else:
+        import pdb; pdb.set_trace()
+        raise Exception(f"Can't handle type {type(a)} for value {a}")
 
 
 @dispatch

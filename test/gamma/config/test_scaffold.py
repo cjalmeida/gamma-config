@@ -3,7 +3,6 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from click.testing import CliRunner
 
 
 @pytest.fixture
@@ -17,19 +16,17 @@ def test_cwd():
 
 
 def test_scaffold(test_cwd):
-    from gamma.config.cli_command import scaffold
-
-    runner = CliRunner()
+    from gamma.config.scaffold import scaffold
 
     # test cwd
-    scaffold.callback(target=None, force=False)
+    scaffold(target=None, force=False)
     assert (Path(test_cwd) / "config/00-meta.yaml").exists()
 
     # test exists meta fail
-    res = runner.invoke(scaffold)
-    assert res.exit_code != 0
+    with pytest.raises(SystemExit):
+        scaffold(target=None, force=False)
 
     # test target folder
     with tempfile.TemporaryDirectory() as td:
-        res = scaffold.callback(target=td, force=False)
+        scaffold(target=td, force=False)
         assert (Path(td) / "config/00-meta.yaml").exists()

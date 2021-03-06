@@ -1,3 +1,8 @@
 # Sample of an environment specific config overriding the default values.
 
 sample_scalar_2: foobar_prod
+deep:
+  lvl1:
+    lvl2:
+      new: new_prod
+      lvl3: foobar_prod

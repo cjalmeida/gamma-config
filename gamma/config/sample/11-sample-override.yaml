@@ -1,1 +1,5 @@
 sample_scalar_2: foobar_dev
+deep:
+  lvl1:
+    lvl2:
+      lvl3: foobar_dev

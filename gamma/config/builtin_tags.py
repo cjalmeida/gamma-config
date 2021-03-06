@@ -1,4 +1,5 @@
 import os
+import pdb
 import threading
 from typing import Any
 
@@ -19,6 +20,7 @@ EnvSecretTag = Tag["!env_secret"]
 ExprTag = Tag["!expr"]
 J2Tag = Tag["!j2"]
 J2SecretTag = Tag["!j2_secret"]
+
 
 
 j2_cache = threading.local()
@@ -58,7 +60,7 @@ def render_node(node: Node, tag: EnvSecretTag, dump=False, **ctx) -> str:
 
 # process: !expr
 @dispatch
-def render_node(node: Node, tag: EnvSecretTag, **ctx) -> Any:
+def render_node(node: Node, tag: ExprTag, **ctx) -> Any:
     """Uses ``eval()`` to render arbitrary Python expressions.
 
     By default, we add the root configuration as `c` variable.
@@ -117,7 +119,7 @@ def render_node(node: Node, tag: J2SecretTag, dump=False, **ctx) -> Any:
 
 # process: !ref
 @dispatch
-def render_node(node: Node, tag: RefTag, root=None, **ctx) -> Any:
+def render_node(node: Node, tag: RefTag, config=None, **ctx) -> Any:
     """References other entries in the config object.
 
     Navigate the object using the dot notation. Complex named keys can be accessed
@@ -139,53 +141,12 @@ def render_node(node: Node, tag: RefTag, root=None, **ctx) -> Any:
     # old_mode = root.dump_mode
     try:
         # root.dump_mode = False
-        parent = functools.reduce(operator.getitem, tokens[:-1], root)
+        parent = functools.reduce(operator.getitem, tokens[:-1], config._root)
     finally:
         1
         # root.dump_mode = old_mode
 
     return parent[tokens[-1]]
-
-
-# def option(value: str):
-#     """Return a command line option argument.
-
-#     You can specify options using the :func:``gamma.config.cli.option`` decorator. They
-#     can be referenced then using the `!option <option_long_name>|<default>`.
-
-#     Examples:
-
-#         Given a command::
-
-#         @click.command()
-#         @option('-a', '--myarg')
-#         def foo(myarg):
-#             ...
-
-#         You can reference the value of `--myarg` as::
-
-#         args:
-#             myarg: !option myarg
-
-#     See:
-#         :func:``gamma.config.cli.option``
-#     """
-
-#     from gamma.config.cli import get_option
-
-#     value, default = _split_default(value)
-#     try:
-#         opt_value = get_option(value)
-#         if opt_value is None:
-#             opt_value = default
-#     except KeyError:
-#         opt_value = default
-
-#     if opt_value == UNDEFINED:
-#         raise plugins.TagException(
-#             f"CLI param '{value}' not set and no default provided."
-#         )
-#     return opt_value
 
 
 ###

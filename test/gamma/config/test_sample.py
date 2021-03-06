@@ -1,5 +1,4 @@
 import os
-
 import pytest
 
 
@@ -8,7 +7,8 @@ def test_load_sample(caplog, monkeypatch):
 
     caplog.set_level(logging.DEBUG)
 
-    from gamma.config import get_config, config as config_mod
+    from gamma.config import get_config
+    from gamma.config.globalconfig import reset_config
 
     # load default config
     config = get_config()
@@ -22,15 +22,9 @@ def test_load_sample(caplog, monkeypatch):
 
     # assert env was loaded and override default
     assert config["sample_scalar_2"] == "foobar_dev"
-
-    # assert functions
-    assert config["sample_func"]["func_1"]() == os.getcwd()
-    assert config["sample_func"]["func_2"]() == os.getenv("USER")
-    assert config["sample_func"]["func_3"]() == os.getenv(key="MISSING", default="foo")
-    assert config["sample_func"]["func_4"] == os.getcwd()
+    assert config["deep"]["lvl1"]["lvl2"]["lvl3"] == "foobar_dev"
 
     # assert dot access
-    assert config.sample_func.func_1() == os.getcwd()
     assert config.sample_list_1 == [1, 2, 3]
     assert not config.missing
     assert not config.missing.subkey
@@ -39,10 +33,12 @@ def test_load_sample(caplog, monkeypatch):
         assert not config._missing_underscore
 
     # reset config and test other env
-    config_mod.reset_config()
+    reset_config()
     monkeypatch.setenv("ENVIRONMENT", "prod")
     config = get_config()
     assert config["sample_scalar_2"] == "foobar_prod"
+    assert config["deep"]["lvl1"]["lvl2"]["lvl3"] == "foobar_prod"
+    assert config["deep"]["lvl1"]["lvl2"]["new"] == "new_prod"
 
 
 def test_env_default(monkeypatch):
@@ -60,7 +56,7 @@ def test_env_default(monkeypatch):
 
 
 def test_sample_dump():
-    from gamma.config import get_config
+    from gamma.config import get_config, to_yaml, to_dict
     from ruamel.yaml import YAML
 
     # load default config
@@ -68,7 +64,7 @@ def test_sample_dump():
     assert config["sample_scalar_1"] == "hello world"
 
     # dump resolving tags
-    dump = config.to_yaml(resolve_tags=True)
+    dump = to_yaml(config, resolve_tags=True)
 
     # load in a regular yaml loader
     yaml = YAML(typ="rt")
@@ -84,14 +80,14 @@ def test_sample_dump():
     assert not isinstance(loaded["nested"]["secret"], str)
 
     # dump again, with original tags
-    dump = config.to_yaml(resolve_tags=False)
+    dump = to_yaml(config, resolve_tags=False)
     yaml = YAML(typ="rt")
     loaded = yaml.load(dump)
     assert not isinstance(loaded["sample_env"]["user"], str)
     assert hasattr(loaded["sample_env"]["user"], "tag")
 
     # dump to dict
-    new_dict = config.to_dict()
+    new_dict = to_dict(config)
     assert type(new_dict) == dict
     assert type(new_dict["sample_env"]) == dict
 

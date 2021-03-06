@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 from gamma.dispatch import dispatch
@@ -10,7 +11,14 @@ logger = logging.getLogger(__name__)
 
 
 @dispatch
-def render_node(node: Node, tag: tags.Tag, *, key, root, config, dump):
+def render_node(
+    node: Node,
+    tag: tags.Tag,
+    *,
+    key: Optional[Node] = None,
+    config: "ConfigNode" = None,
+    dump: bool = False,
+):
     """Spec for tag handling functions.
 
     Functions may accept any argument (or none at all), as needed.
@@ -21,7 +29,6 @@ def render_node(node: Node, tag: tags.Tag, *, key, root, config, dump):
         tag: The tag to be handled. A subinstance of ``Tag``.
     Keywork Args:
         key: The node key, also as a ruamel YAML node.
-        root: The RootConfig object holding the config.
         config: The current ConfigNode object.
         dump: Flag indicating we're dumping the data to a potentially insecure
             destination, so sensitive data should not be returned.
@@ -29,7 +36,9 @@ def render_node(node: Node, tag: tags.Tag, *, key, root, config, dump):
     Return:
         any value
     """
-    raise ValueError(f"Renderer not implemented for node={node}, tag={tag}")
+    raise ValueError(
+        f"Renderer not implemented for node_type={type(node).__name__}, tag={tag.name}"
+    )
 
 
 @dispatch
@@ -71,8 +80,8 @@ def render_node(node: ScalarNode, tag: tags.Timestamp, **args):
 
 
 @dispatch
-def render_node(node: Node):
-    return render_node(node, tags.Tag[node.tag]())
+def render_node(node: Node, **args):
+    return render_node(node, tags.Tag[node.tag](), **args)
 
 
 @dispatch
@@ -90,7 +99,7 @@ def render_node(node: SequenceNode, tag: tags.Tag, **args):
 
 
 @dispatch
-def render_node(node: MappingNode, tag: tags.Tag, **args):
+def render_node(node: MappingNode, tag: tags.Map, **args):
     """Render map nodes"""
     subargs = args.copy()
 
@@ -105,5 +114,28 @@ def render_node(node: MappingNode, tag: tags.Tag, **args):
     return out
 
 
-# load builtin tags automatically
+@dispatch
+def render_node(cfg: "RootConfig"):
+    """Render the resulting node of merging all entries"""
+
+    from gamma.config.merge import merge_nodes
+    from functools import reduce
+
+    nodes = list(cfg._root_nodes.values())
+    _, node = merge_nodes(nodes)
+    return render_node(node, config=cfg)
+
+
+@dispatch
+def render_node(cfg: "ConfigNode", dump=True):
+    """Render the config node. Defaults to "dump mode"!
+
+    Args:
+        dump: If true, assume it's "dump mode" where secrets are not to be rendered.
+    """
+    return render_node(cfg._node, config=cfg, dump=dump)
+
+
 from . import builtin_tags  # noqa
+from gamma.config.confignode import ConfigNode, RootConfig  # noqa
+

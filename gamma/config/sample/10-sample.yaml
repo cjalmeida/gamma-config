@@ -34,30 +34,6 @@ sample_expr:
   # using globals set by the plugins
   expr_3: !expr env['USER']
 
-sample_func:
-  # Sample returning a function reference
-
-  # partial function without arg
-  func_1: !func
-    ref: os:getcwd
-
-  # partial using positional args
-  func_2: !func
-    ref: os:getenv
-    args: ["USER"]
-
-  # partial using kwargs
-  func_3: !func
-    ref: os:getenv
-    kwargs:
-      key: MISSING
-      default: foo
-
-  # call func
-  func_4: !func
-    ref: os:getcwd
-    call: true
-
 nested:
   # in dev you should override those with a 21-db.local.yaml file
   # in prod, you should override with a 90-db.yaml containing externally sourced
@@ -68,3 +44,8 @@ nested:
   # the SQLAlchemy URL to connect to the DB instance
   composite: !j2 "composite:{{c.nested.foo}}:{{c.nested.bar}}"
   secret: !j2_secret "composite:{{c.nested.foo}}:{{c.nested.bar}}"
+
+deep:
+  lvl1:
+    lvl2:
+      lvl3: this should be overriden

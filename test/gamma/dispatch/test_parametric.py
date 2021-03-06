@@ -1,3 +1,4 @@
+from multimethod import DispatchError
 import pytest
 from gamma.dispatch import ParametricMeta, parametric, dispatch
 
@@ -95,6 +96,15 @@ def test_parametric_dispatch():
     assert fun(Tag["new"]()) == "base"
     assert fun(RefTag()) == "ref"
     assert fun(FooTag()) == "foo"
+
+    @dispatch
+    def bar(a: RefTag):
+        return "ok"
+
+    assert bar(RefTag()) == "ok"
+
+    with pytest.raises(DispatchError):
+        bar(RefTag)
 
 
 def test_also_of():

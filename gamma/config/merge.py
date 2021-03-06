@@ -1,23 +1,50 @@
 """Implements the dictionary merging functionality"""
 
 from copy import deepcopy
-from typing import Tuple, Union
+from typing import List, Tuple, Union
 
-from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
+from ruamel.yaml.nodes import MappingNode, Node, SequenceNode
 from gamma.dispatch import dispatch
 
-from .rawnodes import append_comment, get_keys, get_item, get_values, union_nodes, is_in
+from .rawnodes import get_keys, get_item, get_values, union_nodes, is_in
+from functools import reduce
+
+
+@dispatch
+def merge_nodes(nodes: List):
+    """Merge nodes iterable, ignoring key"""
+    if len(nodes) == 0:
+        raise ValueError("Empty nodes list")
+    elif len(nodes) == 1 and isinstance(nodes[0], Tuple):
+        return nodes[0]
+    elif len(nodes) == 1 and isinstance(nodes[0], Node):
+        return None, nodes[0]
+    return reduce(merge_nodes, nodes)
+
+
+@dispatch
+def merge_nodes(l_node: MappingNode, r_node: MappingNode):
+    """merge map nodes ignoring key"""
+    return merge_nodes(None, l_node, None, r_node)
+
+
+@dispatch
+def merge_nodes(left: Tuple, r_node: MappingNode):
+    """merge map nodes ignoring key (for assymetric fold-left)"""
+    l_node = left[-1]
+    return merge_nodes(None, l_node, None, r_node)
 
 
 @dispatch
 def merge_nodes(left: Tuple, right: Tuple):
-    l_entry, l_key, l_node = left
-    r_entry, r_key, r_node = right
+    """merge map nodes (symetric fold-left)
 
-    # append entry to the node comment
-    append_comment(l_node, str(l_entry))
-    append_comment(r_node, str(r_entry))
+    Args:
+        left, right: Tuple of (key: Node, value: Node)
+    """
 
+    l_key, l_node = left
+    r_key, r_node = right
     return merge_nodes(l_key, l_node, r_key, r_node)
 
 

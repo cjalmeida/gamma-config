@@ -8,23 +8,25 @@ packages = [
 version = "0.2.15"
 
 [tool.poetry.dependencies]
+colorama = "^0.4.4"
+multimethod = {git = "https://github.com/cjalmeida/multimethod.git", branch = "main"}
 python = "^3.6"
+python-dateutil = "^2.8.1"
 python-dotenv = "0.13.*"
 "ruamel.yaml" = "0.16.*"
-multimethod = "1.5"
-python-dateutil = "^2.8.1"
-
 
 [tool.poetry.dev-dependencies]
 black = "19.10b0"
-coverage = "4.5.*"
+bump2version = "1.0.*"
 flake8 = "3.8.*"
 httpx = "0.16.*"
 jinja2 = "2.11.*"
-pytest = "5.4.2"
-pytest-cov = "2.8.*"
-pytest-runner = "5.1.*"
+pytest = "6.2.*"
 sphinx = "3.2.*"
 sphinx-autobuild = "2020.9.*"
 sphinx-rtd-theme = "0.5.*"
-bump2version = "1.0.*"
+pytest-cov = "^2.11.1"
+
+[tool.pytest.ini_options]
+addopts = "--cov-report xml:cov.xml --cov gamma"
+testpaths = "test"

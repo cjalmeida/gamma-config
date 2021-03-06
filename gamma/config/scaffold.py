@@ -1,25 +1,15 @@
 import os
-import click
 import shutil
+import colorama
+from colorama import Fore, Style
 
 
-@click.group()
-def config():
-    """Application configuration related commands"""
-
-
-@config.command()
-@click.option("-t", "--target", help="The target folder. Default to current folder.")
-@click.option(
-    "--force",
-    is_flag=True,
-    default=False,
-    help="If set, do not check for existing files.",
-)
 def scaffold(target, force):
     """Initialize the config folder with samples"""
 
     from pathlib import Path
+
+    colorama.init()  # for fellow windows users
 
     if not target:
         target = Path(".").absolute()
@@ -34,17 +24,20 @@ def scaffold(target, force):
 
     # Check if config/00-meta.yaml already exists
     if not force and meta.exists():
-        click.secho(
-            "ERROR: File 'config/00-meta.yaml' already exists "
+        print(
+            Fore.YELLOW + "ERROR: File 'config/00-meta.yaml' already exists "
             "and --force was not set",
-            fg="yellow",
+            Style.RESET_ALL,
         )
         raise SystemExit(1)
 
     confdir.mkdir(exist_ok=True)
     _recursive_copy(src, confdir)
-    click.secho("Copied config samples to: ", fg="yellow", nl=False)
-    click.secho(str(confdir), fg="cyan")
+    print(
+        Fore.YELLOW + "Copied config samples to:",
+        Fore.CYAN + str(confdir),
+        Style.RESET_ALL,
+    )
 
 
 def _recursive_copy(src, dest):
@@ -63,3 +56,26 @@ def _recursive_copy(src, dest):
             new_dest = os.path.join(dest, item)
             os.mkdir(new_dest)
             _recursive_copy(file_path, new_dest)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Initialize config folder with samples"
+    )
+    parser.add_argument(
+        "-t",
+        "--target",
+        help="The target folder. Default to current folder.",
+        default=None,
+    )
+    parser.add_argument(
+        "--force",
+        help="If set, do not check for existing files.",
+        action="store_true",
+        default=False,
+    )
+
+    args = parser.parse_args()
+    scaffold(args.target, args.force)
