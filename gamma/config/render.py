@@ -5,7 +5,6 @@ from gamma.config.confignode import ConfigNode, RootConfig  # noqa
 from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
-from . import builtin_tags  # noqa
 from . import tags
 from .rawnodes import get_items, get_values
 
@@ -38,9 +37,13 @@ def render_node(
     Return:
         any value
     """
-    raise ValueError(
-        f"Renderer not implemented for node_type={type(node).__name__}, tag={tag.name}"
-    )
+
+    msg = f"""Renderer not implemented for node_type={type(node).__name__}, tag={tag.name}
+    Possible causes:
+        * Check if you forgot to import `gamma.config.render_node` when defining your
+          `def render_node` method.
+    """  # noqa
+    raise ValueError(msg)
 
 
 @dispatch
@@ -135,3 +138,6 @@ def render_node(cfg: "ConfigNode", dump=True):
         dump: If true, assume it's "dump mode" where secrets are not to be rendered.
     """
     return render_node(cfg._node, config=cfg, dump=dump)
+
+
+from . import builtin_tags  # noqa isort:skip

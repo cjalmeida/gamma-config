@@ -61,10 +61,10 @@ def folder_fixture(monkeypatch):
 
 def test_custom_plugins(folder_fixture):
     import foo.custom_tag  # noqa
-    from gamma.config import render_node, Node, Tag
+    from gamma.config import render_node, ScalarNode, Tag
 
     # check dispatch correctly added the custom renderer
-    assert render_node[Node, Tag["!myenv"]] is not None
+    assert render_node[ScalarNode, Tag["!myenv"]] is not None
 
     # load config
     config = get_config()

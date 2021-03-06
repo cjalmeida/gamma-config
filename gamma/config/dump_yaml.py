@@ -3,10 +3,11 @@ import copy
 from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
-from . import Tag, render_node
 from .confignode import ConfigNode, RootConfig
 from .merge import merge_nodes
 from .rawnodes import as_node
+from .render import render_node
+from .tags import Tag
 
 
 @dispatch

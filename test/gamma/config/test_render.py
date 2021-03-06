@@ -9,6 +9,13 @@ def test_scalar_str():
     assert got == want
 
 
+def test_scalar_seq():
+    node_a = load_node("foo: [1, 2, 3]")
+    got = render_node(node_a)
+    want = {"foo": [1, 2, 3]}
+    assert got == want
+
+
 def test_scalar_int():
     node_a = load_node("foo: 1")
     got = render_node(node_a)

@@ -21,7 +21,7 @@ class ConfigNode(collections.abc.Mapping):
         self._key = key
 
     def __getitem__(self, key):
-        ctx = dict(root=self._root, config=self, dump=False)
+        ctx = dict(config=self, dump=False)
         return config_getitem(self, key, **ctx)
 
     def __iter__(self):  # pragma: no cover
@@ -130,7 +130,9 @@ def config_getitem(item: Node, **ctx):
 
 @dispatch
 def config_getitem(item: MappingNode, **ctx):
-    return ConfigNode(item, ctx["root"])
+    cfg = ctx.get("config")
+    root = cfg._root if cfg is not None else None
+    return ConfigNode(item, root=root)
 
 
 @dispatch

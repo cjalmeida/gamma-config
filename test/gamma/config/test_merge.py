@@ -52,80 +52,68 @@ def test_merge():
     _test(a, b, expect)
 
 
-# def test_hints():
-#     yaml = YAML()
+def test_hints():
 
-#     # assert replace hint on inline lists
-#     target = {"foo": [1, 2]}
-#     patch = yaml.load(
-#         """
-#         foo: [2, 3] # @hint: merge_replace
-#         """
-#     )
-#     merge(target, patch)
-#     assert target == {"foo": [2, 3]}
+    # assert replace hint on inline lists
+    target = load_node({"foo": [1, 2]})
+    patch = load_node(
+        """
+        foo: [2, 3] # @hint: merge_replace
+        """
+    )
+    _, node = merge_nodes(target, patch)
+    assert render_node(node) == {"foo": [2, 3]}
 
-#     # assert replace hint on expanded lists
-#     target = {"foo": [1, 2]}
-#     patch = yaml.load(
-#         """
-#         foo: # @hint: merge_replace
-#           - 2
-#           - 3
-#         """
-#     )
-#     merge(target, patch)
-#     assert target == {"foo": [2, 3]}
+    # assert replace hint on expanded lists
+    target = load_node({"foo": [1, 2]})
+    patch = load_node(
+        """
+        foo: # @hint: merge_replace
+          - 2
+          - 3
+        """
+    )
+    _, node = merge_nodes(target, patch)
+    assert render_node(node) == {"foo": [2, 3]}
 
-#     # test dict merging inline map
-#     target = {"foo": {"a": 1, "b": 2}}
-#     patch = yaml.load(
-#         """
-#         foo: {"b": 20, "c": 30} # @hint: merge_replace
-#         """
-#     )
-#     merge(target, patch)
-#     assert target == {"foo": {"b": 20, "c": 30}}
+    # test dict merging inline map
+    target = load_node({"foo": {"a": 1, "b": 2}})
+    patch = load_node(
+        """
+        foo: {"b": 20, "c": 30} # @hint: merge_replace
+        """
+    )
+    _, node = merge_nodes(target, patch)
+    assert render_node(node) == {"foo": {"b": 20, "c": 30}}
 
-#     # test dict merging expanded map
-#     target = {"foo": {"a": 1, "b": 2}}
-#     patch = yaml.load(
-#         """
-#         foo:  # @hint: merge_replace
-#           b: 20
-#           c: 30
-#         """
-#     )
-#     merge(target, patch)
-#     assert target == {"foo": {"b": 20, "c": 30}}
+    # test dict merging expanded map
+    target = load_node({"foo": {"a": 1, "b": 2}})
+    patch = load_node(
+        """
+        foo:  # @hint: merge_replace
+          b: 20
+          c: 30
+        """
+    )
+    _, node = merge_nodes(target, patch)
+    assert render_node(node) == {"foo": {"b": 20, "c": 30}}
 
-#     # test nested maps with tags
-#     target = {"foo": {"args": [1]}}
-#     patch = yaml.load(
-#         """
-#         foo: !bar # @hint: merge_replace
-#           args: [2]
-#         """
-#     )
-#     merge(target, patch)
-#     assert target == {"foo": {"args": [2]}}
+    # test some hint syntax variants - 1
+    target = load_node({"foo": {"a": 1, "b": 2}})
+    patch = load_node(
+        """
+        foo: {"b": 20, "c": 30} #@hint: merge_replace
+        """
+    )
+    _, node = merge_nodes(target, patch)
+    assert render_node(node) == {"foo": {"b": 20, "c": 30}}
 
-#     # test some hint syntax variants - 1
-#     target = {"foo": {"a": 1, "b": 2}}
-#     patch = yaml.load(
-#         """
-#         foo: {"b": 20, "c": 30} #@hint: merge_replace
-#         """
-#     )
-#     merge(target, patch)
-#     assert target == {"foo": {"b": 20, "c": 30}}
-
-#     # test some hint syntax variants - 2
-#     target = {"foo": {"a": 1, "b": 2}}
-#     patch = yaml.load(
-#         """
-#         foo: {"b": 20, "c": 30} #  @hint:   merge_replace
-#         """
-#     )
-#     merge(target, patch)
-#     assert target == {"foo": {"b": 20, "c": 30}}
+    # test some hint syntax variants - 2
+    target = load_node({"foo": {"a": 1, "b": 2}})
+    patch = load_node(
+        """
+        foo: {"b": 20, "c": 30} #@hint:   merge_replace
+        """
+    )
+    _, node = merge_nodes(target, patch)
+    assert render_node(node) == {"foo": {"b": 20, "c": 30}}
