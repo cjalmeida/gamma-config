@@ -24,26 +24,18 @@ libraries to provide configuration in a common way.
 
 * Configuration expressed as a set of YAML files (by defaul) inside a
   `config` folder in the root of the project.
-
 * Multiple YAML files merged following simple rules. Simple file ordering convention
   using two digit prefixes.
-
 * Builtin support for environment specific parameters (production, development, etc.)
-
 * Support for `.env` files via `python-dotenv`, including `.local.env` that
   can be added to `.gitignore`
-
 * Dynamic evaluation via YAML tags. For instance, the `!ref` tag allow you to
   reference other parameters in any config file.
-
 * Custom tag support via simple and cool multiple dispatch mechanism.
-
 * Round-trip dump of config back into YAML. Support for hiding sensitive data
   on dump.
-
 * Simplified key access via dot (`.`). Eg. for  `config: {foo: {bar: 100}}`,
   this is True: `config.foo.bar == 100`
-
 
 ## Full documentation
 
