@@ -1,6 +1,6 @@
+import pytest
+from gamma.config.confignode import ConfigNode, RootConfig, push_entry
 from gamma.config.load import load_node
-from gamma.config.confignode import ConfigNode
-
 
 SIMPLE = """
 foo:
@@ -34,3 +34,18 @@ def test_attribute_access():
     assert bool(cfg.foo.notexist) is False
     assert bool(cfg.foo) is True
 
+    with pytest.raises(Exception):
+        cfg.foo.notexist()
+
+
+def test_guards():
+    with pytest.raises(Exception, match="entry"):
+        RootConfig("foo: 1")
+
+    cfg = RootConfig()
+    push_entry(cfg, "a", "foo: 1")
+
+    assert cfg["foo"] == 1
+
+    with pytest.raises(Exception, match="duplicated"):
+        push_entry(cfg, "a", "foo: 1")

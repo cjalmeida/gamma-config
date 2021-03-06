@@ -10,10 +10,11 @@ version = "0.2.15"
 [tool.poetry.dependencies]
 colorama = "^0.4.4"
 multimethod = {git = "https://github.com/cjalmeida/multimethod.git", branch = "main"}
-python = "^3.6"
+python = "^3.7"
 python-dateutil = "^2.8.1"
 python-dotenv = "0.13.*"
 "ruamel.yaml" = "0.16.*"
+ipython = "^7.21.0"
 
 [tool.poetry.dev-dependencies]
 black = "19.10b0"
@@ -26,7 +27,8 @@ sphinx = "3.2.*"
 sphinx-autobuild = "2020.9.*"
 sphinx-rtd-theme = "0.5.*"
 pytest-cov = "^2.11.1"
+pre-commit = "^2.10.1"
 
 [tool.pytest.ini_options]
-addopts = "--cov-report xml:cov.xml --cov gamma"
+addopts = "--cov=gamma --cov-report term --cov-report xml:cov.xml"
 testpaths = "test"

@@ -1,7 +1,8 @@
-from typing import Generic, TypeVar
-from multimethod import multimethod as dispatch
-import types
 import inspect
+import types
+from typing import Generic, TypeVar
+
+from multimethod import multimethod as dispatch
 
 dispatch = dispatch
 
@@ -72,7 +73,9 @@ class parametric(Generic[T]):
         Para.__module__ = module
         return Para
 
+
 @parametric
 class Val:
     """Generic parametric class"""
+
     pass

@@ -1,9 +1,10 @@
-import tempfile
-from pathlib import Path
-from gamma.config import get_config
 import os
 import sys
+import tempfile
+from pathlib import Path
+
 import pytest
+from gamma.config import get_config
 
 CONFIG_STR = """
 test: !myenv USER
@@ -37,6 +38,11 @@ def folder_fixture(monkeypatch):
         src = here / "custom_tag.py"
         plugin.write_text(src.read_text())
 
+        # copy config envs
+        for src in (here / "config.env", here / "config.local.env"):
+            dst = base / src.name
+            dst.write_text(src.read_text())
+
         # set config root
         monkeypatch.setenv("GAMMA_CONFIG_ROOT", str(root))
 
@@ -48,11 +54,14 @@ def folder_fixture(monkeypatch):
         # cleanup sys.path
         sys.path.pop(0)
 
+        # cleanup os.environ
+        del os.environ["DUMMY_ENV"]
+        del os.environ["DUMMY_LOCAL_ENV"]
+
 
 def test_custom_plugins(folder_fixture):
-    import foo.custom_tag
+    import foo.custom_tag  # noqa
     from gamma.config import render_node, Node, Tag
-
 
     # check dispatch correctly added the custom renderer
     assert render_node[Node, Tag["!myenv"]] is not None
@@ -62,3 +71,5 @@ def test_custom_plugins(folder_fixture):
 
     assert config["test"] == os.getenv("USER")
     assert config["test2"] == os.getenv("USER")
+    assert os.getenv("DUMMY_ENV")
+    assert os.getenv("DUMMY_LOCAL_ENV")

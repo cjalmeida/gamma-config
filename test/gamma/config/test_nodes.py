@@ -1,5 +1,5 @@
 from gamma.config.load import load_node
-from gamma.config.rawnodes import get_item, get_values, is_equal, get_values, as_node
+from gamma.config.rawnodes import as_node, get_item, get_values, is_equal
 
 
 def test_get_item():

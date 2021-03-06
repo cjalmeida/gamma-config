@@ -2,8 +2,8 @@ from io import IOBase, StringIO
 from pathlib import Path
 from typing import Dict
 
-from ruamel.yaml.nodes import Node
 from gamma.dispatch import dispatch, parametric
+from ruamel.yaml.nodes import Node
 
 
 @parametric

@@ -1,5 +1,5 @@
-from gamma import dispatch
-from typing import Dict, List, Optional, NamedTuple, Callable, Any
+from typing import Any, Callable, Dict, List, NamedTuple, Optional
+
 from .cache import cache
 
 
@@ -42,14 +42,16 @@ context_providers: List[Callable] = [default_context_provider]
 def get_render_context() -> Dict[str, Any]:
     """Return the render context by calling each function in ``context_provider``.
 
-    The function signature must be one of:
+    A context provider must be a function with the signature:
         () -> List[ContextVar]
+    or simply a list of [ContextVar] objects
 
     """
     out = {}
     for provider in context_providers:
         var: ContextVar
-        for var in provider():
+        vars: List[ContextVar] = provider() if callable(provider) else provider
+        for var in vars:
             if var.cacheable:
                 cache_key = f"render_context/{var.name}"
                 try:

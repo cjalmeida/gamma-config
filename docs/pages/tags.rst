@@ -224,7 +224,3 @@ Calling ``config.to_yaml()`` should output this:
 
     normal:
         bar: myuser
-
-
-
-

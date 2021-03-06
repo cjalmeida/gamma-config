@@ -1,9 +1,11 @@
 import logging
 from typing import Optional
+
+from gamma.config.confignode import ConfigNode, RootConfig  # noqa
+from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
-from gamma.dispatch import dispatch
-
+from . import builtin_tags  # noqa
 from . import tags
 from .rawnodes import get_items, get_values
 
@@ -119,7 +121,6 @@ def render_node(cfg: "RootConfig"):
     """Render the resulting node of merging all entries"""
 
     from gamma.config.merge import merge_nodes
-    from functools import reduce
 
     nodes = list(cfg._root_nodes.values())
     _, node = merge_nodes(nodes)
@@ -134,8 +135,3 @@ def render_node(cfg: "ConfigNode", dump=True):
         dump: If true, assume it's "dump mode" where secrets are not to be rendered.
     """
     return render_node(cfg._node, config=cfg, dump=dump)
-
-
-from . import builtin_tags  # noqa
-from gamma.config.confignode import ConfigNode, RootConfig  # noqa
-

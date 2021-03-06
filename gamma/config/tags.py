@@ -1,5 +1,4 @@
 from gamma.dispatch import parametric
-from typing import Union
 
 
 @parametric

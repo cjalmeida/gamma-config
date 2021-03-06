@@ -1,17 +1,21 @@
+from gamma.config.confignode import RootConfig, get_keys, push_entry
 from gamma.config.load import load_node
 from gamma.config.merge import merge_nodes
-from gamma.config.confignode import RootConfig, push_entry
 from gamma.config.render import render_node
 
 
 def test_root_config_merge():
     root = RootConfig()
 
-    a = "foo: bar"
-    b = "foo: baz"
+    a = "{foo: bar}"
+    b = "{foo: baz, ping: pong}"
     push_entry(root, "a", a)
     push_entry(root, "b", b)
     assert root.foo == "baz"
+    assert root.ping == "pong"
+
+    keys = set([render_node(k) for k in get_keys(root)])
+    assert keys == set(["foo", "ping"])
 
 
 def test_merge():

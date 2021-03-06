@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-from pathlib import Path
-import httpx
 import os
 import subprocess
+from pathlib import Path
+
 import dotenv
+import httpx
 
 dotenv.load_dotenv(".env")
 dotenv.load_dotenv(".local.env")

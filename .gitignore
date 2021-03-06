@@ -27,6 +27,7 @@ wheels/
 .installed.cfg
 *.egg
 gamma-config-*
+_tmp/
 tmp/
 
 # PyInstaller

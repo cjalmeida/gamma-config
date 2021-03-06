@@ -1,17 +1,7 @@
-import collections
-import pdb
 from typing import Iterable, Optional, Tuple
-from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
-from ruamel.yaml.tokens import CommentToken
+
 from gamma.dispatch import dispatch
-from functools import reduce
-
-
-def append_comment(node: Node, comment: str):
-    if not node.comment:
-        node.comment = []
-    token = CommentToken("#" + comment, 0, 0)
-    node.comment.append(token)
+from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 
 @dispatch
@@ -29,7 +19,7 @@ def get_item(node: MappingNode, key, default=...):
     if default is not Ellipsis:
         return default
 
-    raise KeyError(key)
+    raise KeyError(key)  # pragma: no cover
 
 
 @dispatch
@@ -65,16 +55,15 @@ def as_node(a):
     # handle base types
     if isinstance(a, str):
         return ScalarNode("tag:yaml.org,2002:str", value=a)
+    elif isinstance(a, bool):
+        return ScalarNode("tag:yaml.org,2002:bool", value=str(a))
     elif isinstance(a, int):
         return ScalarNode("tag:yaml.org,2002:int", value=str(a))
     elif isinstance(a, float):
         return ScalarNode("tag:yaml.org,2002:float", value=str(a))
-    elif isinstance(a, bool):
-        return ScalarNode("tag:yaml.org,2002:bool", value=str(a))
     elif a is None:
         return ScalarNode("tag:yaml.org,2002:null", value="null")
     else:
-        import pdb; pdb.set_trace()
         raise Exception(f"Can't handle type {type(a)} for value {a}")
 
 
@@ -135,8 +124,3 @@ def union_nodes(first: Iterable, second: Iterable):
             out[get_id(b)] = b
 
     return list(out.values())
-
-
-@dispatch
-def union_nodes(nodes: Iterable):
-    reduce(union_nodes, nodes)

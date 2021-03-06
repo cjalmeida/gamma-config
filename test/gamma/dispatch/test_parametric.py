@@ -1,6 +1,6 @@
-from multimethod import DispatchError
 import pytest
-from gamma.dispatch import ParametricMeta, parametric, dispatch
+from gamma.dispatch import ParametricMeta, dispatch, parametric
+from multimethod import DispatchError
 
 
 class Global(metaclass=ParametricMeta):

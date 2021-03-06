@@ -1,12 +1,7 @@
-import pdb
 import copy
-from functools import reduce
-from ruamel.yaml.compat import StringIO
-
-from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
-from ruamel.yaml.serializer import Serializer
 
 from gamma.dispatch import dispatch
+from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 from . import Tag, render_node
 from .confignode import ConfigNode, RootConfig
@@ -39,8 +34,6 @@ def to_yaml(node: Node, *, resolve_tags=False, config=None):
         node = resolve_node(node, config=config)
 
     return serialize(node)
-
-
 
 
 @dispatch

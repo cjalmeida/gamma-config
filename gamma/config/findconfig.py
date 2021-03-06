@@ -1,7 +1,6 @@
 import logging
 import os
 from pathlib import Path
-import pdb
 from typing import Any, List, Tuple
 
 from gamma.dispatch import Val, dispatch
@@ -108,7 +107,7 @@ def has_meta(root: Path):
     return (root / "00-meta.yaml").exists()
 
 
-def _isnotebook():
+def _isnotebook():  # pragma: no cover
     try:
         shell = get_ipython().__class__.__name__  # type: ignore
         if shell == "ZMQInteractiveShell":
@@ -130,9 +129,6 @@ def load_dotenv(root: Path = None):
 
     import dotenv
 
-    if root is None:
-        get_config_root()
-    else:
-        home = root.parent
-        dotenv.load_dotenv(f"{home}/config.local.env")
-        dotenv.load_dotenv(f"{home}/config.env")
+    home = root.parent
+    dotenv.load_dotenv(f"{home}/config.local.env")
+    dotenv.load_dotenv(f"{home}/config.env")

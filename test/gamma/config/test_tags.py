@@ -1,4 +1,4 @@
-from gamma.config import render_node, RootConfig, ScalarNode
+from gamma.config import RootConfig, ScalarNode, render_node
 from gamma.config.builtin_tags import RefTag
 
 

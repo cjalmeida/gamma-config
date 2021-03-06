@@ -1,5 +1,6 @@
 import multiprocessing
 import threading
+
 from .confignode import RootConfig, push_entry
 from .findconfig import get_entries
 from .load import load_node

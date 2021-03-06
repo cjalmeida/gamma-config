@@ -1,15 +1,17 @@
+import collections
+from typing import Dict, Optional
+
 from gamma.config.load import load_node
 from gamma.dispatch import dispatch
-from typing import Dict, NamedTuple, Optional
 from ruamel.yaml.nodes import MappingNode, Node, SequenceNode
+
+from . import tags
+from .merge import merge_nodes
 from .rawnodes import get_entry, get_keys, get_values
 from .tags import Tag
-from .merge import merge_nodes
-from . import tags
-import collections
 
 
-class ConfigNode(collections.Mapping):
+class ConfigNode(collections.abc.Mapping):
     def __init__(
         self, node: MappingNode, root=Optional["RootConfig"], key=None
     ) -> None:
@@ -22,8 +24,9 @@ class ConfigNode(collections.Mapping):
         ctx = dict(root=self._root, config=self, dump=False)
         return config_getitem(self, key, **ctx)
 
-    def __iter__(self):
+    def __iter__(self):  # pragma: no cover
         from .render import render_node
+
         return (render_node(key) for key in get_keys(self))
 
     def __len__(self) -> int:
@@ -162,4 +165,3 @@ def config_len(cfg: ConfigNode):
 @dispatch
 def config_len(cfg: RootConfig):
     return len(list(get_keys(cfg)))
-

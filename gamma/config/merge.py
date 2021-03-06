@@ -1,13 +1,13 @@
 """Implements the dictionary merging functionality"""
 
 from copy import deepcopy
+from functools import reduce
 from typing import List, Tuple, Union
 
-from ruamel.yaml.nodes import MappingNode, Node, SequenceNode
 from gamma.dispatch import dispatch
+from ruamel.yaml.nodes import MappingNode, Node, SequenceNode
 
-from .rawnodes import get_keys, get_item, get_values, union_nodes, is_in
-from functools import reduce
+from .rawnodes import get_item, get_keys, get_values, is_in, union_nodes
 
 
 @dispatch

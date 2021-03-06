@@ -1,14 +1,14 @@
 import os
-import pdb
 import threading
 from typing import Any
 
+from gamma.dispatch import dispatch
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import Node
-from .tags import Tag, TagException
-from gamma.dispatch import dispatch
+
 from .render import render_node
 from .render_context import get_render_context
+from .tags import Tag, TagException
 
 UNDEFINED = "~~UNDEFINED~~"
 yaml = YAML(typ="safe")
@@ -20,7 +20,6 @@ EnvSecretTag = Tag["!env_secret"]
 ExprTag = Tag["!expr"]
 J2Tag = Tag["!j2"]
 J2SecretTag = Tag["!j2_secret"]
-
 
 
 j2_cache = threading.local()
@@ -93,7 +92,7 @@ def render_node(node: Node, tag: J2Tag, **ctx) -> Any:
     """
     try:
         import jinja2
-    except ModuleNotFoundError:
+    except ModuleNotFoundError:  # pragma: no cover
         raise Exception(
             "Could not find Jinja2 installed. You must manually install it with "
             "`pip install jinja2` if you want to use the !j2 tag"
