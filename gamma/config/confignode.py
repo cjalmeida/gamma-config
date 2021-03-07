@@ -122,21 +122,26 @@ def config_getitem(cfg: RootConfig, key, **ctx):
 
 @dispatch
 def config_getitem(item: Node, **ctx):
+    tag = Tag[item.tag]()
+    return config_getitem(item, tag, **ctx)
+
+
+@dispatch
+def config_getitem(item: Node, tag: Tag, **ctx):
     from .render import render_node
 
-    tag = Tag[item.tag]()
     return render_node(item, tag, **ctx)
 
 
 @dispatch
-def config_getitem(item: MappingNode, **ctx):
+def config_getitem(item: MappingNode, tag: tags.Map, **ctx):
     cfg = ctx.get("config")
     root = cfg._root if cfg is not None else None
     return ConfigNode(item, root=root)
 
 
 @dispatch
-def config_getitem(item: SequenceNode, **ctx):
+def config_getitem(item: SequenceNode, tag: tags.Seq, **ctx):
     out = []
     for sub in get_values(item):
         out.append(config_getitem(sub, **ctx))

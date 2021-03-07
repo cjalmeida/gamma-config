@@ -10,5 +10,4 @@ from .globalconfig import get_config
 from .render import render_node
 from .render_context import ContextVar, context_providers
 from .tags import Tag
-
-to_dict = render_node
+from .dump_dict import to_dict

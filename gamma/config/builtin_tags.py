@@ -1,10 +1,13 @@
+from gamma.config.dump_dict import to_dict
 import os
 import threading
-from typing import Any
+from typing import Any, Mapping, Union
+
+from ruamel.yaml.events import ScalarEvent
 
 from gamma.dispatch import dispatch
 from ruamel.yaml import YAML
-from ruamel.yaml.nodes import Node
+from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 from .render import render_node
 from .render_context import get_render_context
@@ -20,7 +23,8 @@ EnvSecretTag = Tag["!env_secret"]
 ExprTag = Tag["!expr"]
 J2Tag = Tag["!j2"]
 J2SecretTag = Tag["!j2_secret"]
-
+PyTag = Tag["!py"]
+ObjTag = Tag["!obj"]
 
 j2_cache = threading.local()
 
@@ -146,6 +150,60 @@ def render_node(node: Node, tag: RefTag, config=None, **ctx) -> Any:
         # root.dump_mode = old_mode
 
     return parent[tokens[-1]]
+
+
+# process: !py
+@dispatch
+def render_node(node: ScalarNode, tag: PyTag, path=None, **ctx) -> Any:
+    func = _py_tag_get_func("py", path)
+    val = yaml.load(node.value)
+    return func(val)
+
+
+# process: !py
+@dispatch
+def render_node(
+    node: Union[SequenceNode, MappingNode], tag: PyTag, path=None, **ctx
+) -> Any:
+    func = _py_tag_get_func("py", path)
+    val = to_dict(node)
+    return func(val)
+
+
+def _py_tag_get_func(tag, path, default_module=None):
+    import importlib
+
+    if not path:
+        raise ValueError(f"The !{tag} tag is missing the 'path' part after the ':'")
+
+    if ":" in path:
+        module_name, func_name = path.split(":", 1)
+    elif default_module:
+        module_name = default_module
+        func_name = path
+    else:
+        raise ValueError(f"The !{tag} tag has an invalid reference: {path}")
+
+    try:
+        module = importlib.import_module(module_name)
+    except ModuleNotFoundError as ex:
+        raise ValueError(f"Module part from '!{tag}:{path}' not found") from ex
+
+    func = getattr(module, func_name, None)
+    if not func:
+        raise ValueError(f"Name '{func_name}' not found in module {module}")
+
+    return func
+
+
+# process: !obj
+@dispatch
+def render_node(node: MappingNode, tag: ObjTag, path=None, config=None, **ctx) -> Any:
+    root = config and config._root
+    default_module = (root and root.get("obj_default_module")) or None
+    func = _py_tag_get_func("obj", path, default_module=default_module)
+    val = to_dict(node)
+    return func(**val)
 
 
 ###

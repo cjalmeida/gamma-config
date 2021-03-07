@@ -1,5 +1,10 @@
+from gamma.config.tags import Tag
+from gamma.dispatch import dispatch
+from multimethod import DispatchError
+from ruamel.yaml.nodes import Node, ScalarNode
 from gamma.config.load import load_node
-from gamma.config.render import render_node
+from gamma.config.render import RenderDispatchError, render_node
+import pytest
 
 
 def test_scalar_str():
@@ -57,3 +62,47 @@ def test_scalar_timestamp():
         got = render_node(node)
         want = {"foo": parser.parse(v)}
         assert got == want
+
+
+def test_render_uri():
+    from gamma.config import render_node
+
+    src = """
+    a: !foo     1
+    b: !bar:b   2
+    c: !bar:c   3
+    """
+    node = load_node(src)
+
+    with pytest.raises(RenderDispatchError):
+        render_node(node)
+
+    Foo = Tag["!foo"]
+    Bar = Tag["!bar"]
+    BarC = Tag["!bar:c"]
+
+    try:
+
+        @dispatch
+        def render_node(node: Node, tag: Foo, **ctx):
+            return f"foo-{node.value}"
+
+        @dispatch
+        def render_node(node: Node, tag: Bar, **ctx):
+            assert ctx["path"]
+            return f"bar-{node.value}"
+
+        @dispatch
+        def render_node(node: Node, tag: BarC, **ctx):
+            assert ctx.get("path") is None
+            return f"bar-c-{node.value}"
+
+        d = render_node(node)
+        assert d["a"] == "foo-1"
+        assert d["b"] == "bar-2"
+        assert d["c"] == "bar-c-3"
+
+    finally:
+        del render_node[Node, Foo]
+        del render_node[Node, Bar]
+        del render_node[Node, BarC]
