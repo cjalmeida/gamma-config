@@ -18,7 +18,7 @@ python-versions = "*"
 name = "appnope"
 version = "0.1.2"
 description = "Disable App Nap on macOS >= 10.9"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -59,7 +59,7 @@ pytz = ">=2015.7"
 name = "backcall"
 version = "0.2.0"
 description = "Specifications for callback functions passed in to an API"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -146,7 +146,7 @@ toml = ["toml"]
 name = "decorator"
 version = "4.4.2"
 description = "Decorators for Humans"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*"
 
@@ -157,6 +157,30 @@ description = "Distribution utilities"
 category = "dev"
 optional = false
 python-versions = "*"
+
+[[package]]
+name = "docspec"
+version = "0.2.1"
+description = "Docspec is a JSON object specification for representing API documentation of programming languages."
+category = "dev"
+optional = false
+python-versions = ">=3.6.0,<4.0.0"
+
+[package.dependencies]
+"nr.databind.core" = ">=0.0.19,<0.1.0"
+"nr.databind.json" = ">=0.0.9,<0.1.0"
+
+[[package]]
+name = "docspec-python"
+version = "0.1.0"
+description = "A parser based on lib2to3 producing docspec data from Python source code."
+category = "dev"
+optional = false
+python-versions = ">=3.5.0,<4.0.0"
+
+[package.dependencies]
+docspec = ">=0.2.0,<0.3.0"
+"nr.sumtype" = ">=0.0.3,<0.1.0"
 
 [[package]]
 name = "docutils"
@@ -284,7 +308,7 @@ python-versions = "*"
 name = "ipython"
 version = "7.21.0"
 description = "IPython: Productive Interactive Computing"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -315,7 +339,7 @@ test = ["nose (>=0.10.1)", "requests", "testpath", "pygments", "nbformat", "ipyk
 name = "ipython-genutils"
 version = "0.2.0"
 description = "Vestigial utilities from IPython"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -323,7 +347,7 @@ python-versions = "*"
 name = "jedi"
 version = "0.18.0"
 description = "An autocompletion tool for Python that can be used for text editors."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -338,7 +362,7 @@ testing = ["Django (<3.1)", "colorama", "docopt", "pytest (<6.0.0)"]
 name = "jinja2"
 version = "2.11.3"
 description = "A very fast and expressive template engine."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
@@ -364,7 +388,7 @@ tornado = {version = "*", markers = "python_version > \"2.7\""}
 name = "markupsafe"
 version = "1.1.1"
 description = "Safely add untrusted strings to HTML/XML markup."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 
@@ -400,6 +424,138 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "nr.collections"
+version = "0.0.1"
+description = "Useful container datatypes for Python 2 and 3."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+"nr.metaclass" = ">=0.0.1,<0.1.0"
+six = ">=1.11.0,<2.0.0"
+
+[package.extras]
+test = ["nr.fs (>=1.5.0,<2.0.0)"]
+
+[[package]]
+name = "nr.databind.core"
+version = "0.0.22"
+description = "Bind structured data directly to typed objects."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+"nr.collections" = ">=0.0.1,<1.0.0"
+"nr.interface" = ">=0.0.1,<0.1.0"
+"nr.pylang.utils" = ">=0.0.3,<0.1.0"
+"nr.stream" = ">=0.0.1,<0.1.0"
+
+[[package]]
+name = "nr.databind.json"
+version = "0.0.14"
+description = "Deserialize JSON into Python objects and reverse."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+"nr.collections" = ">=0.0.1,<1.0.0"
+"nr.databind.core" = ">=0.0.21,<0.1.0"
+"nr.interface" = ">=0.0.1,<0.1.0"
+"nr.parsing.date" = ">=0.1.0,<1.0.0"
+"nr.pylang.utils" = ">=0.0.1,<0.1.0"
+
+[[package]]
+name = "nr.fs"
+version = "1.6.3"
+description = "Filesystem and path manipulation tools."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+six = ">=1.11.0,<2.0.0"
+
+[[package]]
+name = "nr.interface"
+version = "0.0.4"
+description = "Interface definitions for Python."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+"nr.collections" = ">=0.0.1,<1.0.0"
+"nr.metaclass" = ">=0.0.1,<0.1.0"
+"nr.pylang.utils" = ">=0.0.1,<0.1.0"
+six = ">=1.11.0,<2.0.0"
+
+[[package]]
+name = "nr.metaclass"
+version = "0.0.6"
+description = "Metaclass utilities."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "nr.parsing.date"
+version = "0.4.4"
+description = "A simple and fast date parsing library. Uses dateutil for timezone offset support."
+category = "dev"
+optional = false
+python-versions = ">=3.5.0,<4.0.0"
+
+[package.dependencies]
+"nr.utils.re" = ">=0.1.0,<0.2.0"
+
+[[package]]
+name = "nr.pylang.utils"
+version = "0.0.4"
+description = "Package description here."
+category = "dev"
+optional = false
+python-versions = ">=3.4.0,<4.0.0"
+
+[package.dependencies]
+"nr.collections" = ">=0.0.1,<1.0.0"
+
+[[package]]
+name = "nr.stream"
+version = "0.0.5"
+description = "Use iterators like Java streams."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+"nr.collections" = ">=0.0.1,<1.0.0"
+"nr.pylang.utils" = ">=0.0.1,<1.0.0"
+six = ">=1.11.0,<2.0.0"
+
+[[package]]
+name = "nr.sumtype"
+version = "0.0.4"
+description = "Sumtypes in Python."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+"nr.metaclass" = ">=0.0.4,<1.0.0"
+"nr.stream" = ">=0.0.2,<1.0.0"
+
+[[package]]
+name = "nr.utils.re"
+version = "0.1.1"
+description = "This module provides some utility functions for applying regular expressions."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "packaging"
 version = "20.9"
 description = "Core utilities for Python packages"
@@ -414,7 +570,7 @@ pyparsing = ">=2.0.2"
 name = "parso"
 version = "0.8.1"
 description = "A Python Parser"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -434,7 +590,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 name = "pexpect"
 version = "4.8.0"
 description = "Pexpect allows easy control of interactive console applications."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -445,7 +601,7 @@ ptyprocess = ">=0.5"
 name = "pickleshare"
 version = "0.7.5"
 description = "Tiny 'shelve'-like database with concurrency support"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -484,7 +640,7 @@ virtualenv = ">=20.0.8"
 name = "prompt-toolkit"
 version = "3.0.16"
 description = "Library for building powerful interactive command lines in Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.1"
 
@@ -495,7 +651,7 @@ wcwidth = "*"
 name = "ptyprocess"
 version = "0.7.0"
 description = "Run a subprocess in a pseudo terminal"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -516,6 +672,29 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
+name = "pydoc-markdown"
+version = "3.10.0"
+description = "Create Python API documentation in Markdown format."
+category = "dev"
+optional = false
+python-versions = ">=3.5.0,<4.0.0"
+
+[package.dependencies]
+click = ">=7.0.0,<8.0.0"
+docspec = ">=0.2.0,<0.3.0"
+docspec-python = ">=0.1.0,<0.2.0"
+"nr.collections" = ">=0.0.1,<0.1.0"
+"nr.databind.core" = ">=0.0.18,<0.1.0"
+"nr.databind.json" = ">=0.0.9,<0.1.0"
+"nr.fs" = ">=1.6.0,<2.0.0"
+"nr.interface" = ">=0.0.3,<0.1.0"
+PyYAML = ">=5.3.0,<6.0.0"
+requests = ">=2.23.0,<3.0.0"
+six = ">=1.11.0,<2.0.0"
+toml = ">=0.10.1,<1.0.0"
+watchdog = ">=1.0.0,<2.0.0"
+
+[[package]]
 name = "pyflakes"
 version = "2.2.0"
 description = "passive checker of Python programs"
@@ -527,7 +706,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 name = "pygments"
 version = "2.8.0"
 description = "Pygments is a syntax highlighting package written in Python."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.5"
 
@@ -852,7 +1031,7 @@ python-versions = ">= 3.5"
 name = "traitlets"
 version = "5.0.5"
 description = "Traitlets Python configuration system"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -911,10 +1090,21 @@ docs = ["proselint (>=0.10.2)", "sphinx (>=3)", "sphinx-argparse (>=0.2.5)", "sp
 testing = ["coverage (>=4)", "coverage-enable-subprocess (>=1)", "flaky (>=3)", "pytest (>=4)", "pytest-env (>=0.6.2)", "pytest-freezegun (>=0.4.1)", "pytest-mock (>=2)", "pytest-randomly (>=1)", "pytest-timeout (>=1)", "packaging (>=20.0)", "xonsh (>=0.9.16)"]
 
 [[package]]
+name = "watchdog"
+version = "1.0.2"
+description = "Filesystem events monitoring"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.extras]
+watchmedo = ["PyYAML (>=3.10)", "argh (>=0.24.1)"]
+
+[[package]]
 name = "wcwidth"
 version = "0.2.5"
 description = "Measures the displayed width of unicode strings in a terminal"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -930,10 +1120,13 @@ python-versions = ">=3.6"
 docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "pytest-enabler", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
+[extras]
+jinja2 = ["jinja2"]
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "4604d9c5ce3521ec91330245e7bffc622739554fbe85f00b2fb565bd14bdb7c5"
+content-hash = "6df7b1180eeb97c4b0b2196e083b7671aed93ff0287dc0892654c82b6a9f7ec7"
 
 [metadata.files]
 alabaster = [
@@ -1054,6 +1247,14 @@ distlib = [
     {file = "distlib-0.3.1-py2.py3-none-any.whl", hash = "sha256:8c09de2c67b3e7deef7184574fc060ab8a793e7adbb183d942c389c8b13c52fb"},
     {file = "distlib-0.3.1.zip", hash = "sha256:edf6116872c863e1aa9d5bb7cb5e05a022c519a4594dc703843343a9ddd9bff1"},
 ]
+docspec = [
+    {file = "docspec-0.2.1-py3-none-any.whl", hash = "sha256:1792cb79d5e6f39aa0c4c17b26b283e2e044b3adb7457151b21e14dca44d5d43"},
+    {file = "docspec-0.2.1.tar.gz", hash = "sha256:8ff14da2cdf69a958c3e25c748d629129e38d3145cf5d0c4d55da8e6cfa0cd29"},
+]
+docspec-python = [
+    {file = "docspec-python-0.1.0.tar.gz", hash = "sha256:8858dc3318b6a67d8452a89ac5c14a15c73f1aa1dd72f9cf63eaa9687082d278"},
+    {file = "docspec_python-0.1.0-py3-none-any.whl", hash = "sha256:86561c77dc9ebe4f7d9c224c0740cd66407db849a78580a7509963d4e2c02dfe"},
+]
 docutils = [
     {file = "docutils-0.16-py2.py3-none-any.whl", hash = "sha256:0c5b78adfbf7762415433f5515cd5c9e762339e23369dbe8000d84a4bf4ab3af"},
     {file = "docutils-0.16.tar.gz", hash = "sha256:c2de3a60e9e7d07be26b7f2b00ca0309c207e06c100f9cc2a94931fc75a478fc"},
@@ -1161,6 +1362,49 @@ nodeenv = [
     {file = "nodeenv-1.5.0-py2.py3-none-any.whl", hash = "sha256:5304d424c529c997bc888453aeaa6362d242b6b4631e90f3d4bf1b290f1c84a9"},
     {file = "nodeenv-1.5.0.tar.gz", hash = "sha256:ab45090ae383b716c4ef89e690c41ff8c2b257b85b309f01f3654df3d084bd7c"},
 ]
+"nr.collections" = [
+    {file = "nr.collections-0.0.1.tar.gz", hash = "sha256:ddf38cd6379cac546ce7abdadf024fc01cca75540e11b1d5f1aa701a33817f1c"},
+]
+"nr.databind.core" = [
+    {file = "nr.databind.core-0.0.22-py2.py3-none-any.whl", hash = "sha256:854a0a0551a0aa5a5acedaa547af930bdaca331bc705b3f26732f6b913491572"},
+    {file = "nr.databind.core-0.0.22.tar.gz", hash = "sha256:87fe32d7d8dd91b878a25cd144d056435107ca56a8db7be3030f765334075f77"},
+]
+"nr.databind.json" = [
+    {file = "nr.databind.json-0.0.14-py2.py3-none-any.whl", hash = "sha256:3765fd581c2ca2ee249ccfd460be0f472cc2bc9e5305e2f415d587a5e27c3b86"},
+    {file = "nr.databind.json-0.0.14.tar.gz", hash = "sha256:27c7a7a69f6f703a0c616b898950fdb53a51b39cf9874d412ebc12dea574f20e"},
+]
+"nr.fs" = [
+    {file = "nr.fs-1.6.3-py2.py3-none-any.whl", hash = "sha256:64108c168ea2e8077fdf5f0c5417459d1a145fe34cb305fe90faeb75b4e8b421"},
+    {file = "nr.fs-1.6.3.tar.gz", hash = "sha256:788aa0a04c4143f95c5245bc8ccc0c0872e932be533bd37780fbb55afcdf124a"},
+]
+"nr.interface" = [
+    {file = "nr.interface-0.0.4-py2.py3-none-any.whl", hash = "sha256:5f88579643ea18e1d948d92a49b326aa4585516bf64eb529ae693c4c8bddcc6e"},
+    {file = "nr.interface-0.0.4.tar.gz", hash = "sha256:285cd82b932427c9d5c21cdc02ad319f701c4eed201377e2b30485c91eac67a3"},
+]
+"nr.metaclass" = [
+    {file = "nr.metaclass-0.0.6-py2.py3-none-any.whl", hash = "sha256:d458eb1bddd93373cc74e19981214e7d478c92c9b08fc9732bd430225698a8f0"},
+    {file = "nr.metaclass-0.0.6.tar.gz", hash = "sha256:3d52f8e603e3c2944b9135e5a09593c3c36191f26cf1c29a7c71efb192552b10"},
+]
+"nr.parsing.date" = [
+    {file = "nr.parsing.date-0.4.4-py3-none-any.whl", hash = "sha256:047404978517d892b961bf065d3373ba5e53b6207af978b2c08b2e49498e7bb0"},
+    {file = "nr.parsing.date-0.4.4.tar.gz", hash = "sha256:1c4d25f8f7141676cce03728153f4216d2170adc537aefb2f535a4bad78e3d5d"},
+]
+"nr.pylang.utils" = [
+    {file = "nr.pylang.utils-0.0.4-py3-none-any.whl", hash = "sha256:cf8c88b9e7821a256e31e83e16dcd506d1fb33ea3cf37578eb163526ab044a27"},
+    {file = "nr.pylang.utils-0.0.4.tar.gz", hash = "sha256:48f81167a5f0a7376b0dd1b3db2b88ab1cfa815645a2d4048eb369564f4e2485"},
+]
+"nr.stream" = [
+    {file = "nr.stream-0.0.5-py2.py3-none-any.whl", hash = "sha256:cf418a4de3cedb8622286d2baca6007a153c780af48362d1f2ef2c1993525615"},
+    {file = "nr.stream-0.0.5.tar.gz", hash = "sha256:3489ce5e8174b70d194a6592248ba341fbbd5bf30c9ec5f1223a351df909f505"},
+]
+"nr.sumtype" = [
+    {file = "nr.sumtype-0.0.4-py2.py3-none-any.whl", hash = "sha256:a1017468bbc3d187592c413892c19d0e9642bdeae0149fa0c122ca21dfb23132"},
+    {file = "nr.sumtype-0.0.4.tar.gz", hash = "sha256:a224c7f70c212aebf3754cf941d94527e68f1afad8db0e224d9885eb113d797c"},
+]
+"nr.utils.re" = [
+    {file = "nr.utils.re-0.1.1-py2.py3-none-any.whl", hash = "sha256:eb4e6c10b074e8b296c4e2a83d0299e9a162524fb3e5e6b916dfd194688dbd06"},
+    {file = "nr.utils.re-0.1.1.tar.gz", hash = "sha256:71e21300dbf890d914841f1e6d66eb4e7d6a9f01c9a20d8e83e5242c8d3140aa"},
+]
 packaging = [
     {file = "packaging-20.9-py2.py3-none-any.whl", hash = "sha256:67714da7f7bc052e064859c05c595155bd1ee9f69f76557e21f051443c20947a"},
     {file = "packaging-20.9.tar.gz", hash = "sha256:5b327ac1320dc863dca72f4514ecc086f31186744b84a230374cc1fd776feae5"},
@@ -1204,6 +1448,10 @@ py = [
 pycodestyle = [
     {file = "pycodestyle-2.6.0-py2.py3-none-any.whl", hash = "sha256:2295e7b2f6b5bd100585ebcb1f616591b652db8a741695b3d8f5d28bdc934367"},
     {file = "pycodestyle-2.6.0.tar.gz", hash = "sha256:c58a7d2815e0e8d7972bf1803331fb0152f867bd89adf8a01dfd55085434192e"},
+]
+pydoc-markdown = [
+    {file = "pydoc-markdown-3.10.0.tar.gz", hash = "sha256:5076e16a14a2d708db269f6767236c2b2137e2816cf9efaba6b6bfca36367932"},
+    {file = "pydoc_markdown-3.10.0-py3-none-any.whl", hash = "sha256:eccca05d136f17a1b85fc6d9fba58e5a4f134621ab0426958c79f8fc03b589ff"},
 ]
 pyflakes = [
     {file = "pyflakes-2.2.0-py2.py3-none-any.whl", hash = "sha256:0d94e0e05a19e57a99444b6ddcf9a6eb2e5c68d3ca1e98e90707af8152c90a92"},
@@ -1491,6 +1739,25 @@ urllib3 = [
 virtualenv = [
     {file = "virtualenv-20.4.2-py2.py3-none-any.whl", hash = "sha256:2be72df684b74df0ea47679a7df93fd0e04e72520022c57b479d8f881485dbe3"},
     {file = "virtualenv-20.4.2.tar.gz", hash = "sha256:147b43894e51dd6bba882cf9c282447f780e2251cd35172403745fc381a0a80d"},
+]
+watchdog = [
+    {file = "watchdog-1.0.2-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:e2a531e71be7b5cc3499ae2d1494d51b6a26684bcc7c3146f63c810c00e8a3cc"},
+    {file = "watchdog-1.0.2-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:e7c73edef48f4ceeebb987317a67e0080e5c9228601ff67b3c4062fa020403c7"},
+    {file = "watchdog-1.0.2-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:85e6574395aa6c1e14e0f030d9d7f35c2340a6cf95d5671354ce876ac3ffdd4d"},
+    {file = "watchdog-1.0.2-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:27d9b4666938d5d40afdcdf2c751781e9ce36320788b70208d0f87f7401caf93"},
+    {file = "watchdog-1.0.2-pp36-pypy36_pp73-macosx_10_9_x86_64.whl", hash = "sha256:2f1ade0d0802503fda4340374d333408831cff23da66d7e711e279ba50fe6c4a"},
+    {file = "watchdog-1.0.2-pp37-pypy37_pp73-macosx_10_9_x86_64.whl", hash = "sha256:f1d0e878fd69129d0d68b87cee5d9543f20d8018e82998efb79f7e412d42154a"},
+    {file = "watchdog-1.0.2-py3-none-manylinux2014_aarch64.whl", hash = "sha256:d948ad9ab9aba705f9836625b32e965b9ae607284811cd98334423f659ea537a"},
+    {file = "watchdog-1.0.2-py3-none-manylinux2014_armv7l.whl", hash = "sha256:101532b8db506559e52a9b5d75a308729b3f68264d930670e6155c976d0e52a0"},
+    {file = "watchdog-1.0.2-py3-none-manylinux2014_i686.whl", hash = "sha256:b1d723852ce90a14abf0ec0ca9e80689d9509ee4c9ee27163118d87b564a12ac"},
+    {file = "watchdog-1.0.2-py3-none-manylinux2014_ppc64.whl", hash = "sha256:68744de2003a5ea2dfbb104f9a74192cf381334a9e2c0ed2bbe1581828d50b61"},
+    {file = "watchdog-1.0.2-py3-none-manylinux2014_ppc64le.whl", hash = "sha256:602dbd9498592eacc42e0632c19781c3df1728ef9cbab555fab6778effc29eeb"},
+    {file = "watchdog-1.0.2-py3-none-manylinux2014_s390x.whl", hash = "sha256:016b01495b9c55b5d4126ed8ae75d93ea0d99377084107c33162df52887cee18"},
+    {file = "watchdog-1.0.2-py3-none-manylinux2014_x86_64.whl", hash = "sha256:5f1f3b65142175366ba94c64d8d4c8f4015825e0beaacee1c301823266b47b9b"},
+    {file = "watchdog-1.0.2-py3-none-win32.whl", hash = "sha256:57f05e55aa603c3b053eed7e679f0a83873c540255b88d58c6223c7493833bac"},
+    {file = "watchdog-1.0.2-py3-none-win_amd64.whl", hash = "sha256:f84146f7864339c8addf2c2b9903271df21d18d2c721e9a77f779493234a82b5"},
+    {file = "watchdog-1.0.2-py3-none-win_ia64.whl", hash = "sha256:ee21aeebe6b3e51e4ba64564c94cee8dbe7438b9cb60f0bb350c4fa70d1b52c2"},
+    {file = "watchdog-1.0.2.tar.gz", hash = "sha256:376cbc2a35c0392b0fe7ff16fbc1b303fd99d4dd9911ab5581ee9d69adc88982"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},

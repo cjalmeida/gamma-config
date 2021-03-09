@@ -79,6 +79,7 @@ def get_id(a):
 
 @dispatch
 def get_id(a: ScalarNode):
+    """Return an object that allows to ScalarNodes to be hashed and compared"""
     return (a.tag, a.value)
 
 

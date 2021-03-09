@@ -1,5 +1,5 @@
 import collections
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from gamma.config.load import load_node
 from gamma.dispatch import dispatch
@@ -7,7 +7,7 @@ from ruamel.yaml.nodes import MappingNode, Node, SequenceNode
 
 from . import tags
 from .merge import merge_nodes
-from .rawnodes import get_entry, get_keys, get_values
+from .rawnodes import get_entry, get_keys, get_values, get_id
 from .tags import Tag
 
 
@@ -19,6 +19,7 @@ class ConfigNode(collections.abc.Mapping):
         self._node = node
         self._root = root
         self._key = key
+        self._frozen = True
 
     def __getitem__(self, key):
         ctx = dict(config=self, dump=False)
@@ -47,6 +48,14 @@ class ConfigNode(collections.abc.Mapping):
             "A ConfigNode object is not callable. Are you're trying to "
             f"access the empty/undefined key '{self._key}'?"
         )
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if not name[0] == "_":
+            raise TypeError(
+                f"'{self.__class__.__name__}' object does not support item assignment"
+            )
+        else:
+            object.__setattr__(self, name, value)
 
 
 class RootConfig(ConfigNode):
@@ -89,6 +98,11 @@ def push_entry(root: RootConfig, entry_key: str, node: Node) -> None:
     # sort by entry_key
     s = collections.OrderedDict(sorted(d.items(), key=lambda x: x[0]))
     root._root_nodes = s
+
+
+@dispatch
+def remove_entry(root: RootConfig, entry_key: str):
+    del root._root_nodes[entry_key]
 
 
 @dispatch
@@ -158,9 +172,10 @@ def get_keys(cfg: RootConfig):
     returned = set()
     for node in cfg._root_nodes.values():
         for key in get_keys(node):
-            if key in returned:
+            key_id = get_id(key)
+            if key_id in returned:
                 continue
-            returned.add(key)
+            returned.add(key_id)
             yield key
 
 

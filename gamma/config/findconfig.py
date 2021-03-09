@@ -123,12 +123,17 @@ def _isnotebook():  # pragma: no cover
 def load_dotenv(root: Path = None):
     """Load dotenv files located in:
 
+        $PWD/config.local.env
         {config_root}/../config.local.env
+        $PWD/config.env
         {config_root}/../config.env
     """
 
     import dotenv
 
     home = root.parent
+    dotenv.load_dotenv("./config.local.env")
     dotenv.load_dotenv(f"{home}/config.local.env")
+    dotenv.load_dotenv("./config.env")
     dotenv.load_dotenv(f"{home}/config.env")
+

@@ -1,6 +1,7 @@
 [tool.poetry]
 authors = ["Cloves Almeida <almeida.cloves@bcg.com>"]
 description = "Opinionated config handling for BCG Gamma projects"
+license = "Proprietary"
 name = "gamma-config"
 packages = [
   {include = "gamma"},
@@ -9,26 +10,30 @@ version = "0.2.15"
 
 [tool.poetry.dependencies]
 colorama = "^0.4.4"
+jinja2 = {version = "^2.11", optional = true}
 multimethod = {git = "https://github.com/cjalmeida/multimethod.git", branch = "main"}
 python = "^3.7"
 python-dateutil = "^2.8.1"
 python-dotenv = "0.13.*"
 "ruamel.yaml" = "0.16.*"
 
-
 [tool.poetry.dev-dependencies]
 black = "19.10b0"
 bump2version = "1.0.*"
 flake8 = "3.8.*"
 httpx = "0.16.*"
-jinja2 = "2.11.*"
+ipython = "^7.21.0"
+jinja2 = "^2.11"
+pre-commit = "^2.10.1"
+pydoc-markdown = "^3.10.0"
 pytest = "6.2.*"
+pytest-cov = "^2.11.1"
 sphinx = "3.2.*"
 sphinx-autobuild = "2020.9.*"
 sphinx-rtd-theme = "0.5.*"
-pytest-cov = "^2.11.1"
-pre-commit = "^2.10.1"
-ipython = "^7.21.0"
+
+[tool.poetry.extras]
+jinja2 = ["jinja2"]
 
 [tool.pytest.ini_options]
 addopts = "--cov=gamma --cov-report term --cov-report xml:cov.xml"

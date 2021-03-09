@@ -9,7 +9,7 @@ from .load import load_node
 class _GlobalStore:
     def __init__(self) -> None:
         self.root = None
-        self.load_thread_id = None
+        self.load_key = None
         self.load_thread_name = None
         self.load_pid = None
 
@@ -25,17 +25,18 @@ class _GlobalStore:
         """
 
         thread = threading.current_thread()
-        if force or self.root is None or self.load_thread_id == thread.ident:
+        pid = multiprocessing.current_process().pid
+        key = (thread.ident, pid)
+        if force or self.root is None or self.load_key == key:
             self.root = root
-            self.load_thread_id = thread.ident
-            self.load_thread_name = thread.name
-            self.load_pid = multiprocessing.current_process().pid
+            self.load_key = key
+            self.load_thread_name = threading.current_thread().name
             return
 
         raise Exception(
-            f"Current thread {thread.name}(id={thread.ident}) tried to update "
+            f"Current thread {thread.name}(tid={key[0]}; pid={key[1]}) tried to update "
             f"the global config that was originally loaded from thread "
-            f"{self.load_thread_name}({self.load_thread_id})"
+            f"{self.load_thread_name}(tid={self.load_key[0]}; pid={self.load_key[1]})"
         )
 
     def get(self) -> RootConfig:
