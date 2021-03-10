@@ -40,7 +40,7 @@ side-effect. I recommend watching the following presentation by one of Julia cre
 
 ### So what?!
 
-Every year we write from scratch literally millions of lines of code solving similar
+Every year at BCG Gamma write millions of lines of code solving similar
 but not quite the same problems. Our level of code reuse is very low. As a consulting
 company, we're doomed to work on a multitude of different environments. Creating a
 *one-size-fits-all* framework that can handle even a small subset of scenarios is a
@@ -55,6 +55,6 @@ problem* stated above.
 For a number of reasons, I don't think we should go full Julia (yet). But what if
 idiomatic Python code had the same level of extensibility? Python is flexible enough
 that we could "bend the rules" and make multiple-dispatch the core paradigm simply by
-stylistic convention. My (long-shot) bet is that with point investments and a little
+stylistic convention. My (long shot) bet is that with point investments and a little
 coordination, we could greatly improve code reuse across cases.
 
