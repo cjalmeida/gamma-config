@@ -149,7 +149,7 @@ my_section: !obj:myapp.config:MySection
         foo: bar
 ```
 
-And in you application code:
+And in your application code:
 
 ```py
 from gamma.config import get_config

@@ -3,4 +3,5 @@
 * [Using gamma-config](/using.md)
 * [Environment specific config](/environment.md)
 * [Built-in and custom tags](/tags.md)
+* [Internals](/internals.md)
 * [API Reference](/api.md)
