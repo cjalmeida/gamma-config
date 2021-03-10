@@ -55,7 +55,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v3-{{ checksum "poetry.lock" }}
+            - v4-{{ checksum "poetry.lock" }}
       - run:
           name: install nodejs
           command: |
@@ -86,7 +86,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v3-{{ checksum "poetry.lock" }}
+            - v4-{{ checksum "poetry.lock" }}
 
       - attach_workspace:
           at: ./dist
