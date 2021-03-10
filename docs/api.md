@@ -100,7 +100,7 @@ foo: !mytag:bar 1
 - `dump` - Flag indicating we're dumping the data to a potentially insecure
   destination, so sensitive data should not be returned.
 - `path` - The URI path for URI fallback dispatch
-  
+
 
 **Returns**:
 
@@ -175,7 +175,9 @@ load_dotenv(root: Path = None)
 
 Load dotenv files located in:
 
+$PWD/config.local.env
 {config_root}/../config.local.env
+$PWD/config.env
 {config_root}/../config.env
 
 <a name="gamma.config.render_context"></a>
@@ -401,7 +403,7 @@ name.
 
 **Examples**:
 
-  
+
 - `my_var` - !env MYVAR|my_default
 
 <a name="gamma.config.builtin_tags.render_node"></a>
@@ -499,4 +501,17 @@ union_nodes(first: Iterable, second: Iterable)
 Union two sets of nodes.
 
 By default we keep the ones in `first` if equals.
+
+<a name="gamma.dispatch"></a>
+# gamma.dispatch
+
+<a name="gamma.dispatch.Val"></a>
+## Val Objects
+
+```python
+@parametric
+class Val()
+```
+
+Generic parametric class
 
