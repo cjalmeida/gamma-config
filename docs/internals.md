@@ -38,7 +38,7 @@ side-effect. I recommend watching the following presentation by one of Julia cre
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/kc9HwsxE1OY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-## So what?!
+### So what?!
 
 Every year we write from scratch literally millions of lines of code solving similar
 but not quite the same problems. Our level of code reuse is very low. As a consulting
