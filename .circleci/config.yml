@@ -11,8 +11,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v3-{{ checksum "poetry.lock" }}
-            - v3-
+            - v4-{{ checksum "poetry.lock" }}
 
       - run:
           name: install dependencies
@@ -27,7 +26,7 @@ jobs:
           paths:
             - .poetry
             - .venv
-          key: v3-{{ checksum "poetry.lock" }}
+          key: v4-{{ checksum "poetry.lock" }}
 
       - run:
           name: run tests
