@@ -113,13 +113,13 @@ workflows:
             tags:
               only: /^v.*/
             branches:
-              only: [master]
+              only: [master, multi-dispatch]
       - doc:
           requires:
             - build
           filters:
             branches:
-              only: [master]
+              only: [master, multi-dispatch]
             tags:
               only: /^v.*/
 
