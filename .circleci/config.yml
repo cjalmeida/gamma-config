@@ -20,7 +20,7 @@ jobs:
             poetry config virtualenvs.in-project true
             poetry env use 3.7 -n
             . .venv/bin/activate
-            poetry install -v -n
+            poetry install -n --no-ansi
 
       - save_cache:
           paths:
