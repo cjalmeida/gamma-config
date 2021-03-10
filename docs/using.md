@@ -20,7 +20,7 @@ In the section below we'll discuss some patterns and caveats.
 If you try to access a non-existing value from the returned config object using the
 dictionary style `config['missing']`, it will throw a `KeyError` as expected. However,
 accessing using attribute style `config.missing` **will return an empty sub config**
-object that (like regular dict) is *false-y*.
+object that (like regular dict) is *falsy*.
 
 
 ```python
@@ -32,7 +32,7 @@ except KeyError:
     pass
 
 val = config.missing                    # val is an empty ConfigNode object
-assert not val                          # and is 'false-y` like empty dict
+assert not val                          # and is 'falsey' like empty dict
 ```
 
 This behavior allows you to conveniently navigate deep across nodes, but can be
