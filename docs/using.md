@@ -15,7 +15,7 @@ def do_something():
 
 In the section below we'll discuss some patterns and caveats.
 
-## Config object as a "default config"
+## Safe navigation using attribute (dot) access
 
 If you try to access a non-existing value from the returned config object using the
 dictionary style `config['missing']`, it will throw a `KeyError` as expected. However,
