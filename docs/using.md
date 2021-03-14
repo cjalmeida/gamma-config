@@ -37,7 +37,7 @@ assert not val                          # and is 'falsey' like empty dict
 This behavior allows you to conveniently navigate deep across nodes, but can be
 backfire. Stick to the dictionary style if you want to be safe.
 
-## Config object to "true" `dict`
+## Config object to "real" `dict`
 
 Despite behaving like one, sometimes you need a "real" dict. The way to convert a
 config node into one is to use the `to_dict` function.
@@ -52,7 +52,7 @@ def do_something():
     assert type(val_dict) == dict
 ```
 
-## Dump to YAML / Pickle
+## Dump to YAML or Pickle
 
 `gamma-config` supports dumping the config object to YAML in a safe way, protecting
 secrets. This is very useful, for instance, to capture the config state at a given
@@ -79,7 +79,7 @@ def do_something():
 ```
 
 
-## Do not call get_config outside a wrapping function
+## Ways call `get_config` inside a function
 
 It's a general good practice to avoid _side-effects_ on `import`s. This is doubly true
 when using `gamma-config`.
@@ -142,7 +142,7 @@ you most likely want to use a _high_ number to ensure your config is inserted
 with the highest priority. Likewise, you can use the [`remove_entry`](api?id=remove_entry)
 method to remove a given entry by `entry_key`.
 
-### With config_context
+### Use `config_context` for temporary changes
 
 Adding a partial config for a while then removing it is a common pattern. You can use
 the `config_context` for this, with the added benefit of not having to worry about
