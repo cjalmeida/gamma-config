@@ -1,6 +1,6 @@
 # Environment specific configuration
 
-By default `gamma-config` only load the YAML files _in the root of the config folder_.
+By default `gamma-config` only loads the YAML files _in the root of the config folder_.
 Loading YAML files in subfolders is controlled by the `include_subfolders` entry
 in the `config/00-meta.yaml` file.
 
@@ -39,8 +39,9 @@ of precedence:
 
 !> We recommend you adding `*.local.*` to your `.gitignore` file
 
-!> With native environment specific support, the need for environment variables in
-parameterization is minimized, prefer directly writing YAML config instead.
+!> With built-in support for environment specific configuration, the need for
+environment variables in parameterization is minimized, prefer directly writing
+YAML config instead.
 
 Secrets and credentials are another thing. Due to their sensitvity, even during
 development, you **should never commit credentials to Git repo**! In this particular
