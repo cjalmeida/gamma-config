@@ -1,10 +1,10 @@
-from gamma.config.dump_dict import to_dict
+"""Module that implements renderers for builtin-tags"""
+
 import os
 import threading
-from typing import Any, Mapping, Union
+from typing import Any, Union
 
-from ruamel.yaml.events import ScalarEvent
-
+from gamma.config.dump_dict import to_dict
 from gamma.dispatch import dispatch
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
@@ -29,10 +29,9 @@ ObjTag = Tag["!obj"]
 j2_cache = threading.local()
 
 
-# render !env
 @dispatch
 def render_node(node: Node, tag: EnvTag, **ctx) -> str:
-    """Maps the value to an environment variable of the same name.
+    """[!env] Maps the value to an environment variable of the same name.
 
     You can provide a default using the ``|`` (pipe) character after the variable
     name.
@@ -55,7 +54,7 @@ def render_node(node: Node, tag: EnvTag, **ctx) -> str:
 # process: !env_secret
 @dispatch
 def render_node(node: Node, tag: EnvSecretTag, dump=False, **ctx) -> str:
-    """Similar to !env, but never returns the value when dumping."""
+    """[!env_secret] Similar to !env, but never returns the value when dumping."""
     if dump:
         return node
     return render_node(node, EnvTag(), dump=dump, **ctx)
@@ -64,7 +63,7 @@ def render_node(node: Node, tag: EnvSecretTag, dump=False, **ctx) -> str:
 # process: !expr
 @dispatch
 def render_node(node: Node, tag: ExprTag, **ctx) -> Any:
-    """Uses ``eval()`` to render arbitrary Python expressions.
+    """[!expr] Uses ``eval()`` to render arbitrary Python expressions.
 
     By default, we add the root configuration as `c` variable.
 
@@ -77,10 +76,9 @@ def render_node(node: Node, tag: ExprTag, **ctx) -> Any:
     return eval(node.value, _globals, _locals)
 
 
-# process: !expr
 @dispatch
 def render_node(node: Node, tag: J2Tag, **ctx) -> Any:
-    """Treats the value a Jinj2 Template
+    """[!j2] Treats the value a Jinj2 Template
 
     See ``gamma.config.render_context.context_providers`` documentation to add your
     own variables to the context.
@@ -113,17 +111,16 @@ def render_node(node: Node, tag: J2Tag, **ctx) -> Any:
 # process: !j2_secret
 @dispatch
 def render_node(node: Node, tag: J2SecretTag, dump=False, **ctx) -> Any:
-    """Similar to !j2, but never returns the value when dumping."""
+    """[!j2_secret] Similar to !j2, but never returns the value when dumping."""
 
     if dump:
         return node
     return render_node(node, J2Tag(), dump=dump, **ctx)
 
 
-# process: !ref
 @dispatch
 def render_node(node: Node, tag: RefTag, config=None, **ctx) -> Any:
-    """References other entries in the config object.
+    """[!ref] References other entries in the config object.
 
     Navigate the object using the dot notation. Complex named keys can be accessed
     using quotes.
@@ -155,6 +152,25 @@ def render_node(node: Node, tag: RefTag, config=None, **ctx) -> Any:
 # process: !py
 @dispatch
 def render_node(node: ScalarNode, tag: PyTag, path=None, **ctx) -> Any:
+    """[!py] Pass the node value to a Python callable.
+
+    This tag should be used as a URI-style tag on the form `!py:<module>:<callable>`
+
+    The scalar node value is first implicitly resolved to a Python object using
+    `yaml.load`. For instance:
+
+    ```yaml
+    foo: !py:myapp.mymodule:myfunc 100
+    bar: !py:myapp.mymodule:myfunc "100"
+    zig: !py:myapp.mymodule:myfunc a value
+    ```
+
+    Will call the function `myfunc` in `myapp.mymodule` module with the arguments:
+    - `type(value) == int; value == 100` for `foo`
+    - `type(value) == str; value == "100"` for `bar`
+    - `type(value) == str; value == "a value"` for `zig`
+    """
+
     func = _py_tag_get_func("py", path)
     val = yaml.load(node.value)
     return func(val)
@@ -165,12 +181,29 @@ def render_node(node: ScalarNode, tag: PyTag, path=None, **ctx) -> Any:
 def render_node(
     node: Union[SequenceNode, MappingNode], tag: PyTag, path=None, **ctx
 ) -> Any:
+    """[!py] Pass the node value to a Python callable.
+
+    This tag should be used as a URI-style tag on the form `!py:<module>:<callable>`
+
+    The `map` or `seq` node value is first converted to a Python `dict`/`list`
+    recursively using the `to_dict` method.
+    """
+
     func = _py_tag_get_func("py", path)
     val = to_dict(node)
     return func(val)
 
 
 def _py_tag_get_func(tag, path, default_module=None):
+    """Get the callable for a given tag `path` argument
+
+    Used by `!py` and `!obj` tags
+
+    Args:
+        tag: either "obj" or "py"
+        path: the tag "path" part in the format `!<tag>:<module>:<callable>`
+    """
+
     import importlib
 
     if not path:
@@ -178,7 +211,7 @@ def _py_tag_get_func(tag, path, default_module=None):
 
     if ":" in path:
         module_name, func_name = path.split(":", 1)
-    elif default_module:
+    elif tag == "obj" and default_module:
         module_name = default_module
         func_name = path
     else:
@@ -199,6 +232,33 @@ def _py_tag_get_func(tag, path, default_module=None):
 # process: !obj
 @dispatch
 def render_node(node: MappingNode, tag: ObjTag, path=None, config=None, **ctx) -> Any:
+    """[!obj] Create a Python object by passing the mapping value as nested dicts to
+    the object constructor.
+
+    This tag should be used as a URI-style tag on the form `!obj:<module>:<callable>`
+    It behaves like `!py`, but only applies to `map` nodes, and
+    automatically unpack the mapping.
+
+    You may omit the `<module>` part of the path if you define an `obj_default_module`
+    scalar entry at the root of the config.
+
+    Examples:
+
+    ```yaml
+    foo: !obj:myapp.mymodule:MyClass
+        a: 100
+        b: a value
+
+    # the above `foo` is equivalent to `bar` below
+
+    obj_default_module: myapp.mymodule
+
+    bar: !obj:MyClass
+        a: 100
+        b: a value
+    ```
+    """
+
     root = config and config._root
     default_module = (root and root.get("obj_default_module")) or None
     func = _py_tag_get_func("obj", path, default_module=default_module)

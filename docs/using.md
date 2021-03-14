@@ -20,8 +20,7 @@ In the section below we'll discuss some patterns and caveats.
 If you try to access a non-existing value from the returned config object using the
 dictionary style `config['missing']`, it will throw a `KeyError` as expected. However,
 accessing using attribute style `config.missing` **will return an empty sub config**
-object that (like regular dict) is *falsy*.
-
+object that (like regular dict) is _falsy_.
 
 ```python
 config = get_config()
@@ -38,7 +37,7 @@ assert not val                          # and is 'falsey' like empty dict
 This behavior allows you to conveniently navigate deep across nodes, but can be
 backfire. Stick to the dictionary style if you want to be safe.
 
-## Config object is not a dictionary
+## Config object to "true" `dict`
 
 Despite behaving like one, sometimes you need a "real" dict. The way to convert a
 config node into one is to use the `to_dict` function.
@@ -53,10 +52,36 @@ def do_something():
     assert type(val_dict) == dict
 ```
 
+## Dump to YAML / Pickle
+
+`gamma-config` supports dumping the config object to YAML in a safe way, protecting
+secrets. This is very useful, for instance, to capture the config state at a given
+pipeline run for reproducibility.
+
+By default, the [`to_yaml`](api?id=to_yaml) method will serialized the config objects
+**with all tags rendered**, except for those marked as sensitive. Eg. it will
+store a `!env USER` node with the actual value of the `USER`. On the other hand,
+`!env_secret MY_KEY` will be serialized as is.
+
+The config object should be pickable by default. But note that when you pickle,
+it **does not render** the tags, as expected.
+
+```py
+from gamma.config import get_config, to_yaml
+
+def do_something():
+    config = get_config()
+    val = config["foo"]
+
+    render_tags = True                          # this control rendering
+    val_yaml = to_yaml(val, render_tags)
+    assert type(val_dict) == str  # YAML content
+```
+
 
 ## Do not call get_config outside a wrapping function
 
-It's a general good practice to avoid *side-effects* on `import`s. This is doubly true
+It's a general good practice to avoid _side-effects_ on `import`s. This is doubly true
 when using `gamma-config`.
 
 The first time you call `get_config`, the loading mechanism will load the config files
@@ -81,7 +106,6 @@ def do_something():
     my_value = get_config()["my_value"]
 ```
 
-
 ## Config objects are immutable
 
 Config objects (`RootConfig` and `ConfigNode` classes) are read-only and effectively
@@ -102,15 +126,41 @@ from gamma.config import get_config, push_entry
 
 def do_something():
     config = get_config()
-    patch = dict(foo=10)
+    assert config["foo"] == 100
+
+    patch = dict(foo=200)
     push_entry(config, "90-myentry", patch)
-    assert config["foo"] == 10
+    assert config["foo"] == 200
+
+    remove_entry(config, "90-myentry")
+    assert config["foo"] == 100
 ```
 
-The `push_entry(config, entry_key, entry)` function accept a `dict` or YAML string as
+The `push_entry(config, entry_key, entry)` method accept a `dict` or YAML string as
 `entry` value. The `entry_key` is used to place the new entry in the correct order;
-you most likely want to use a *high* number to ensure your config is inserted
-with the highest priority.
+you most likely want to use a _high_ number to ensure your config is inserted
+with the highest priority. Likewise, you can use the [`remove_entry`](api?id=remove_entry)
+method to remove a given entry by `entry_key`.
+
+### With config_context
+
+Adding a partial config for a while then removing it is a common pattern. You can use
+the `config_context` for this, with the added benefit of not having to worry about
+removing the entry in case of exception. Those temporary entries are _anonymous_ and
+guaranteed to be of highest priority. Also, if the first argument is not a
+`RootConfig` object, it defaults to using the global config object.
+
+```py
+from gamma.config import get_config, config_context
+
+def do_something():
+    assert get_config()["foo"] == 100
+
+    with config_context(dict(foo=200)):
+        assert get_config()["foo"] == 200
+
+    assert get_config()["foo"] == 100
+```
 
 ## Applying validation and schemas
 

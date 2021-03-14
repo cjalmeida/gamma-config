@@ -20,10 +20,10 @@ For the theorically inclined, multiple dispatch solves the
 in a very elegant way. In summary, the expression problem is a fundamental issue in
 programming language design: how can you structure your application so that you can:
 
-- add new behavior (functions) to existing types
-- add new types that can be used with existing behavior
-- without changing original code
-- with no or minimal repetition
+-   add new behavior (functions) to existing types
+-   add new types that can be used with existing behavior
+-   without changing original code
+-   with no or minimal repetition
 
 This is actually **a solved problem** for most languages, including Python, using a
 variety of techniques, where multiple dispatch is one of them (and probably the most
@@ -43,14 +43,14 @@ side-effect. I recommend watching the following presentation by one of Julia cre
 Every year at BCG Gamma write millions of lines of code solving similar
 but not quite the same problems. Our level of code reuse is very low. As a consulting
 company, we're doomed to work on a multitude of different environments. Creating a
-*one-size-fits-all* framework that can handle even a small subset of scenarios is a
+_one-size-fits-all_ framework that can handle even a small subset of scenarios is a
 massive investment.
 
-In fact, I argue that in the pressure of case work, it would be *detrimental
-to the project* to actually create flexible, extensible code. You're just adding extra
+In fact, I argue that in the pressure of case work, it would be _detrimental
+to the project_ to actually create flexible, extensible code. You're just adding extra
 complexity with a dubious immediate value. And the reason is that even good, idiomatic
-Python (functional or OO) code is not naturally extensible due to the *expression
-problem* stated above.
+Python (functional or OO) code is not naturally extensible due to the _expression
+problem_ stated above.
 
 For a number of reasons, I don't think we should go full Julia (yet). But what if
 idiomatic Python code had the same level of extensibility? Python is flexible enough
@@ -58,3 +58,17 @@ that we could "bend the rules" and make multiple-dispatch the core paradigm simp
 stylistic convention. My (long shot) bet is that with point investments and a little
 coordination, we could greatly improve code reuse across cases.
 
+## Core types and methods
+
+### ConfigNode tree
+
+Represents the core config object returned by `get_config`.
+
+On package [`gamma.config.confignode`](api?id=gammaconfigconfignode)
+
+```mermaid
+graph RL
+    RootConfig --> ConfigNode
+```
+
+**TBD**

@@ -1,5 +1,6 @@
+from gamma.config.globalconfig import get_config, set_config
 import pytest
-from gamma.config.confignode import ConfigNode, RootConfig, push_entry
+from gamma.config.confignode import ConfigNode, RootConfig, push_entry, config_context
 from gamma.config.load import load_node
 
 SIMPLE = """
@@ -43,9 +44,28 @@ def test_guards():
         RootConfig("foo: 1")
 
     cfg = RootConfig()
-    push_entry(cfg, "a", "foo: 1")
+    push_entry(cfg, "abc", "foo: 1")
 
     assert cfg["foo"] == 1
 
     with pytest.raises(Exception, match="duplicated"):
-        push_entry(cfg, "a", "foo: 1")
+        push_entry(cfg, "abc", "foo: 1")
+
+    with pytest.raises(Exception, match="entry"):
+        push_entry(cfg, "~abc", "foo: 1")
+
+
+def test_config_context():
+    cfg = RootConfig()
+    push_entry(cfg, "abc", "foo: 1")
+
+    assert cfg["foo"] == 1
+
+    with config_context(cfg, "foo: 2"):
+        assert cfg["foo"] == 2
+
+    assert cfg["foo"] == 1
+
+    set_config(cfg)
+    with config_context("foo: 3"):
+        get_config()["foo"] == 3

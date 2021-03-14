@@ -13,7 +13,7 @@ repos:
       - id: detect-private-key
         exclude: data/responsys_key.pem
       - id: check-byte-order-marker
-      - id: check-docstring-first
+      # - id: check-docstring-first
       # - id: detect-aws-credentials
       - id: mixed-line-ending
       - id: check-case-conflict

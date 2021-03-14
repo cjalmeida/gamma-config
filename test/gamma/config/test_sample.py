@@ -65,7 +65,7 @@ def test_sample_dump():
     assert config["sample_scalar_1"] == "hello world"
 
     # dump resolving tags
-    dump = to_yaml(config, resolve_tags=True)
+    dump = to_yaml(config, True)
 
     # load in a regular yaml loader
     yaml = YAML(typ="rt")
@@ -81,11 +81,18 @@ def test_sample_dump():
     assert not isinstance(loaded["nested"]["secret"], str)
 
     # dump again, with original tags
-    dump = to_yaml(config, resolve_tags=False)
+    dump = to_yaml(config, False)
     yaml = YAML(typ="rt")
     loaded = yaml.load(dump)
     assert not isinstance(loaded["sample_env"]["user"], str)
     assert hasattr(loaded["sample_env"]["user"], "tag")
+
+    # dump partial config
+    dump = to_yaml(config["sample_env"], True)
+    yaml = YAML(typ="rt")
+    loaded = yaml.load(dump)
+    assert loaded["user"] == os.environ["USER"]
+
 
     # dump to dict
     new_dict = to_dict(config)

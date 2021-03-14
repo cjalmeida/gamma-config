@@ -1,4 +1,4 @@
-"""Implements the dictionary merging functionality"""
+"""Implements the node merging functionality"""
 import re
 from copy import deepcopy
 from functools import reduce
@@ -26,20 +26,20 @@ def merge_nodes(nodes: List):
 
 @dispatch
 def merge_nodes(l_node: MappingNode, r_node: MappingNode):
-    """merge map nodes ignoring key"""
+    """Merge map nodes ignoring key"""
     return merge_nodes(None, l_node, None, r_node)
 
 
 @dispatch
 def merge_nodes(left: Tuple, r_node: MappingNode):
-    """merge map nodes ignoring key (for assymetric fold-left)"""
+    """Merge map nodes ignoring key (for assymetric fold-left)"""
     l_node = left[-1]
     return merge_nodes(None, l_node, None, r_node)
 
 
 @dispatch
 def merge_nodes(left: Tuple, right: Tuple):
-    """merge map nodes (symetric fold-left)
+    """Merge map nodes (symetric fold-left)
 
     Args:
         left, right: Tuple of (key: Node, value: Node)
@@ -52,7 +52,11 @@ def merge_nodes(left: Tuple, right: Tuple):
 
 @dispatch
 def merge_nodes(l_key, l_node: Union[None, Node], r_key, r_node: Union[None, Node]):
-    # scalars, return right or left if right is null
+    """Merge scalars.
+
+    Return "right", or "left" if "right" is `None`
+    """
+    # scalars,
     if r_node is not None:
         return r_key, r_node
     else:
@@ -61,6 +65,11 @@ def merge_nodes(l_key, l_node: Union[None, Node], r_key, r_node: Union[None, Nod
 
 @dispatch
 def merge_nodes(l_key, l_node: MappingNode, r_key, r_node: MappingNode):
+    """Merge `map` nodes recursively.
+
+    Right side has precedence. `@hint: merge_replace` overrides merging, returning
+    right.
+    """
     if has_replace_hint(r_node):
         return r_key, r_node
 
@@ -83,6 +92,12 @@ def merge_nodes(l_key, l_node: MappingNode, r_key, r_node: MappingNode):
 
 @dispatch
 def merge_nodes(l_key, l_node: SequenceNode, r_key, r_node: SequenceNode):
+    """Merge `sequence` nodes recursively.
+
+    Right side has precedence. `@hint: merge_replace` overrides merging, returning
+    right.
+    """
+
     if has_replace_hint(r_node):
         return r_key, r_node
 
@@ -99,6 +114,11 @@ def merge_nodes(l_key, l_node: SequenceNode, r_key, r_node: SequenceNode):
 
 @dispatch
 def has_replace_hint(node: Node) -> bool:
+    """Check for existence of config "hint" in the node's comments.
+
+    Only `@hint: merge_replace` is supported.
+    """
+
     node_comments = getattr(node, "comment", [])
     if not node_comments:
         return False

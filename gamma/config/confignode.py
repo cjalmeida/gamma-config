@@ -1,5 +1,5 @@
 import collections
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Generator, Iterable, Optional
 
 from gamma.config.load import load_node
 from gamma.dispatch import dispatch
@@ -7,14 +7,35 @@ from ruamel.yaml.nodes import MappingNode, Node, SequenceNode
 
 from . import tags
 from .merge import merge_nodes
-from .rawnodes import get_entry, get_keys, get_values, get_id
+from .rawnodes import get_entry, get_id, get_keys, get_values
 from .tags import Tag
+import re
+from contextlib import contextmanager
+
+SAFE_ENTRY_KEY = re.compile("^[A-Za-z0-9].+$")
 
 
 class ConfigNode(collections.abc.Mapping):
+    """Represent a dict-like config object.
+
+    `ConfigNode` is immutable, changes should be made to the source `RootConfig`
+    object. This class should be safe to pickle and pass to subprocesses.
+
+    You when accessing keys by attribute `eg: config.foo` they'll return an empty
+    `ConfigNode` instead of raising an `AttributeError`.
+
+
+    """
+
     def __init__(
         self, node: MappingNode, root=Optional["RootConfig"], key=None
     ) -> None:
+        """
+        Args:
+            node: the backing `MappingNode`
+            root: the root of the config tree
+            key: the node key in the config tree
+        """
 
         self._node = node
         self._root = root
@@ -59,13 +80,21 @@ class ConfigNode(collections.abc.Mapping):
 
 
 class RootConfig(ConfigNode):
+    """A root config object.
+
+    The object is a collection of `(entry_key: str, entry: Node)`, sorted by
+    the `entry_key`. A item access will search for the key in each entry and merge
+    those found.
+
+    New entries should be inserted with the push_entry` function.
+    The entries are always iterated in `entry_key` lexicographical
+    sort order and this affects merge results.
+    """
+
     def __init__(self, entry_key: Optional[str] = None, entry=None) -> None:
-        """Initialize the root config with optionally a default entry
-
-        New entries should be inserted with the ``push_entry`` function.
-        The entries are always iterated in ``entry_key`` lexicographical
-        sort order and this affects merge results.
-
+        """
+        Initialize the object, optionally adding a single entry. See
+        [`push_entry`](api?id=push_entry).
         """
         self._root_nodes: Dict[str, MappingNode] = collections.OrderedDict()
         super().__init__(node=None, root=self)
@@ -77,18 +106,37 @@ class RootConfig(ConfigNode):
 
 
 @dispatch
-def push_entry(root: RootConfig, entry_key: str, entry, content_type=None) -> None:
+def push_entry(
+    root: RootConfig, entry_key: str, entry, *, _allow_unsafe=False, content_type=None
+) -> None:
     """Add an entry to the root config.
 
     The entry itself can be of any supported format by ``load_node``. You can
     disambiguate between string/bytes values by providing an optional ``content_type``
     """
     node = load_node(entry, content_type)
-    push_entry(root, entry_key, node)
+    push_entry(root, entry_key, node, _allow_unsafe=_allow_unsafe)
 
 
 @dispatch
-def push_entry(root: RootConfig, entry_key: str, node: Node) -> None:
+def push_entry(
+    root: RootConfig, entry_key: str, node: Node, *, _allow_unsafe=False
+) -> None:
+    """Add a `Node` entry to the root config object.
+
+    Entries are loaded in sorted order.
+
+    Note: the global root object can only be modified by the thread that created it.
+    """
+
+    from .globalconfig import check_can_modify
+
+    check_can_modify(root)
+
+    if (not _allow_unsafe) and (not SAFE_ENTRY_KEY.match(entry_key)):
+        pat = SAFE_ENTRY_KEY.pattern
+        raise ValueError(f"Invalid entry_key: '{entry_key}'. Should match {pat}.")
+
     if entry_key in root._root_nodes:
         raise ValueError(f"Config file/entry named {entry_key} duplicated.")
 
@@ -101,21 +149,27 @@ def push_entry(root: RootConfig, entry_key: str, node: Node) -> None:
 
 
 @dispatch
-def remove_entry(root: RootConfig, entry_key: str):
-    del root._root_nodes[entry_key]
+def remove_entry(cfg: RootConfig, entry_key: str):
+    """Remove an entry from the RootConfig object."""
+    del cfg._root_nodes[entry_key]
 
 
 @dispatch
 def config_getitem(cfg: ConfigNode, key, **ctx):
+    """Get an item from config by key."""
     _key, _item = get_entry(cfg._node, key)
     ctx = ctx.copy()
     ctx["key"] = _key
-    return config_getitem(_item, **ctx)
+    return resolve_item(_item, **ctx)
 
 
 @dispatch
 def config_getitem(cfg: RootConfig, key, **ctx):
-    # search recursily on root nodes for an item matching
+    """Get an item from a root config by key.
+
+    We find all entries matching the key and merge them dynamically using
+    `merge_nodes`.
+    """
     matches = []
     key: str
     node: Node
@@ -131,44 +185,57 @@ def config_getitem(cfg: RootConfig, key, **ctx):
     else:
         raise KeyError(key)
 
-    return config_getitem(node, key=key, **ctx)
+    return resolve_item(node, key=key, **ctx)
 
 
 @dispatch
-def config_getitem(item: Node, **ctx):
+def resolve_item(item: Node, **ctx):
+    """Resolve a config item from a ruamel.yaml `Node`
+
+    This method delegates to a more specific method dispatched on (Node, Tag) types
+    """
     tag = Tag[item.tag]()
-    return config_getitem(item, tag, **ctx)
+    return resolve_item(item, tag, **ctx)
 
 
 @dispatch
-def config_getitem(item: Node, tag: Tag, **ctx):
+def resolve_item(item: Node, tag: Tag, **ctx):
+    """Resolve a config item from a ruamel.yaml `Node`
+
+    Fallback to rendering the node using `render_node`
+    """
+
     from .render import render_node
 
     return render_node(item, tag, **ctx)
 
 
 @dispatch
-def config_getitem(item: MappingNode, tag: tags.Map, **ctx):
+def resolve_item(item: MappingNode, tag: tags.Map, **ctx):
+    """Wrap a plain `map` node as a child `ConfigNode` object"""
     cfg = ctx.get("config")
     root = cfg._root if cfg is not None else None
     return ConfigNode(item, root=root)
 
 
 @dispatch
-def config_getitem(item: SequenceNode, tag: tags.Seq, **ctx):
+def resolve_item(item: SequenceNode, tag: tags.Seq, **ctx):
+    """Iterates on a `seq` node, resolving each child item node."""
     out = []
     for sub in get_values(item):
-        out.append(config_getitem(sub, **ctx))
+        out.append(resolve_item(sub, **ctx))
     return out
 
 
 @dispatch
-def get_keys(cfg: ConfigNode):
+def get_keys(cfg: ConfigNode) -> Iterable[Node]:
+    """Return all keys in a config node"""
     return get_keys(cfg._node)
 
 
 @dispatch
-def get_keys(cfg: RootConfig):
+def get_keys(cfg: RootConfig) -> Iterable[Node]:
+    """Return all *distinct* keys in a config node"""
     returned = set()
     for node in cfg._root_nodes.values():
         for key in get_keys(node):
@@ -180,10 +247,39 @@ def get_keys(cfg: RootConfig):
 
 
 @dispatch
-def config_len(cfg: ConfigNode):
+def config_len(cfg: ConfigNode) -> int:
+    """Number of keys in a config node"""
     return len(cfg._node.value)
 
 
 @dispatch
-def config_len(cfg: RootConfig):
+def config_len(cfg: RootConfig) -> int:
+    """Number of *distinct* keys in a config node"""
     return len(list(get_keys(cfg)))
+
+
+@dispatch
+def create_last_entry_key(cfg: RootConfig) -> str:
+    """Create an entry_key guaranteed to be the last entry for the object."""
+    clen = config_len(cfg)
+    return f"~{clen:03d}-temp"
+
+
+@dispatch
+@contextmanager
+def config_context(cfg: RootConfig, partial) -> None:
+    entry_key = create_last_entry_key(cfg)
+    push_entry(cfg, entry_key, partial, _allow_unsafe=True)
+    yield
+    remove_entry(cfg, entry_key)
+
+
+@dispatch
+@contextmanager
+def config_context(partial) -> None:
+    from gamma.config.globalconfig import get_config
+
+    cfg = get_config()
+    with config_context(cfg, partial):
+        yield
+

@@ -1,10 +1,9 @@
-from gamma.config.tags import Tag
-from gamma.dispatch import dispatch
-from multimethod import DispatchError
-from ruamel.yaml.nodes import Node, ScalarNode
+import pytest
 from gamma.config.load import load_node
 from gamma.config.render import RenderDispatchError, render_node
-import pytest
+from gamma.config.tags import Tag
+from gamma.dispatch import dispatch
+from ruamel.yaml.nodes import Node
 
 
 def test_scalar_str():

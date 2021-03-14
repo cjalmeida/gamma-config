@@ -9,8 +9,8 @@ def test_root_config_merge():
 
     a = "{foo: bar}"
     b = "{foo: baz, ping: pong}"
-    push_entry(root, "a", a)
-    push_entry(root, "b", b)
+    push_entry(root, "a1", a)
+    push_entry(root, "b1", b)
     assert root.foo == "baz"
     assert root.ping == "pong"
 

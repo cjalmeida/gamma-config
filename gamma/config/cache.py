@@ -1,7 +1,13 @@
+"""Module declaring a cache utility for gamma.config"""
+
 from typing import Any, Mapping
 
 
 class Cache(Mapping):
+    """
+    A cache backed by a in-memory `dict`
+    """
+
     def __init__(self) -> None:
         self.store = dict()
 
@@ -17,8 +23,9 @@ class Cache(Mapping):
     def __len__(self) -> int:  # pragma: no cover
         return self.store.__len__()
 
-    def reset(self):
-        self.store = dict()
+    def clear(self):
+        """Clear cache contents"""
+        return self.store.clear()
 
 
 cache = Cache()

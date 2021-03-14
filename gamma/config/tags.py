@@ -1,3 +1,4 @@
+"""Definition of base Tag class and standard YAML derived tag types"""
 from gamma.dispatch import parametric
 
 

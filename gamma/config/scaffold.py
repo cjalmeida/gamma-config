@@ -1,3 +1,4 @@
+"""Module to 'scaffold' a simple config folder from the command-line"""
 import os
 import shutil
 

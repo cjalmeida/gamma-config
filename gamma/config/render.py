@@ -1,14 +1,14 @@
-import logging
-from typing import Optional
+"""Base render_node methods"""
 
-from multimethod import DispatchError
+import logging
+from typing import Any, Optional
 
 from gamma.config.confignode import ConfigNode, RootConfig  # noqa
 from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 from . import tags
-from .rawnodes import get_items, get_values
+from .rawnodes import get_entries, get_values
 
 logger = logging.getLogger(__name__)
 
@@ -81,33 +81,47 @@ def render_node(
 
 
 @dispatch
-def render_node(node: Node, **args):
+def render_node(node: Node, **args) -> Any:
+    """Render node.
+
+    Construct a parameterized `Tag` class from `node.tag` and call
+    `render_node(Node, Tag)`
+    """
+
     TagClass = tags.Tag[node.tag]
     return render_node(node, TagClass(), **args)
 
 
 @dispatch
 def render_node(node: ScalarNode, tag: tags.Str, **args):
+    """Render scalar string"""
     return node.value
 
 
 @dispatch
 def render_node(node: ScalarNode, tag: tags.Int, **args):
+    """Render scalar int"""
     return int(node.value)
 
 
 @dispatch
 def render_node(node: ScalarNode, tag: tags.Float, **args):
+    """Render scalar float"""
     return float(node.value)
 
 
 @dispatch
 def render_node(node: ScalarNode, tag: tags.Null, **args):
+    """Render scalar null"""
     return None
 
 
 @dispatch
 def render_node(node: ScalarNode, tag: tags.Bool, **args):
+    """Render scalar boolean. Accepts YAML extended interpretation of `bool`s, like
+    `ruamel.yaml`
+    """
+
     val = node.value.lower()
     if val in ("y", "yes", "true", "on", "1"):
         return True
@@ -119,6 +133,7 @@ def render_node(node: ScalarNode, tag: tags.Bool, **args):
 
 @dispatch
 def render_node(node: ScalarNode, tag: tags.Timestamp, **args):
+    """Render timestamp node as `datetime.datetime`. Use `dateutil.parser` module"""
     from dateutil import parser
 
     return parser.parse(node.value)
@@ -126,7 +141,7 @@ def render_node(node: ScalarNode, tag: tags.Timestamp, **args):
 
 @dispatch
 def render_node(node: SequenceNode, tag: tags.Seq, **args):
-    """Render seq nodes"""
+    """Render `seq` nodes recursively"""
     subargs = args.copy()
 
     out = []
@@ -139,11 +154,11 @@ def render_node(node: SequenceNode, tag: tags.Seq, **args):
 
 @dispatch
 def render_node(node: MappingNode, tag: tags.Map, **args):
-    """Render map nodes"""
+    """Render `seq` nodes recursively"""
     subargs = args.copy()
 
     out = {}
-    for subkeynode, subvaluenode in get_items(node):
+    for subkeynode, subvaluenode in get_entries(node):
         subkey = render_node(subkeynode)
         subargs["key"] = subkeynode
         subvalue = render_node(subvaluenode, **subargs)
@@ -164,8 +179,8 @@ def render_node(cfg: "RootConfig"):
 
 
 @dispatch
-def render_node(cfg: "ConfigNode", dump=True):
-    """Render the config node. Defaults to "dump mode"!
+def render_node(cfg: "ConfigNode", dump=False):
+    """Render the config node.
 
     Args:
         dump: If true, assume it's "dump mode" where secrets are not to be rendered.

@@ -32,7 +32,7 @@ def custom_ctx():
 
     context_providers.pop()
     context_providers.pop()
-    cache.reset()
+    cache.clear()
 
 
 def test_custom_ctx(custom_ctx):

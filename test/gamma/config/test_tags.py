@@ -1,4 +1,5 @@
 from typing import NamedTuple
+
 from gamma.config import RootConfig, ScalarNode, render_node
 from gamma.config.builtin_tags import RefTag
 
