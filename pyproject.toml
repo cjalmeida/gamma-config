@@ -6,7 +6,7 @@ name = "gamma-config"
 packages = [
   {include = "gamma"},
 ]
-version = "0.3.1"
+version = "0.3.2"
 
 [tool.poetry.dependencies]
 colorama = "^0.4.4"

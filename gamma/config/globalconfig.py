@@ -3,10 +3,11 @@
 import multiprocessing
 import threading
 from typing import Tuple
+
+from .cache import cache
 from .confignode import RootConfig, push_entry
 from .findconfig import get_entries
 from .load import load_node
-from .cache import cache
 
 
 class _GlobalStore:

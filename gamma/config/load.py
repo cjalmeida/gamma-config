@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict
 
 from gamma.dispatch import dispatch, parametric
-from ruamel.yaml.nodes import MappingNode, Node
+from ruamel.yaml.nodes import Node
 
 
 @parametric

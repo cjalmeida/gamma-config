@@ -1,8 +1,8 @@
 import copy
 
 from gamma.dispatch import dispatch
-from ruamel.yaml.nodes import MappingNode, ScalarNode, SequenceNode
 from ruamel.yaml.main import serialize
+from ruamel.yaml.nodes import MappingNode, ScalarNode, SequenceNode
 
 from .confignode import ConfigNode, RootConfig
 from .merge import merge_nodes

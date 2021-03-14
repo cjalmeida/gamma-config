@@ -342,7 +342,7 @@ foo: !mytag:bar 1
 - `dump` - Flag indicating we're dumping the data to a potentially insecure
   destination, so sensitive data should not be returned.
 - `path` - The URI path for URI fallback dispatch
-  
+
 
 **Returns**:
 
@@ -948,7 +948,7 @@ name.
 
 **Examples**:
 
-  
+
 - `my_var` - !env MYVAR|my_default
 
 <a name="gamma.config.builtin_tags.render_node"></a>
@@ -1083,7 +1083,7 @@ scalar entry at the root of the config.
 
 **Examples**:
 
-  
+
 ```yaml
 foo: !obj:myapp.mymodule:MyClass
     a: 100
@@ -1136,7 +1136,7 @@ Get a (key, value) entry from a `map` node.
 **Arguments**:
 
 - `default` - return this value instead of `KeyError` if not found.
-  
+
   Raise:
   `KeyError` if key not found and `default` not provided
 
@@ -1246,4 +1246,3 @@ class Val()
 ```
 
 Generic parametric class
-

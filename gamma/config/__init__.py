@@ -1,11 +1,11 @@
 # flake8: noqa
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 from .builtin_tags import yaml
-from .confignode import ConfigNode, RootConfig, push_entry, remove_entry, config_context
+from .confignode import ConfigNode, RootConfig, config_context, push_entry, remove_entry
 from .dump_dict import to_dict
 from .dump_yaml import to_yaml
 from .globalconfig import get_config

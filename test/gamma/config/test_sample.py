@@ -93,7 +93,6 @@ def test_sample_dump():
     loaded = yaml.load(dump)
     assert loaded["user"] == os.environ["USER"]
 
-
     # dump to dict
     new_dict = to_dict(config)
     assert type(new_dict) == dict

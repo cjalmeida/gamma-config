@@ -1,5 +1,7 @@
 import collections
-from typing import Any, Dict, Generator, Iterable, Optional
+import re
+from contextlib import contextmanager
+from typing import Any, Dict, Iterable, Optional
 
 from gamma.config.load import load_node
 from gamma.dispatch import dispatch
@@ -9,8 +11,6 @@ from . import tags
 from .merge import merge_nodes
 from .rawnodes import get_entry, get_id, get_keys, get_values
 from .tags import Tag
-import re
-from contextlib import contextmanager
 
 SAFE_ENTRY_KEY = re.compile("^[A-Za-z0-9].+$")
 
@@ -282,4 +282,3 @@ def config_context(partial) -> None:
     cfg = get_config()
     with config_context(cfg, partial):
         yield
-

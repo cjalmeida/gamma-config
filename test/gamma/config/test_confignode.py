@@ -1,6 +1,6 @@
-from gamma.config.globalconfig import get_config, set_config
 import pytest
-from gamma.config.confignode import ConfigNode, RootConfig, push_entry, config_context
+from gamma.config.confignode import ConfigNode, RootConfig, config_context, push_entry
+from gamma.config.globalconfig import get_config, set_config
 from gamma.config.load import load_node
 
 SIMPLE = """
