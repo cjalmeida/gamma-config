@@ -55,7 +55,8 @@ dependency.
 ### !ref
 
 References another entry in the config object, even if it's in another file or
-overriden by an environment specific entry.
+overriden by an environment specific entry. If you key has a `.` (dot) or other
+special characters, you can wrap the key in single-quotes `'`.
 
 Example:
 
@@ -63,9 +64,13 @@ Example:
 key_a:
     sub_key: 100
 
+key_b:
+    "my sub": bar
+
 # use dot notation to access nested entries
 # will be the same as key_a -> subkey == 100
-key_b: !ref key_a.sub_key
+ref_a: !ref key_a.sub_key
+ref_b: !ref key_b.'my sub'
 ```
 
 ### !expr
