@@ -29,7 +29,7 @@ def get_entries() -> List[Tuple[str, Any]]:
 
 
 @dispatch
-def get_entries(folder: Path, meta_include_folders=True) -> List[Tuple[str, Any]]:
+def get_entries(folder: Path, *, meta_include_folders=True) -> List[Tuple[str, Any]]:
     """Get all entries in a given folder.
 
     Args:

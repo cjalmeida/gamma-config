@@ -53,7 +53,7 @@ def render_node(node: Node, tag: EnvTag, **ctx) -> str:
 
 # process: !env_secret
 @dispatch
-def render_node(node: Node, tag: EnvSecretTag, dump=False, **ctx) -> str:
+def render_node(node: Node, tag: EnvSecretTag, *, dump=False, **ctx) -> str:
     """[!env_secret] Similar to !env, but never returns the value when dumping."""
     if dump:
         return node
@@ -110,7 +110,7 @@ def render_node(node: Node, tag: J2Tag, **ctx) -> Any:
 
 # process: !j2_secret
 @dispatch
-def render_node(node: Node, tag: J2SecretTag, dump=False, **ctx) -> Any:
+def render_node(node: Node, tag: J2SecretTag, *, dump=False, **ctx) -> Any:
     """[!j2_secret] Similar to !j2, but never returns the value when dumping."""
 
     if dump:
@@ -119,7 +119,7 @@ def render_node(node: Node, tag: J2SecretTag, dump=False, **ctx) -> Any:
 
 
 @dispatch
-def render_node(node: Node, tag: RefTag, config=None, **ctx) -> Any:
+def render_node(node: Node, tag: RefTag, *, config=None, **ctx) -> Any:
     """[!ref] References other entries in the config object.
 
     Navigate the object using the dot notation. Complex named keys can be accessed
@@ -151,7 +151,7 @@ def render_node(node: Node, tag: RefTag, config=None, **ctx) -> Any:
 
 # process: !py
 @dispatch
-def render_node(node: ScalarNode, tag: PyTag, path=None, **ctx) -> Any:
+def render_node(node: ScalarNode, tag: PyTag, *, path=None, **ctx) -> Any:
     """[!py] Pass the node value to a Python callable.
 
     This tag should be used as a URI-style tag on the form `!py:<module>:<callable>`
@@ -179,7 +179,7 @@ def render_node(node: ScalarNode, tag: PyTag, path=None, **ctx) -> Any:
 # process: !py
 @dispatch
 def render_node(
-    node: Union[SequenceNode, MappingNode], tag: PyTag, path=None, **ctx
+    node: Union[SequenceNode, MappingNode], tag: PyTag, *, path=None, **ctx
 ) -> Any:
     """[!py] Pass the node value to a Python callable.
 
@@ -231,7 +231,9 @@ def _py_tag_get_func(tag, path, default_module=None):
 
 # process: !obj
 @dispatch
-def render_node(node: MappingNode, tag: ObjTag, path=None, config=None, **ctx) -> Any:
+def render_node(
+    node: MappingNode, tag: ObjTag, *, path=None, config=None, **ctx
+) -> Any:
     """[!obj] Create a Python object by passing the mapping value as nested dicts to
     the object constructor.
 

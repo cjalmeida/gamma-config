@@ -15,7 +15,7 @@ def get_keys(node: MappingNode) -> Iterable[Node]:
 
 
 @dispatch
-def get_item(node: MappingNode, key, default=...) -> Node:
+def get_item(node: MappingNode, key, *, default=...) -> Node:
     """Get a single child node item from `map` node"""
     for item_key, item_value in node.value:
         if is_equal(key, item_key):
@@ -28,7 +28,7 @@ def get_item(node: MappingNode, key, default=...) -> Node:
 
 
 @dispatch
-def get_entry(node: MappingNode, key, default=...) -> Entry:
+def get_entry(node: MappingNode, key, *, default=...) -> Entry:
     """Get a (key, value) entry from a `map` node.
 
     Args:

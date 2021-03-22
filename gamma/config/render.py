@@ -179,7 +179,7 @@ def render_node(cfg: "RootConfig"):
 
 
 @dispatch
-def render_node(cfg: "ConfigNode", dump=False):
+def render_node(cfg: "ConfigNode", *, dump=False):
     """Render the config node.
 
     Args:

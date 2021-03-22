@@ -79,8 +79,8 @@ def merge_nodes(l_key, l_node: MappingNode, r_key, r_node: MappingNode):
     r_keys = get_keys(r_node)
     subkeys = union_nodes(r_keys, l_keys)
     for subkey in subkeys:
-        l_subnode = get_item(l_node, subkey, None)
-        r_subnode = get_item(r_node, subkey, None)
+        l_subnode = get_item(l_node, subkey, default=None)
+        r_subnode = get_item(r_node, subkey, default=None)
         _, subvalue = merge_nodes(subkey, l_subnode, subkey, r_subnode)
         newvalue.append((subkey, subvalue))
 
