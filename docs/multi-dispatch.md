@@ -90,11 +90,46 @@ positional arguments using the `*` separator.
 
 ```py
 @dispatch
-def foo(a: int, *, c=1):
+def foo(a: int, *, c):
     return "kw"
 
 assert foo(1, c=2) == "kw"
 ```
+
+Default values work as expected. Internally, they create additional methods pointing
+to the same implementation. For instance:
+
+```py
+@dispatch
+def foo(a: int, b: int = 1):
+    return "first"
+
+assert foo(1, 2) == "first"
+assert foo(1) == "first"
+```
+
+In the example above, it created `foo(:int, :int)` and `foo(:int)` methods. A
+common "gotcha" is to accidentally ovewrite the default method with a new signature.
+
+```py
+@dispatch
+def foo(a: int, b: int = 1):
+    return "first"
+
+assert foo(1, 2) == "first"
+assert foo(1) == "first"
+
+@dispatch
+def foo(a: int, b: float = 1.0):
+    return "second"
+
+assert foo(1, 2) == "first"
+assert foo(1, 2.0) == "second"
+assert foo(1) == "second"           # the default has changed!
+```
+
+To minimize confusion, this will log a "warning" telling you about the side-effect.
+If you do want to overwrite the method, you can pass `@dispatch(overwrite=True)`.
 
 ### Parametric dispatch
 
