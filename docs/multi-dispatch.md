@@ -93,7 +93,7 @@ positional arguments using the `*` separator.
 def foo(a: int, *, c=1):
     return "kw"
 
-assert(1, c=2) == "kw"
+assert foo(1, c=2) == "kw"
 ```
 
 ### Parametric dispatch
