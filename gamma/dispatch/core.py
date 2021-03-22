@@ -199,11 +199,11 @@ class dispatch:
                 self.signatures[sig] = func
                 for name in sig.arg_names:
                     self.arg_names[name].add(sig)
-
-        except (NameError, AttributeError):
+        except NameError:
             if allow_pending:
                 self.pending.add((func, overwrite))
-            raise
+            else:
+                raise
 
     def _warn_overwrite(self, new: DispatchSignature, old: DispatchSignature):
         msg = (
@@ -223,6 +223,7 @@ class dispatch:
         self.clear()
         if not key:
             return
+        key = key if isinstance(key, tuple) else (key,)
         sig = DispatchSignature(key)
         self.signatures[sig] = func
 
@@ -354,24 +355,12 @@ class dispatch:
             func, overwrite = self.pending.pop()
             self.register(func, overwrite=overwrite, allow_pending=False)
 
-    def dump(self) -> str:
+    def dump(self) -> str:  # pragma: no cover
+        """Pretty-print debug information about this function"""
         msg = repr(self) + " with signatures:"
         for sig in self.signatures:
             msg += "\n    " + sig.dump()
         return msg
-
-    @property
-    def docstring(self):
-        """a descriptive docstring of all registered functions"""
-        docs = []
-        for func in set(self.signatures.values()):
-            try:
-                sig = inspect.signature(func)
-            except ValueError:
-                sig = ""
-            doc = func.__doc__ or ""
-            docs.append(f"{func.__name__}{sig}\n    {doc}")
-        return "\n\n".join(docs)
 
     def __repr__(self) -> str:
         n = len(self.signatures)

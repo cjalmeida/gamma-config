@@ -244,3 +244,34 @@ def test_cache_reset():
         return "int"
 
     assert temp(1) == "int"
+
+
+def test_pending():
+
+    # forward reference to types won't work for local classes
+    assert global_temp(GlobalFoo()) == "foo"
+
+
+@dispatch
+def global_temp(x: "GlobalFoo"):
+    return "foo"
+
+
+class GlobalFoo:
+    pass
+
+
+def test_manual_setitem():
+    @dispatch
+    def temp(x: int):
+        return "int"
+
+    def alt(*args):
+        return "alt"
+
+    temp[str] = alt
+    temp[float, float] = alt
+
+    assert temp(1) == "int"
+    assert temp("1") == "alt"
+    assert temp(1.0, 1.0) == "alt"
