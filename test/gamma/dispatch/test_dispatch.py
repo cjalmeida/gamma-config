@@ -166,7 +166,7 @@ def test_name_shadowing():
     # an object with the same name appearing previously in the same namespace
     temp = 123  # noqa
 
-    # a multimethod shadowing that name
+    # a multi-dipatch method shadowing that name
     @dispatch
     def temp(x: int):  # noqa
         return "int"
