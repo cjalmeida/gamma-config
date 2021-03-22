@@ -3,5 +3,5 @@
 * [Using gamma-config](/using.md)
 * [Environment specific config](/environment.md)
 * [Built-in and custom tags](/tags.md)
-* [Multi-dispatch](/multi-dispatch.md)
+* [Multiple dispatch](/multi-dispatch.md)
 * [API Reference](/api.md)
