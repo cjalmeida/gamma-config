@@ -109,7 +109,7 @@ assert foo(1) == "first"
 ```
 
 In the example above, it created `foo(:int, :int)` and `foo(:int)` methods. A
-common "gotcha" is to accidentally ovewrite the default method with a new signature.
+common "gotcha" is to accidentally ovewrite the second method with a new signature.
 
 ```py
 @dispatch
@@ -125,7 +125,7 @@ def foo(a: int, b: float = 1.0):
 
 assert foo(1, 2) == "first"
 assert foo(1, 2.0) == "second"
-assert foo(1) == "second"           # the default has changed!
+assert foo(1) == "second"           # it has changed!
 ```
 
 To minimize confusion, this will log a "warning" telling you about the side-effect.
