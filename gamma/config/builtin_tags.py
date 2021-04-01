@@ -9,6 +9,7 @@ from gamma.dispatch import dispatch
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
+from .findconfig import get_config_root
 from .render import render_node
 from .render_context import get_render_context
 from .tags import Tag, TagException
@@ -25,6 +26,7 @@ J2Tag = Tag["!j2"]
 J2SecretTag = Tag["!j2_secret"]
 PyTag = Tag["!py"]
 ObjTag = Tag["!obj"]
+ConfDirTag = Tag["!conf_dir"]
 
 j2_cache = threading.local()
 
@@ -266,6 +268,21 @@ def render_node(
     func = _py_tag_get_func("obj", path, default_module=default_module)
     val = to_dict(node)
     return func(**val)
+
+
+# process: !conf_dir
+@dispatch
+def render_node(node: Node, tag: ConfDirTag, **ctx) -> str:
+    """[!conf_dir] Allows to construct an absolute filepath by joining a path
+    fragment to the known path of the config directory
+
+    Examples:
+
+        my_var: !conf_dir ../data/hello_world.csv
+    """
+    path_fragment = node.value
+    config_dir = get_config_root()
+    return str(config_dir.joinpath(path_fragment).absolute())
 
 
 ###

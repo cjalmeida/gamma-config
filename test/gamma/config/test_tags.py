@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from typing import NamedTuple
 
 from gamma.config import RootConfig, ScalarNode, render_node
@@ -80,3 +82,18 @@ def test_obj_tag():
     assert isinstance(foo, MyObj2)
     assert foo.a == 1
     assert foo.b == 2
+
+
+def test_confdir_tag():
+    # construct paths for testing non-OS-specific:
+    test_path = os.path.join("testdir", "testfile")
+    test_path_fragment = os.path.join(os.pardir, test_path)
+
+    src = f"""
+    foo: !conf_dir ..{test_path_fragment}
+    """
+
+    foo = RootConfig("dummy", src).foo
+
+    assert str(foo).endswith(test_path_fragment)
+    assert Path(foo).is_absolute()

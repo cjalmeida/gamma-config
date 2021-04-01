@@ -166,6 +166,19 @@ The following holds:
     assert section.a == 1 and section.b == 2
 ```
 
+### !confdir
+
+Allows to easily define config values that hold absolute filesystem paths,
+through basing them off the `config` folder.
+
+
+For example, consider you have a `data` folder located as a sibling to
+`config` and want to reference a file in it:
+
+```yaml
+my_var: !conf_dir ../data/hello_world.csv
+```
+
 ## Writing custom tags
 
 We use [multiple dispatch](https://en.wikipedia.org/wiki/Multiple_dispatch) for almost everything in `gamma.config`, including which function to call when we need to render a node in the parse YAML tree. Adding your own tag handler requires just adding the function to the `dispatch` table like in the example below:
