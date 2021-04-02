@@ -2,8 +2,23 @@ import functools
 import inspect
 import typing
 import warnings
+import itertools
 from collections import defaultdict
-from typing import Callable, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
+from typing import (
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    List,
+    MutableSet,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
+from collections.abc import MutableMapping
 
 __all__ = ["dispatch"]
 
@@ -20,32 +35,162 @@ class Vararg:
     pass
 
 
-# marker indicating not dispatchable
-NO_DISPATCH = (2 ** 16) - 1
-
-# to support dynamic subclass check, assign a high distance to
-# subclasses not on the MRO
-DYN_SUBCLASS_DISTANCE = 99
+KT = TypeVar("KT")
+VT = TypeVar("VT")
 
 
-def _distance(subclass: type, cls) -> int:
-    """Return estimated distance between classes, based on MRO."""
-    if getattr(cls, "__origin__", None) is typing.Union:
-        return min(_distance(subclass, arg) for arg in cls.__args__)
-    mro = type.mro(subclass)
-    try:
-        return mro.index(cls)
-    except ValueError:
-        if issubclass(subclass, cls):
-            return DYN_SUBCLASS_DISTANCE
-        return NO_DISPATCH
+class PODict(MutableMapping, Generic[KT, VT]):
+    """Dictionary that stores keys sorted (like a prio queue) that works
+    for partial orders"""
+
+    data: List[Tuple[KT, VT]]
+    __unset = object()
+
+    def __init__(self, data=None) -> None:
+        self.data = []
+        if data:
+            # initialize
+            items = getattr(data, "items", lambda: data)
+            for k, v in items():
+                self[k] = v
+
+    def __setitem__(self, key: KT, value: VT) -> None:
+        for i, (k, _) in enumerate(self.data):
+            if key == k:
+                self.data.pop(i)
+                self.data.insert(i, (key, value))
+                return
+            elif key < k:
+                self.data.insert(i, (key, value))
+                return
+        self.data.append((key, value))
+
+    def __getitem__(self, key: KT) -> VT:
+        for (k, v) in self.data:
+            if key == k:
+                return v
+        raise KeyError(key)
+
+    def pop(self, key: KT, default=__unset) -> VT:
+        try:
+            item = self.popitem(key)
+        except KeyError:
+            if default is self.__unset:
+                raise
+            return default
+        else:
+            return item[1]
+
+    def popitem(self, key: KT, default=__unset) -> Tuple[KT, VT]:
+        for i, (k, v) in enumerate(self.data):
+            if key == k:
+                self.data.pop(i)
+                return k, v
+
+        if default is not self.__unset:
+            return default
+        raise KeyError(key)
+
+    def __iter__(self):
+        return self.keys()
+
+    def __len__(self) -> int:
+        return self.data.__len__()
+
+    def __delitem__(self, key: KT) -> None:
+        for i, (k, _) in enumerate(self.data):
+            if key == k:
+                self.data.pop(i)
+                return
+
+    def keys(self) -> Iterable[KT]:
+        return (x[0] for x in self.data)
+
+    def items(self) -> Iterable[KT]:
+        return iter(self.data)
+
+    def values(self) -> Iterable[VT]:
+        return (x[1] for x in self.data)
+
+    def __contains__(self, o) -> bool:
+        return o in self.keys()
+
+    def clear(self) -> None:
+        return self.data.clear()
+
+
+class POSet(PODict, MutableSet):
+    def __init__(self, data) -> None:
+        self.data = []
+        if data:
+            for v in data:
+                self.add(v)
+
+    def add(self, value) -> None:
+        self[value] = None
+
+    def discard(self, value) -> None:
+        del self[value]
+
+
+def get_union_args(t: Type) -> Optional[Type]:
+    if getattr(t, "__origin__", None) is Union:
+        return t.__args__
+    return None
+
+
+def issametype(this, other):
+    if this is other:
+        return True
+
+    this = get_union_args(this) or [this]
+    other = get_union_args(other) or [other]
+    for (a, b) in itertools.product(this, other):
+        if a is b:
+            return True
+    return False
+
+
+def methods_for(call, table) -> List[Callable]:
+    matches = [x for x in table if call <= x]
+    methods = []
+    while matches:
+        match = matches[0]
+        methods.append(match)
+        matches = [x for x in matches[1:] if not (match < x)]
+    return methods
+
+
+def issubtype(this, other, strict: bool = False):
+    """Check if `this` is a subtype of `other`
+
+    For Union types, this is true if any element in `this` union is subtype of any
+    member of `other` union.
+
+    Args:
+        strict: Do a strict subtype check if True
+    """
+
+    this = get_union_args(this) or [this]
+    other = get_union_args(other) or [other]
+
+    if len(this) == 1 and len(other) == 1:
+        return issubclass(this[0], other[0]) and not (strict and this[0] is other[0])
+    else:
+        for (a, b) in itertools.product(this, other):
+            if issubtype(a, b, strict):
+                return True
+        return False
 
 
 class DispatchSignature:
+    """This represents a tuple of types with extra information for debugging"""
 
     param_types: Tuple[Type]
-    arg_names: Set[str]
+    arg_names: Tuple[str]
     func_site: Optional[str] = None
+    isvariadic: bool
+    min_arity: int
 
     @classmethod
     def from_callable(cls, func: Callable) -> Iterable["DispatchSignature"]:
@@ -81,8 +226,14 @@ class DispatchSignature:
             self: DispatchSignature = object.__new__(cls)
             self.param_types = tuple(_types)
             self.arg_names = tuple(_names)
+
+            arity = len(_types)
+            self.isvariadic = arity and _types[-1] is Vararg
+            self.min_arity = arity - 1 if self.isvariadic else arity
+
             code = func.__code__
             self.func_site = f"{code.co_filename}:{code.co_firstlineno}"
+
             yield self
 
             if params and params[-1].default != inspect.Parameter.empty:
@@ -90,47 +241,31 @@ class DispatchSignature:
 
     def __init__(self, param_types: Tuple[Type]) -> None:
         self.param_types = param_types
+        arity = len(param_types)
+        self.isvariadic = arity and param_types[-1] is Vararg
+        self.min_arity = arity - 1 if self.isvariadic else arity
 
-    def expand_args(self, n):
-        ptypes = self.param_types
-        if ptypes and ptypes[-1] is Vararg and n >= (len(ptypes) - 1):
-            pad = n - len(self.param_types) + 1
-            return tuple([*self.param_types[:-1], *([object] * pad)])
-        return ptypes
-
-    def strip_args(self):
-        ptypes = self.param_types
-        if ptypes and ptypes[-1] is Vararg:
-            return ptypes[:-1]
-        return ptypes
-
-    def distance(self, other: "DispatchSignature") -> Union[Tuple, int]:
-        """Give the relative dispatch "distance"between `self` other `other`
-
-        Dispatch rules:
-            - arguments must be of same length (accounting for variadic expansion)
-            - all `other` param types must be an instance of `self` param types
-
-        If `other` is not a dispatch match, this returns `NO_DISPATCH`
-        """
-        other_types = other.strip_args()
-        n = len(other_types)
-        self_types = self.expand_args(n)
-
-        if len(self_types) != n:
-            return NO_DISPATCH
-
-        res = tuple(_distance(o, s) for (o, s) in zip(other_types, self_types))
-        if NO_DISPATCH in res:
-            return NO_DISPATCH
-
-        return res
-
-    def __hash__(self) -> int:
-        return hash(self.param_types)
+    def _pad(self, n):
+        ptypes = self.param_types[:-1] if self.isvariadic else self.param_types
+        pad = n - len(ptypes)
+        return tuple([*ptypes, *([object] * pad)])
 
     def __eq__(self, o: object) -> bool:
-        return self.param_types == getattr(o, "param_types", None)
+        self_types = self.param_types
+        other_types = getattr(o, "param_types", None)
+
+        if other_types is None:
+            return False
+
+        if len(self_types) != len(other_types):
+            return False
+
+        if self_types == other_types:
+            return True
+
+        # this breaks __hash__ contract
+        if all(issametype(a, b) for (a, b) in zip(self_types, other_types)):
+            return True
 
     def __repr__(self) -> str:
         def name(t):
@@ -145,6 +280,36 @@ class DispatchSignature:
         names = ", ".join(f":{name(t)}" for t in self.param_types)
         return f"<sig ({names})>"
 
+    def _normalize(self, other: "DispatchSignature") -> bool:
+        if any((self.isvariadic, other.isvariadic)):
+            n = max(self.min_arity, other.min_arity)
+            self_types = self._pad(n) if self.isvariadic else self.param_types
+            other_types = other._pad(n) if other.isvariadic else other.param_types
+            return self_types, other_types
+        else:
+            return self.param_types, other.param_types
+
+    def __le__(self, other: "DispatchSignature") -> bool:
+        """Check if self tuple type is a subtype of other tuple type or equal"""
+        self_types, other_types = self._normalize(other)
+        if len(self_types) != len(other_types):
+            return False
+
+        return all(issubtype(s, o) for (s, o) in zip(self_types, other_types))
+
+    def __lt__(self, other: "DispatchSignature") -> bool:
+        """Check if self tuple type is a strict subtype of other tuple type"""
+        self_types, other_types = self._normalize(other)
+        if len(self_types) != len(other_types):
+            return False
+
+        le = all(issubtype(s, o) for (s, o) in zip(self_types, other_types))
+        if not le:
+            return False
+
+        # check for equality
+        return not all(issametype(s, o) for (s, o) in zip(self_types, other_types))
+
     def dump(self) -> str:
         msg = repr(self) + f" at {self.func_site}"
         return msg
@@ -154,11 +319,11 @@ class dispatch:
     """Function wrapper to dispatch methods"""
 
     pending: Set
-    signatures: Dict[DispatchSignature, Callable]
+    methods: PODict[DispatchSignature, Callable]
     cache: Dict[Tuple, Callable]
     get_type: Callable
     name: str
-    arg_names: Dict[str, Set[DispatchSignature]]
+    arg_names: Dict[str, List[DispatchSignature]]
 
     def __new__(cls, *args, overwrite=False):
         namespace = inspect.currentframe().f_back.f_locals
@@ -174,10 +339,10 @@ class dispatch:
             self: dispatch = functools.update_wrapper(object.__new__(cls), func)
             self.pending = set()
             self.get_type = type
-            self.signatures = dict()
+            self.methods = PODict()
             self.cache = dict()
             self.name = func.__name__
-            self.arg_names = defaultdict(set)
+            self.arg_names = defaultdict(list)
             self.register(func, overwrite=overwrite)
             return self
 
@@ -192,18 +357,26 @@ class dispatch:
         self.clear()
         try:
             for sig in DispatchSignature.from_callable(func):
-                if not overwrite:
-                    if sig in self.signatures:
-                        old = [x for x in self.signatures if x == sig][0]
-                        self._warn_overwrite(sig, old)
-                self.signatures[sig] = func
+                self._register_single(sig, func, overwrite)
                 for name in sig.arg_names:
-                    self.arg_names[name].add(sig)
+                    lst = self.arg_names[name]
+                    try:
+                        lst.remove(sig)
+                    except ValueError:
+                        pass
+                    lst.append(sig)
+
         except NameError:
             if allow_pending:
                 self.pending.add((func, overwrite))
             else:
                 raise
+
+    def _register_single(self, sig, func, overwrite):
+        old, _ = self.methods.popitem(sig, (None, None))
+        if old is not None and not overwrite:
+            self._warn_overwrite(sig, old)
+        self.methods[sig] = func
 
     def _warn_overwrite(self, new: DispatchSignature, old: DispatchSignature):
         msg = (
@@ -225,12 +398,12 @@ class dispatch:
             return
         key = key if isinstance(key, tuple) else (key,)
         sig = DispatchSignature(key)
-        self.signatures[sig] = func
+        self._register_single(sig, func, False)
 
     def __delitem__(self, types: Tuple):
         self.clear()
         sig = DispatchSignature(types)
-        self.signatures.pop(sig, None)
+        self.methods.pop(sig)
 
     def __getitem__(self, key: Tuple):
         return self.find_method(key)
@@ -239,7 +412,7 @@ class dispatch:
         """Find and cache the next applicable method of given types.
 
         Args:
-            key: A call args types.
+            key: A call args types tuple.
         """
         self.resolve_pending()
         cached = self.cache.get(key)
@@ -248,56 +421,25 @@ class dispatch:
 
         call_sig = DispatchSignature(key)
 
-        candidates = []
-        for msig in self.signatures:
-            d = msig.distance(call_sig)
-            if d != NO_DISPATCH:
-                candidates.append((d, msig))
-
-        if not candidates:
+        match = methods_for(call_sig, self.methods)
+        if not match:
             self._except_no_method_found(key)
 
-        candidates.sort()
-        best_sig = self._get_meet(candidates, key)
-        method = self.signatures[best_sig]
+        if len(match) > 1:
+            self._except_no_meet(key, match)
+
+        method = self.methods[match[0]]
 
         # cache and return
         self.cache[key] = method
         return method
 
-    def _get_meet(self, oset: List[Tuple[Tuple, DispatchSignature]], key):
-        """Get the "meet" of a set, eg. the element that is lower than everyone else.
-
-        When the dispatch is ambiguous, there's distance set is partially ordered and
-        may not have a meet.
-        """
-
-        if len(oset) == 1:
-            return oset[0][1]
-
-        def is_le(a, b):
-            return all(x <= y for x, y in zip(a, b))
-
-        meet = None
-        for (z, z_sig) in oset:
-            valid = True
-            for (w, _) in oset:
-                valid &= is_le(z, w)
-                if not valid:
-                    break
-            if valid:
-                meet = z_sig
-                break
-
-        if not meet:
-            names = ", ".join(":" + t.__name__ for t in key)
-            msg = f"Method call ({names}) is ambiguous. Candidates:"
-            c: DispatchSignature
-            for (_, c) in oset:
-                msg += f"\n    {c} at {c.func_site}"
-            raise DispatchError(msg)
-
-        return meet
+    def _except_no_meet(self, key, match: List[DispatchSignature]):
+        names = ", ".join(":" + t.__name__ for t in key)
+        msg = f"Method call ({names}) is ambiguous. Candidates:"
+        for m in match:
+            msg += f"\n    {m} at {m.func_site}"
+        raise DispatchError(msg)
 
     def _except_no_method_found(self, key):
         names = ", ".join(":" + t.__name__ for t in key)
@@ -358,12 +500,12 @@ class dispatch:
     def dump(self) -> str:  # pragma: no cover
         """Pretty-print debug information about this function"""
         msg = repr(self) + " with signatures:"
-        for sig in self.signatures:
+        for sig in self.methods:
             msg += "\n    " + sig.dump()
         return msg
 
     def __repr__(self) -> str:
-        n = len(self.signatures)
+        n = len(self.methods)
         p = ""
         if n == 1:
             p = "(s)"

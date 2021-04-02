@@ -1,3 +1,4 @@
+from gamma.dispatch.core import issubtype, DispatchSignature as DS, methods_for
 import pytest
 from gamma.dispatch import DispatchError, ParametricMeta, dispatch, parametric
 
@@ -143,3 +144,23 @@ def test_union():
     assert fun(ATag()) == "ok"
     assert fun(BTag()) == "ok"
     assert fun(Tag["C"]()) == "fail"
+
+
+def test_type_system():
+    @parametric
+    class Tag:
+        pass
+
+    ATag = Tag["A"]
+    BTag = Tag["B"]
+
+    assert issubtype(ATag, Tag)
+    assert issubtype(BTag, Tag)
+
+    a = DS((ATag,))
+    b = DS((BTag,))
+    base = DS((Tag,))
+
+    assert not a <= b
+    assert a <= base
+

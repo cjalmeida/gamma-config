@@ -143,7 +143,6 @@ def test_specialization():
     def temp(a: Foo):
         return "1 arg"
 
-    # TODO: bug in dispatch, should match Julia behavior here
     assert temp(Foo(), False) == "2 args"
     assert temp(Foo()) == "1 arg"
 
