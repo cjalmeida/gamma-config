@@ -26,6 +26,7 @@ class ParametricMeta(type):
                 SubClass.__repr__ = lambda *_: c_repr
                 SubClass.__module__ = c_module
                 SubClass.__values__ = values
+                SubClass.__tag__ = cls
 
                 @classmethod
                 def _also_of(_, *new_values):

@@ -1,0 +1,241 @@
+import functools
+import inspect
+import typing
+import warnings
+import itertools
+from collections import defaultdict
+from typing import (
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
+from collections.abc import MutableMapping
+
+from .typesystem import Sig, SigDict, is_more_specific, issubtype, signatures_from
+
+
+class DispatchError(Exception):
+    pass
+
+
+class OverwriteWarning(UserWarning):
+    pass
+
+
+def methods_matching(call, table) -> List:
+    """Given a method table, return the methods matching the call signature.
+
+    Args:
+        table: an iterable of methods ordered by `is_more_specific`
+        call: the call signature as a `Sig` object or `Tuple[...]` type
+    """
+    matches = [x for x in table if issubtype(call, x)]
+    methods = []
+    while matches:
+        match = matches[0]
+        methods.append(match)
+        matches = [x for x in matches[1:] if not is_more_specific(match, x)]
+    return methods
+
+
+class dispatch:
+    """Function wrapper to dispatch methods"""
+
+    pending: Set
+    methods: SigDict[Callable]
+    cache: Dict[Tuple, Callable]
+    get_type: Callable
+    name: str
+    arg_names: Dict[str, List[Sig]]
+
+    def __new__(cls, *args, overwrite=False):
+        namespace = inspect.currentframe().f_back.f_locals
+
+        def wrapped(func):
+            # check if function with the same name exists in scope
+            existing = namespace.get(func.__name__)
+            if existing and isinstance(existing, dispatch):
+                existing.register(func, overwrite=overwrite)
+                return existing
+
+            # create a new dispatch table wrapper
+            self: dispatch = functools.update_wrapper(object.__new__(cls), func)
+            self.pending = set()
+            self.get_type = type
+            self.methods = SigDict()
+            self.cache = dict()
+            self.name = func.__name__
+            self.arg_names = defaultdict(list)
+            self.register(func, overwrite=overwrite)
+            return self
+
+        if args and callable(args[0]):
+            return wrapped(args[0])
+
+        return wrapped
+
+    def register(
+        self, func: Callable, *, overwrite=False, allow_pending=True
+    ) -> Callable:
+        self.clear()
+        try:
+            for sig in signatures_from(func):
+                self._register_single(sig, func, overwrite)
+                for name in sig.arg_names:
+                    lst = self.arg_names[name]
+                    try:
+                        lst.remove(sig)
+                    except ValueError:
+                        pass
+                    lst.append(sig)
+
+        except NameError:
+            if allow_pending:
+                self.pending.add((func, overwrite))
+            else:
+                raise
+
+    def _register_single(self, sig, func, overwrite):
+        old, _ = self.methods.popitem(sig, (None, None))
+        if old is not None and not overwrite:
+            self._warn_overwrite(sig, old)
+        self.methods[sig] = func
+
+    def _warn_overwrite(self, new: Sig, old: Sig):
+        msg = (
+            f"Method for function '{self.name}' defined\n"
+            f"    at {old.func_site}\n"
+            f"will be overwritten by new method defined\n"
+            f"    at {new.func_site}\n"
+            f"If using kw-or-positional vs kw-only arguments correctly."
+        )
+        warnings.warn(msg, OverwriteWarning)
+
+    def clear(self):
+        """Empty the cache."""
+        self.cache.clear()
+
+    def __setitem__(self, key, func: Callable):
+        self.clear()
+        if not key:
+            return
+        key = key if isinstance(key, tuple) else (key,)
+        sig = Sig(*key)
+        self._register_single(sig, func, False)
+
+    def __delitem__(self, types: Tuple):
+        self.clear()
+        sig = Sig(*types)
+        self.methods.pop(sig)
+
+    def __getitem__(self, key: Tuple):
+        return self.find_method(key)
+
+    def find_method(self, key: Tuple) -> Callable:
+        """Find and cache the next applicable method of given types.
+
+        Args:
+            key: A call args types tuple.
+        """
+        self.resolve_pending()
+        cached = self.cache.get(key)
+        if cached:
+            return cached
+
+        call_sig = Sig(*key)
+
+        match = methods_matching(call_sig, self.methods)
+        if not match:
+            self._except_no_method_found(key)
+
+        if len(match) > 1:
+            self._except_no_meet(key, match)
+
+        method = self.methods[match[0]]
+
+        # cache and return
+        self.cache[key] = method
+        return method
+
+    def _except_no_meet(self, key, match: List[Sig]):
+        names = ", ".join(":" + t.__name__ for t in key)
+        msg = f"Method call ({names}) is ambiguous. Candidates:"
+        for m in match:
+            msg += f"\n    {m} at {m.func_site}"
+        raise DispatchError(msg)
+
+    def _except_no_method_found(self, key):
+        names = ", ".join(":" + t.__name__ for t in key)
+        msg = f"{self}: no method found for call ({names})"
+        raise DispatchError(msg)
+
+    def __call__(self, *args, **kwargs):
+        """Resolve and dispatch to best method.
+
+        Dispatch rules should match Julia's.
+        """
+        try:
+            if kwargs:
+                self._check_invalid_kwargs(kwargs)
+            key = tuple(self.get_type(a) for a in args)
+            func = self.cache.get(key)
+            if not func:
+                func = self.find_method(key)
+
+            try:
+                return func(*args, **kwargs)
+            except TypeError as ex:
+                file = func.__code__.co_filename
+                line = func.__code__.co_firstlineno
+                msg = f"{ex.args[0]}\n    in function {file}:{line}"
+                raise DispatchError(msg) from ex
+
+        except DispatchError as ex:
+            file = inspect.currentframe().f_back.f_code.co_filename
+            line = inspect.currentframe().f_back.f_lineno
+            msg = f"{ex.args[0]}\n    called from {file}:{line}"
+            raise DispatchError(msg) from ex
+
+    def _check_invalid_kwargs(self, kwargs):
+        isec = set(kwargs).intersection(self.arg_names)
+        if isec:
+            msg = (
+                f"Reserved argument names were used as keywords in "
+                f"method call: {isec}"
+            )
+            for arg in isec:
+                msg += f"\n    '{arg}' in signatures:"
+                for sig in self.arg_names[arg]:
+                    msg += f"\n        '{sig.dump()}'"
+
+            raise DispatchError(msg)
+
+    def resolve_pending(self):
+        """Evaluate any pending forward references.
+
+        This can be called explicitly when using forward references,
+        otherwise cache misses will evaluate.
+        """
+        while self.pending:
+            func, overwrite = self.pending.pop()
+            self.register(func, overwrite=overwrite, allow_pending=False)
+
+    def dump(self) -> str:  # pragma: no cover
+        """Pretty-print debug information about this function"""
+        msg = repr(self) + " with signatures:"
+        for sig in self.methods:
+            msg += "\n    " + sig.dump()
+        return msg
+
+    def __repr__(self) -> str:
+        n = len(self.methods)
+        p = ""
+        if n == 1:
+            p = "(s)"
+        return f"<function '{self.__name__}' with {n} method{p}>"

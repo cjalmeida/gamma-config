@@ -1,4 +1,4 @@
-from gamma.dispatch.core import issubtype, DispatchSignature as DS, methods_for
+from gamma.dispatch.dispatchsystem import issubtype, Sig, methods_matching
 import pytest
 from gamma.dispatch import DispatchError, ParametricMeta, dispatch, parametric
 
@@ -157,10 +157,10 @@ def test_type_system():
     assert issubtype(ATag, Tag)
     assert issubtype(BTag, Tag)
 
-    a = DS((ATag,))
-    b = DS((BTag,))
-    base = DS((Tag,))
+    a = Sig(ATag)
+    b = Sig(BTag)
+    base = Sig(Tag)
 
-    assert not a <= b
-    assert a <= base
+    assert not issubtype(a, b)
+    assert issubtype(a, base)
 
