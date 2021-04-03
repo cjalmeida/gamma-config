@@ -3,20 +3,12 @@ check Jeff Bezanson's PhD thesis at
 https://github.com/JeffBezanson/phdthesis/blob/master/main.pdf
 """
 
-from typing import (
-    Callable,
-    Iterable,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+import inspect
 import itertools
 import typing
-import inspect
-from .poset import PODict, POSet, VT
+from typing import Callable, Iterable, Optional, Tuple, Type, TypeVar, Union
+
+from .poset import VT, PODict, POSet
 
 T = TypeVar("T")
 

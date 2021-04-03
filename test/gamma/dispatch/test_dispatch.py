@@ -1,13 +1,9 @@
-from gamma.dispatch.typesystem import Sig, SigSet, Vararg, signatures_from
 from typing import Dict, Union
 
 import pytest
 from gamma.dispatch import DispatchError, dispatch
-from gamma.dispatch.dispatchsystem import (
-    Sig,
-    OverwriteWarning,
-    methods_matching,
-)
+from gamma.dispatch.dispatchsystem import OverwriteWarning, Sig, methods_matching
+from gamma.dispatch.typesystem import Sig, SigSet, Vararg, signatures_from
 
 
 class SuperFoo:

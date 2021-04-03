@@ -1,6 +1,6 @@
-from gamma.dispatch.dispatchsystem import issubtype, Sig, methods_matching
 import pytest
 from gamma.dispatch import DispatchError, ParametricMeta, dispatch, parametric
+from gamma.dispatch.dispatchsystem import Sig, issubtype
 
 
 class Global(metaclass=ParametricMeta):
@@ -163,4 +163,3 @@ def test_type_system():
 
     assert not issubtype(a, b)
     assert issubtype(a, base)
-

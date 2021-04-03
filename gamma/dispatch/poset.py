@@ -1,6 +1,6 @@
 from collections.abc import MutableMapping, MutableSet
-from typing import Generic, Iterable, TypeVar, List, Tuple
-from operator import __lt__, __eq__
+from operator import __eq__, __lt__
+from typing import Generic, Iterable, List, Tuple, TypeVar
 
 KT = TypeVar("KT")
 VT = TypeVar("VT")
@@ -100,4 +100,3 @@ class POSet(PODict[KT, None], MutableSet, Generic[KT]):
 
     def discard(self, value) -> None:
         del self[value]
-

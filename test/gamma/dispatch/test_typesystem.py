@@ -1,5 +1,6 @@
-from typing import Union, Tuple
-from gamma.dispatch.typesystem import SigSet, Vararg, issubtype, Sig, is_more_specific
+from typing import Tuple, Union
+
+from gamma.dispatch.typesystem import Sig, SigSet, Vararg, is_more_specific, issubtype
 
 
 class SuperFoo:

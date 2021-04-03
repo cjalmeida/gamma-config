@@ -73,7 +73,6 @@ def test_podict():
     podict.clear()
     assert len(podict) == 0
 
-
     poset = POSet([pb, p1, pa, p2])
     assert list(poset) in (
         [pa, pb, p1, p2],

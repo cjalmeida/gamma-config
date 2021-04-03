@@ -1,21 +1,8 @@
 import functools
 import inspect
-import typing
 import warnings
-import itertools
 from collections import defaultdict
-from typing import (
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
-from collections.abc import MutableMapping
+from typing import Callable, Dict, List, Set, Tuple
 
 from .typesystem import Sig, SigDict, is_more_specific, issubtype, signatures_from
 
