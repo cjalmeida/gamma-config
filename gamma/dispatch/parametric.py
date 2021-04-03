@@ -62,6 +62,8 @@ T = TypeVar("T")
 
 
 class parametric(Generic[T]):
+    """Decorator to create new parametric base classes"""
+
     def __new__(deco, Class: T) -> T:
         Para = types.new_class(
             Class.__name__, (Class,), kwds={"metaclass": ParametricMeta}

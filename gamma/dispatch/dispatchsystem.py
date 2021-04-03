@@ -34,11 +34,22 @@ def methods_matching(call, table) -> List:
 class dispatch:
     """Function wrapper to dispatch methods"""
 
+    #: Pending methods register due to forward references
     pending: Set
+
+    #: The methods table for this function
     methods: SigDict[Callable]
+
+    #: Cache from call signature to actual function
     cache: Dict[Tuple, Callable]
+
+    #: Callable to get types from function arguments
     get_type: Callable
+
+    #: function name
     name: str
+
+    #: set of reserved argument names
     arg_names: Dict[str, List[Sig]]
 
     def __new__(cls, *args, overwrite=False):
@@ -70,6 +81,14 @@ class dispatch:
     def register(
         self, func: Callable, *, overwrite=False, allow_pending=True
     ) -> Callable:
+        """Register a new method to this function's dispatch table.
+
+        Args:
+            func: the method to register
+            overwrite: if False, will warn if the registration will overwrite and
+                existing registration.
+            allow_pending: if True, won't error on forward references
+        """
         self.clear()
         try:
             for sig in signatures_from(func):
@@ -109,6 +128,8 @@ class dispatch:
         self.cache.clear()
 
     def __setitem__(self, key, func: Callable):
+        """Manually map a call signature to a callable"""
+
         self.clear()
         if not key:
             return
@@ -117,6 +138,7 @@ class dispatch:
         self._register_single(sig, func, False)
 
     def __delitem__(self, types: Tuple):
+        """Remove a method registration"""
         self.clear()
         sig = Sig(*types)
         self.methods.pop(sig)
@@ -163,10 +185,7 @@ class dispatch:
         raise DispatchError(msg)
 
     def __call__(self, *args, **kwargs):
-        """Resolve and dispatch to best method.
-
-        Dispatch rules should match Julia's.
-        """
+        """Resolve and dispatch to best method."""
         try:
             if kwargs:
                 self._check_invalid_kwargs(kwargs)
@@ -190,6 +209,23 @@ class dispatch:
             raise DispatchError(msg) from ex
 
     def _check_invalid_kwargs(self, kwargs):
+        """Check if we're passing 'reserved' arg names in kwargs.
+
+        Python allows passing positional args as kwargs. This effectively forbid this,
+        ie. all keyword call arguments are deemed to be kwargs, and this is required to
+        avoid weird behavior.
+
+        Example:
+
+            @dispatch
+            def foo(a: int, *, b):
+                return "ok"
+
+            assert foo(1, b=1) == "ok"
+            assert foo(1, b="foo") == "ok"
+            assert foo(a=1, b=1) == "ok"   # <- this is not allowed
+        """
+
         isec = set(kwargs).intersection(self.arg_names)
         if isec:
             msg = (

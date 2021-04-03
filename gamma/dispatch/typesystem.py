@@ -23,7 +23,7 @@ class Sig:
 
     def __init__(self, *types) -> None:
         self.types: Type[Tuple] = Tuple.__getitem__(types)
-        self.arg_names: Optional[Tuple[str]] = None
+        self.arg_names: Tuple[str, ...] = tuple(["unset"] * len(types))
         self.func_site: Optional[str] = None
 
         arity = len(types)

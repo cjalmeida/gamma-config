@@ -349,3 +349,21 @@ def test_varargs_dispatch():
     call = Sig(int, int)
     match = methods_matching(call, [target])
     assert match
+
+
+def test_caching():
+
+    @dispatch
+    def temp(a):
+        return 1
+
+    assert temp("a") == 1
+
+    @dispatch
+    def temp(a: str):
+        return 2
+
+    assert temp("a") == 2
+    assert temp(True) == 1
+
+
