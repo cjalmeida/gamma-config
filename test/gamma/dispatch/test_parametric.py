@@ -1,5 +1,6 @@
 import pytest
 from gamma.dispatch import DispatchError, ParametricMeta, dispatch, parametric
+from gamma.dispatch.dispatchsystem import Sig, issubtype
 
 
 class Global(metaclass=ParametricMeta):
@@ -143,3 +144,22 @@ def test_union():
     assert fun(ATag()) == "ok"
     assert fun(BTag()) == "ok"
     assert fun(Tag["C"]()) == "fail"
+
+
+def test_type_system():
+    @parametric
+    class Tag:
+        pass
+
+    ATag = Tag["A"]
+    BTag = Tag["B"]
+
+    assert issubtype(ATag, Tag)
+    assert issubtype(BTag, Tag)
+
+    a = Sig(ATag)
+    b = Sig(BTag)
+    base = Sig(Tag)
+
+    assert not issubtype(a, b)
+    assert issubtype(a, base)

@@ -26,6 +26,7 @@ class ParametricMeta(type):
                 SubClass.__repr__ = lambda *_: c_repr
                 SubClass.__module__ = c_module
                 SubClass.__values__ = values
+                SubClass.__tag__ = cls
 
                 @classmethod
                 def _also_of(_, *new_values):
@@ -61,6 +62,8 @@ T = TypeVar("T")
 
 
 class parametric(Generic[T]):
+    """Decorator to create new parametric base classes"""
+
     def __new__(deco, Class: T) -> T:
         Para = types.new_class(
             Class.__name__, (Class,), kwds={"metaclass": ParametricMeta}

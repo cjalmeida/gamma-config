@@ -2,7 +2,24 @@ from typing import Dict, Union
 
 import pytest
 from gamma.dispatch import DispatchError, dispatch
-from gamma.dispatch.core import DispatchSignature, OverwriteWarning
+from gamma.dispatch.dispatchsystem import OverwriteWarning, Sig, methods_matching
+from gamma.dispatch.typesystem import Sig, SigSet, Vararg, signatures_from
+
+
+class SuperFoo:
+    pass
+
+
+class Foo(SuperFoo):
+    pass
+
+
+class SuperBar:
+    pass
+
+
+class Bar(SuperBar):
+    pass
 
 
 def test_simple_dispatch():
@@ -143,7 +160,6 @@ def test_specialization():
     def temp(a: Foo):
         return "1 arg"
 
-    # TODO: bug in dispatch, should match Julia behavior here
     assert temp(Foo(), False) == "2 args"
     assert temp(Foo()) == "1 arg"
 
@@ -184,7 +200,7 @@ def test_union_sig():
     def temp(x: Union[int, float]):  # noqa
         return "int-float"
 
-    for sig in DispatchSignature.from_callable(temp):
+    for sig in signatures_from(temp):
         assert "int" in repr(sig)
         assert "float" in repr(sig)
 
@@ -275,3 +291,79 @@ def test_manual_setitem():
     assert temp(1) == "int"
     assert temp("1") == "alt"
     assert temp(1.0, 1.0) == "alt"
+
+
+def test_specialize1():
+
+    sig1 = Sig(object, object)
+    sig2 = Sig(SuperFoo, object)
+    sig3 = Sig(Foo, object)
+    sig4 = Sig(Foo, SuperFoo)
+    sigN = Sig(int, int)
+    table = SigSet([sig1, sig2, sig3, sig4, sigN])
+
+    call = Sig(Foo, Foo)
+    match = methods_matching(call, table)
+    assert match[0] == sig4
+    assert sigN not in match
+    assert len(match) == 1
+
+    # add an ambiguous match
+    # (:Foo, :Foo) matches (:Foo, :SuperFoo) and (:SuperFoo, :Foo)
+    # but one is not a strict subtype of the other
+    sig5 = Sig(SuperFoo, Foo)
+    table.add(sig5)
+    match = methods_matching(call, table)
+    assert len(match) == 2
+
+    # add a more specific sig
+    sig6 = Sig(Foo, Foo)
+    table.add(sig6)
+    match = methods_matching(call, table)
+    assert len(match) == 1
+
+
+def test_specialize2():
+    sig1 = Sig(Foo,)
+    sig2 = Sig(SuperFoo, bool)
+    table = SigSet([sig1, sig2])
+
+    call = Sig(Foo, bool)
+    got = methods_matching(call, table)
+    assert len(got) == 1
+    assert got[0] == sig2
+
+    call = Sig(Foo,)
+    got = methods_matching(call, table)
+    assert len(got) == 1
+    assert got[0] == sig1
+
+
+def test_varargs_dispatch():
+    target = Sig(int, int, Vararg)
+    call = Sig(int, int, int)
+    match = methods_matching(call, [target])
+    assert match
+
+    target = Sig(int, int, Vararg)
+    call = Sig(int, int)
+    match = methods_matching(call, [target])
+    assert match
+
+
+def test_caching():
+
+    @dispatch
+    def temp(a):
+        return 1
+
+    assert temp("a") == 1
+
+    @dispatch
+    def temp(a: str):
+        return 2
+
+    assert temp("a") == 2
+    assert temp(True) == 1
+
+
