@@ -166,17 +166,15 @@ The following holds:
     assert section.a == 1 and section.b == 2
 ```
 
-### !confdir
+### !path
 
-Allows to easily define config values that hold absolute filesystem paths,
-through basing them off the `config` folder.
-
+Return an absolute path string, relative to the **parent of the config root folder**.
 
 For example, consider you have a `data` folder located as a sibling to
 `config` and want to reference a file in it:
 
 ```yaml
-my_var: !conf_dir ../data/hello_world.csv
+my_var: !path data/hello_world.csv
 ```
 
 ## Writing custom tags

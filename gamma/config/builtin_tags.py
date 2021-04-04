@@ -26,7 +26,7 @@ J2Tag = Tag["!j2"]
 J2SecretTag = Tag["!j2_secret"]
 PyTag = Tag["!py"]
 ObjTag = Tag["!obj"]
-ConfDirTag = Tag["!conf_dir"]
+PathTag = Tag["!path"]
 
 j2_cache = threading.local()
 
@@ -270,19 +270,19 @@ def render_node(
     return func(**val)
 
 
-# process: !conf_dir
+# process: !path
 @dispatch
-def render_node(node: Node, tag: ConfDirTag, **ctx) -> str:
-    """[!conf_dir] Allows to construct an absolute filepath by joining a path
-    fragment to the known path of the config directory
+def render_node(node: Node, tag: PathTag, **ctx) -> str:
+    """[!path] Construct an absolute file path by joining a path
+    fragment to the known path of the *parent* of config root directory
 
     Examples:
-
-        my_var: !conf_dir ../data/hello_world.csv
+        # should point to `<config-root>/../data/hello_world.csv`
+        my_var: !path data/hello_world.csv
     """
     path_fragment = node.value
-    config_dir = get_config_root()
-    return str(config_dir.joinpath(path_fragment).absolute())
+    base = get_config_root().parent
+    return str(base.joinpath(path_fragment).absolute())
 
 
 ###

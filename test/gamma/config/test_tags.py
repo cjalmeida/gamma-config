@@ -84,13 +84,13 @@ def test_obj_tag():
     assert foo.b == 2
 
 
-def test_confdir_tag():
+def test_path_tag():
     # construct paths for testing non-OS-specific:
     test_path = os.path.join("testdir", "testfile")
     test_path_fragment = os.path.join(os.pardir, test_path)
 
     src = f"""
-    foo: !conf_dir ..{test_path_fragment}
+    foo: !path ..{test_path_fragment}
     """
 
     foo = RootConfig("dummy", src).foo
