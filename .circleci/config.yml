@@ -35,16 +35,6 @@ jobs:
             export PYTHONPATH=$PWD
             pytest --junitxml=test-results/junit.xml --cov-report xml --cov=gamma test/
 
-      - run:
-          name: build wheel
-          command: |
-            poetry build
-
-      - persist_to_workspace:
-          root: ./dist
-          paths:
-            - "*"
-
       - store_test_results:
           path: test-results
 
@@ -82,24 +72,24 @@ jobs:
   publish:
     docker:
       - image: circleci/python:3.7.9
+
     steps:
       - checkout
       - restore_cache:
           keys:
             - v4-{{ checksum "poetry.lock" }}
 
-      - attach_workspace:
-          at: ./dist
+      - run:
+          name: build wheel
+          command: |
+            poetry build
 
       - run:
           name: publish dist
           command: |
-            export NOBUILD=1
             export GITHUB_USER=almeida-cloves
             export GITHUB_TOKEN=${github_pat}
 
-            echo $PWD
-            ls -l
             . .venv/bin/activate
             python ./publish
 
@@ -109,17 +99,15 @@ workflows:
     jobs:
       - build
       - doc:
-          requires:
-            - build
+          requires: [build]
           filters:
             branches:
               only: [master]
             # tags:
-              # only: /^v.*/
+            #   only: /^v.*/
 
       - publish:
-          requires:
-            - build
+          requires: [build]
           filters:
             tags:
               only: /^v.*/

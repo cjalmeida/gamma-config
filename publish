@@ -40,13 +40,6 @@ def publish():
     else:
         version = os.getenv("VERSION")
 
-    # build wheel
-    if os.getenv("NOBUILD", "0") == "0":
-        cmd = "(rm -rf build dist/* || true) && python setup.py sdist"
-        env = os.environ.copy()
-        env["VERSION"] = version
-        subprocess.run(cmd, shell=True, check=True, env=env)
-
     # create a release
     auth = (gh_user, gh_token)
     body = {"tag_name": version}
