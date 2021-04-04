@@ -1,7 +1,12 @@
 # Gamma Config
 
 ![python](https://img.shields.io/badge/python-3.7%2B-blue)
-[![CircleCI](https://cci.gamma.bcg.com/gh/BCG/gamma-config/tree/master.svg?style=svg&circle-token=8106c47ad7a019907079adc538ec98b9ba6b0e95)](https://cci.gamma.bcg.com/gh/BCG/gamma-config/tree/master)
+
+Build:
+
+-   `master`:
+    [![CircleCI](https://cci.gamma.bcg.com/gh/BCG/gamma-config/tree/master.svg?style=svg&circle-token=8106c47ad7a019907079adc538ec98b9ba6b0e95)](https://cci.gamma.bcg.com/gh/BCG/gamma-config/tree/master)
+-   `develop`: [![CircleCI](https://cci.gamma.bcg.com/gh/BCG/gamma-config/tree/develop.svg?style=svg&circle-token=8106c47ad7a019907079adc538ec98b9ba6b0e95)](https://cci.gamma.bcg.com/gh/BCG/gamma-config/tree/develop)
 
 An opinionated way of setting up configuration for data science projects.
 
