@@ -85,7 +85,7 @@ pip install gamma-config[jinja2]
 The package comes with "scaffolding" to help you get started. In your project folder:
 
 ```bash
-   python -m gamma.config scaffold
+   python -m gamma.config.scaffold
 ```
 
 Remove the sample files, then create yourself a `config/20-myconfig.yaml` file
