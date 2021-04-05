@@ -19,6 +19,7 @@ jobs:
             python3 -m venv .venv
             . .venv/bin/activate
             pip install -e .
+            pip install pytest>=6.2 pytest-cov>=2.11
 
       - save_cache:
           paths:
