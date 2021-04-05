@@ -11,22 +11,19 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v4-{{ checksum "poetry.lock" }}
+            - v5-{{ checksum "setup.cfg" }}
 
       - run:
           name: install dependencies
           command: |
-            pip install --user poetry
-            poetry config virtualenvs.in-project true
-            poetry env use 3.7 -n
+            python3 -m venv .venv
             . .venv/bin/activate
-            poetry install -n --no-ansi
+            pip install -e .
 
       - save_cache:
           paths:
-            - .poetry
             - .venv
-          key: v4-{{ checksum "poetry.lock" }}
+          key: v5-{{ checksum "setup.cfg" }}
 
       - run:
           name: run tests
@@ -45,7 +42,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v4-{{ checksum "poetry.lock" }}
+            - v5-{{ checksum "setup.cfg" }}
       - run:
           name: install nodejs
           command: |
@@ -77,12 +74,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v4-{{ checksum "poetry.lock" }}
+            - v5-{{ checksum "setup.cfg" }}
 
       - run:
           name: build wheel
           command: |
-            poetry build
+            . .venv/bin/activate
+            python setup.py bdist_wheel
 
       - run:
           name: publish dist
