@@ -11,7 +11,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v5-{{ checksum "setup.cfg" }}
+            - v5-{{ checksum "setup.cfg" }}-{{ checksum "requirements.dev.txt" }}
 
       - run:
           name: install dependencies
@@ -24,7 +24,7 @@ jobs:
       - save_cache:
           paths:
             - .venv
-          key: v5-{{ checksum "setup.cfg" }}
+          key: v5-{{ checksum "setup.cfg" }}-{{ checksum "requirements.dev.txt" }}
 
       - run:
           name: run tests
@@ -43,7 +43,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v5-{{ checksum "setup.cfg" }}
+            - v5-{{ checksum "setup.cfg" }}-{{ checksum "requirements.dev.txt" }}
       - run:
           name: install nodejs
           command: |
@@ -75,7 +75,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v5-{{ checksum "setup.cfg" }}
+            - v5-{{ checksum "setup.cfg" }}-{{ checksum "requirements.dev.txt" }}
 
       - run:
           name: build wheel

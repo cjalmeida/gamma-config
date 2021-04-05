@@ -10,3 +10,4 @@ black
 pdbpp
 pip-tools
 wheel
+ipython
