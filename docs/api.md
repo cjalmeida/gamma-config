@@ -457,7 +457,7 @@ Render the resulting node of merging all entries
 
 ```python
 @dispatch
-render_node(cfg: "ConfigNode", dump=False)
+render_node(cfg: "ConfigNode", *, dump=False)
 ```
 
 Render the config node.
@@ -486,7 +486,7 @@ Discover the config root folder and get all entries
 
 ```python
 @dispatch
-get_entries(folder: Path, meta_include_folders=True) -> List[Tuple[str, Any]]
+get_entries(folder: Path, *, meta_include_folders=True) -> List[Tuple[str, Any]]
 ```
 
 Get all entries in a given folder.
@@ -956,7 +956,7 @@ name.
 
 ```python
 @dispatch
-render_node(node: Node, tag: EnvSecretTag, dump=False, **ctx) -> str
+render_node(node: Node, tag: EnvSecretTag, *, dump=False, **ctx) -> str
 ```
 
 [!env_secret] Similar to !env, but never returns the value when dumping.
@@ -1004,7 +1004,7 @@ foo2: !j2 This is a number = {c.myvar}
 
 ```python
 @dispatch
-render_node(node: Node, tag: J2SecretTag, dump=False, **ctx) -> Any
+render_node(node: Node, tag: J2SecretTag, *, dump=False, **ctx) -> Any
 ```
 
 [!j2_secret] Similar to !j2, but never returns the value when dumping.
@@ -1014,7 +1014,7 @@ render_node(node: Node, tag: J2SecretTag, dump=False, **ctx) -> Any
 
 ```python
 @dispatch
-render_node(node: Node, tag: RefTag, config=None, **ctx) -> Any
+render_node(node: Node, tag: RefTag, *, config=None, **ctx) -> Any
 ```
 
 [!ref] References other entries in the config object.
@@ -1027,7 +1027,7 @@ using quotes.
 
 ```python
 @dispatch
-render_node(node: ScalarNode, tag: PyTag, path=None, **ctx) -> Any
+render_node(node: ScalarNode, tag: PyTag, *, path=None, **ctx) -> Any
 ```
 
 [!py] Pass the node value to a Python callable.
@@ -1053,7 +1053,7 @@ Will call the function `myfunc` in `myapp.mymodule` module with the arguments:
 
 ```python
 @dispatch
-render_node(node: Union[SequenceNode, MappingNode], tag: PyTag, path=None, **ctx) -> Any
+render_node(node: Union[SequenceNode, MappingNode], tag: PyTag, *, path=None, **ctx) -> Any
 ```
 
 [!py] Pass the node value to a Python callable.
@@ -1068,7 +1068,7 @@ recursively using the `to_dict` method.
 
 ```python
 @dispatch
-render_node(node: MappingNode, tag: ObjTag, path=None, config=None, **ctx) -> Any
+render_node(node: MappingNode, tag: ObjTag, *, path=None, config=None, **ctx) -> Any
 ```
 
 [!obj] Create a Python object by passing the mapping value as nested dicts to
@@ -1118,7 +1118,7 @@ Get all keys on a `map` node
 
 ```python
 @dispatch
-get_item(node: MappingNode, key, default=...) -> Node
+get_item(node: MappingNode, key, *, default=...) -> Node
 ```
 
 Get a single child node item from `map` node
@@ -1128,7 +1128,7 @@ Get a single child node item from `map` node
 
 ```python
 @dispatch
-get_entry(node: MappingNode, key, default=...) -> Entry
+get_entry(node: MappingNode, key, *, default=...) -> Entry
 ```
 
 Get a (key, value) entry from a `map` node.
@@ -1237,7 +1237,161 @@ By default we keep the ones in `first` if equals.
 <a name="gamma.dispatch"></a>
 # gamma.dispatch
 
-<a name="gamma.dispatch.Val"></a>
+<a name="gamma.dispatch.dispatchsystem"></a>
+# gamma.dispatch.dispatchsystem
+
+<a name="gamma.dispatch.dispatchsystem.methods_matching"></a>
+#### methods\_matching
+
+```python
+methods_matching(call, table) -> List
+```
+
+Given a method table, return the methods matching the call signature.
+
+**Arguments**:
+
+- `table` - an iterable of methods ordered by `is_more_specific`
+- `call` - the call signature as a `Sig` object or `Tuple[...]` type
+
+<a name="gamma.dispatch.dispatchsystem.dispatch"></a>
+## dispatch Objects
+
+```python
+class dispatch()
+```
+
+Function wrapper to dispatch methods
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.pending"></a>
+#### pending
+
+Pending methods register due to forward references
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.methods"></a>
+#### methods
+
+The methods table for this function
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.cache"></a>
+#### cache
+
+Cache from call signature to actual function
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.get_type"></a>
+#### get\_type
+
+Callable to get types from function arguments
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.name"></a>
+#### name
+
+function name
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.arg_names"></a>
+#### arg\_names
+
+set of reserved argument names
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.register"></a>
+#### register
+
+```python
+ | register(func: Callable, *, overwrite=False, allow_pending=True) -> Callable
+```
+
+Register a new method to this function's dispatch table.
+
+**Arguments**:
+
+- `func` - the method to register
+- `overwrite` - if False, will warn if the registration will overwrite and
+  existing registration.
+- `allow_pending` - if True, won't error on forward references
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.clear"></a>
+#### clear
+
+```python
+ | clear()
+```
+
+Empty the cache.
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.__setitem__"></a>
+#### \_\_setitem\_\_
+
+```python
+ | __setitem__(key, func: Callable)
+```
+
+Manually map a call signature to a callable
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.__delitem__"></a>
+#### \_\_delitem\_\_
+
+```python
+ | __delitem__(types: Tuple)
+```
+
+Remove a method registration
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.find_method"></a>
+#### find\_method
+
+```python
+ | find_method(key: Tuple) -> Callable
+```
+
+Find and cache the next applicable method of given types.
+
+**Arguments**:
+
+- `key` - A call args types tuple.
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.__call__"></a>
+#### \_\_call\_\_
+
+```python
+ | __call__(*args, **kwargs)
+```
+
+Resolve and dispatch to best method.
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.resolve_pending"></a>
+#### resolve\_pending
+
+```python
+ | resolve_pending()
+```
+
+Evaluate any pending forward references.
+
+This can be called explicitly when using forward references,
+otherwise cache misses will evaluate.
+
+<a name="gamma.dispatch.dispatchsystem.dispatch.dump"></a>
+#### dump
+
+```python
+ | dump() -> str
+```
+
+Pretty-print debug information about this function
+
+<a name="gamma.dispatch.parametric"></a>
+# gamma.dispatch.parametric
+
+<a name="gamma.dispatch.parametric.parametric"></a>
+## parametric Objects
+
+```python
+class parametric(Generic[T])
+```
+
+Decorator to create new parametric base classes
+
+<a name="gamma.dispatch.parametric.Val"></a>
 ## Val Objects
 
 ```python
@@ -1246,3 +1400,79 @@ class Val()
 ```
 
 Generic parametric class
+
+<a name="gamma.dispatch.typesystem"></a>
+# gamma.dispatch.typesystem
+
+Module implementing core rules in Julia's dispatch system. For reference,
+check Jeff Bezanson's PhD thesis at
+https://github.com/JeffBezanson/phdthesis/blob/master/main.pdf
+
+<a name="gamma.dispatch.typesystem.Sig"></a>
+## Sig Objects
+
+```python
+class Sig()
+```
+
+Represent a Tuple type with extra features, mostly used for method signature
+dispatching
+
+<a name="gamma.dispatch.typesystem.pad_varargs"></a>
+#### pad\_varargs
+
+```python
+pad_varargs(a, b) -> Tuple[Tuple[Type], Tuple[Type]]
+```
+
+Extract Tuple args and pad with `object`, accounting for varargs
+
+<a name="gamma.dispatch.typesystem.issubtype"></a>
+#### issubtype
+
+```python
+issubtype(_type: Union[Type, Sig], _super: Union[Type, Sig])
+```
+
+Check if `_type` is a subtype of `_super`.
+
+Arguments are either `Type` (including parameterized Type) or `Sig` (signature).
+
+Follow rules in 4.2.2 in Bezanson's thesis.
+
+Generic (aka parametric) types are invariant. For instance:
+    `issubtype(List[int], List[object]) == False`
+    `issubtype(List[int], List[int]) == True`
+    `issubtype(list, List[object]) == False`
+
+Since Python don't tag container instances with the type paramemeters
+(eg. `type([1,2,3]) == list`) this means that we can't dispatch lists as we would
+with arrays in Julia. The multiple dispatch system must then erase method signature
+generic information for such container types.
+
+See the `parametric` module for a way to declare and dispatch on parametric types.
+
+Also, we don't currently support the equivalent of `UnionAll`. This is not an issue
+since we don't support parametric dispatch, ie. `TypeVar`s in method signatures.
+
+<a name="gamma.dispatch.typesystem.signatures_from"></a>
+#### signatures\_from
+
+```python
+signatures_from(func: Callable) -> Iterable[Sig]
+```
+
+Parse a callable to extract the dispatchable type tuple.
+
+<a name="gamma.dispatch.poset"></a>
+# gamma.dispatch.poset
+
+<a name="gamma.dispatch.poset.PODict"></a>
+## PODict Objects
+
+```python
+class PODict(MutableMapping,  Generic[KT, VT])
+```
+
+Dictionary that stores keys sorted (like a prio queue) that works
+for partial orders
