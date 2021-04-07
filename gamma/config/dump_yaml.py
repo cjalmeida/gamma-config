@@ -1,7 +1,8 @@
 import copy
+from io import StringIO
 
 from gamma.dispatch import dispatch
-from ruamel.yaml.main import serialize
+from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode, ScalarNode, SequenceNode
 
 from .confignode import ConfigNode, RootConfig
@@ -9,6 +10,14 @@ from .merge import merge_nodes
 from .rawnodes import as_node
 from .render import render_node
 from .tags import Tag
+
+
+def yaml_serialize(node):
+    with StringIO() as stream:
+        yaml = YAML(typ="rt")
+        yaml.serialize(node, stream)
+        stream.seek(0)
+        return stream.read()
 
 
 @dispatch
@@ -23,7 +32,7 @@ def to_yaml(cfg: RootConfig, resolve_tags: bool):
     _, node = merge_nodes(nodes)
     if resolve_tags:
         node = dump_node(node, config=cfg)
-    return serialize(node)
+    return yaml_serialize(node)
 
 
 @dispatch
@@ -31,7 +40,7 @@ def to_yaml(cfg: ConfigNode, resolve_tags: bool):
     node = cfg._node
     if resolve_tags:
         node = dump_node(node, config=cfg)
-    return serialize(node)
+    return yaml_serialize(node)
 
 
 @dispatch

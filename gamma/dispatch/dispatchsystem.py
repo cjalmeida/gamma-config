@@ -2,7 +2,7 @@ import functools
 import inspect
 import warnings
 from collections import defaultdict
-from typing import Callable, Dict, List, Set, Tuple
+from typing import Callable, Dict, Iterable, List, Set, Tuple
 
 from .typesystem import Sig, SigDict, is_more_specific, issubtype, signatures_from
 
@@ -29,6 +29,11 @@ def methods_matching(call, table) -> List:
         methods.append(match)
         matches = [x for x in matches[1:] if not is_more_specific(match, x)]
     return methods
+
+
+def get_type(val):
+    valuetype = isinstance(val, type) and getattr(val, "__valuetype__", False)
+    return valuetype and val or type(val)
 
 
 class dispatch:
@@ -65,7 +70,7 @@ class dispatch:
             # create a new dispatch table wrapper
             self: dispatch = functools.update_wrapper(object.__new__(cls), func)
             self.pending = set()
-            self.get_type = type
+            self.get_type = get_type
             self.methods = SigDict()
             self.cache = dict()
             self.name = func.__name__
@@ -152,6 +157,16 @@ class dispatch:
         Args:
             key: A call args types tuple.
         """
+
+        # ensure tuple of types
+        if getattr(key, "__origin__", None) is tuple:
+            key = key.__args__
+        elif not isinstance(key, tuple):
+            if isinstance(key, Iterable):
+                key = tuple(*key)
+            else:
+                key = tuple([key])
+
         self.resolve_pending()
         cached = self.cache.get(key)
         if cached:

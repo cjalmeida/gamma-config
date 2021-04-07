@@ -1,5 +1,5 @@
 import pytest
-from gamma.dispatch import DispatchError, ParametricMeta, dispatch, parametric
+from gamma.dispatch import ParametricMeta, Val, dispatch, parametric
 from gamma.dispatch.dispatchsystem import Sig, issubtype
 
 
@@ -102,9 +102,7 @@ def test_parametric_dispatch():
         return "ok"
 
     assert bar(RefTag()) == "ok"
-
-    with pytest.raises(DispatchError):
-        bar(RefTag)
+    assert bar(RefTag) == "ok"
 
 
 def test_also_of():
@@ -163,3 +161,16 @@ def test_type_system():
 
     assert not issubtype(a, b)
     assert issubtype(a, base)
+
+
+def test_dispatch_valuetype():
+
+    ATag = Val["A"]
+
+    @dispatch
+    def fun(a):
+        return "ok"
+
+    # should dispatch parametric types on instance or on the type itself
+    assert fun(ATag()) == "ok"
+    assert fun(ATag) == "ok"

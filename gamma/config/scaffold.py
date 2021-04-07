@@ -1,15 +1,33 @@
-"""Module to 'scaffold' a simple config folder from the command-line"""
-import os
+"""Module to 'scaffold' append bootstrap config for gamma-io"""
 import shutil
+from pathlib import Path
+from typing import NamedTuple
+
+import pkg_resources
 
 import colorama
 from colorama import Fore, Style
+from gamma.dispatch import dispatch
+
+ENTRYPOINT_GROUP = "gamma.config.scaffold"
+
+
+class GammaConfigScaffold(NamedTuple):
+    name = "gamma-config"
+
+
+@dispatch
+def get_source(module: GammaConfigScaffold):
+    return Path(__file__).parent / "sample"
+
+
+@dispatch
+def get_files(module, src):
+    return sorted(src.glob("**/*"))
 
 
 def scaffold(target, force):
     """Initialize the config folder with samples"""
-
-    from pathlib import Path
 
     colorama.init()  # for fellow windows users
 
@@ -19,45 +37,37 @@ def scaffold(target, force):
     print(f"TARGET: {target}")
     target = Path(target)
     confdir: Path = target / "config"
-    meta: Path = confdir / "00-meta.yaml"
+    confdir.mkdir(exist_ok=True)
+
+    # load plugins from ENTRYPOINT_GROUP
+    modules = [GammaConfigScaffold()]
+    for entry in pkg_resources.iter_entry_points(ENTRYPOINT_GROUP):
+        plugin = entry.load()
+        modules.append(plugin())
 
     # find source under sample folder
-    src = Path(__file__).parent / "sample"
-
-    # Check if config/00-meta.yaml already exists
-    if not force and meta.exists():
-        print(
-            Fore.YELLOW + "ERROR: File 'config/00-meta.yaml' already exists "
-            "and --force was not set",
-            Style.RESET_ALL,
-        )
-        raise SystemExit(1)
-
-    confdir.mkdir(exist_ok=True)
-    _recursive_copy(src, confdir)
-    print(
-        Fore.YELLOW + "Copied config samples to:",
-        Fore.CYAN + str(confdir),
-        Style.RESET_ALL,
-    )
-
-
-def _recursive_copy(src, dest):
-    """
-    Copy each file from src dir to dest dir, including sub-directories.
-    """
-    for item in os.listdir(src):
-        file_path = os.path.join(src, item)
-
-        # if item is a file, copy it
-        if os.path.isfile(file_path):
-            shutil.copy(file_path, dest)
-
-        # else if item is a folder, recurse
-        elif os.path.isdir(file_path):
-            new_dest = os.path.join(dest, item)
-            os.mkdir(new_dest)
-            _recursive_copy(file_path, new_dest)
+    for mod in modules:
+        src = get_source(mod)
+        for srcfile in get_files(mod, src):
+            # Check if target file already exists
+            relfile = srcfile.relative_to(src)
+            dstfile: Path = confdir / relfile
+            if srcfile.is_dir():
+                continue
+            elif not force and dstfile.exists():
+                print(
+                    Fore.YELLOW + f"[{mod.name}] File '{relfile}' already exists "
+                    "and --force was not set",
+                    Style.RESET_ALL,
+                )
+            else:
+                dstfile.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(srcfile, dstfile)
+                _file = Fore.CYAN + str(relfile) + Style.RESET_ALL
+                print(
+                    f"[{mod.name}] copied file {_file} to",
+                    str(confdir.relative_to(target)),
+                )
 
 
 if __name__ == "__main__":
@@ -80,4 +90,6 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    scaffold(args.target, args.force)
+    from gamma.config.scaffold import scaffold as _run
+
+    _run(args.target, args.force)

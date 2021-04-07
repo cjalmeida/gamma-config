@@ -1,10 +1,12 @@
 import inspect
 import types
-from typing import Generic, TypeVar
+from typing import Any, Generic, Tuple, TypeVar
+
+T = TypeVar("T")
 
 
 class ParametricMeta(type):
-    def __getitem__(cls, key):
+    def __getitem__(cls: T, key) -> T:
         return cls.of(key)
 
     def __new__(metacls, name, bases, namespace):
@@ -14,11 +16,11 @@ class ParametricMeta(type):
                 values_s = ",".join([repr(x) for x in values])
                 c_super = f"{cls.__name__}[{values_s}]"
                 if name:
-                    c_repr = f"Type {name} of {c_super}"
+                    c_repr = "<instance of {name}>"
                     c_name = name
                     c_module = inspect.getmodule(inspect.currentframe().f_back).__name__
                 else:
-                    c_repr = f"Type {c_super}"
+                    c_repr = f"{c_super}"
                     c_name = c_super
                     c_module = cls.__module__
 
@@ -27,6 +29,7 @@ class ParametricMeta(type):
                 SubClass.__module__ = c_module
                 SubClass.__values__ = values
                 SubClass.__tag__ = cls
+                SubClass.__valuetype__ = True
 
                 @classmethod
                 def _also_of(_, *new_values):
@@ -58,9 +61,6 @@ class ParametricMeta(type):
         return Class
 
 
-T = TypeVar("T")
-
-
 class parametric(Generic[T]):
     """Decorator to create new parametric base classes"""
 
@@ -73,8 +73,17 @@ class parametric(Generic[T]):
         return Para
 
 
-@parametric
-class Val:
-    """Generic parametric class"""
+class ValMeta(ParametricMeta):
+    @property
+    def values(cls) -> Tuple:
+        """Return all values used to create the parametric value type"""
+        return cls.__values__
 
-    pass
+    @property
+    def value(cls) -> Any:
+        vals = cls.values
+        return vals and vals[0] or None
+
+
+class Val(metaclass=ValMeta):
+    """Generic parametric class with easy value accessors"""

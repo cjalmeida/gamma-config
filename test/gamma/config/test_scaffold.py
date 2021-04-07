@@ -1,5 +1,6 @@
 import os
 import tempfile
+import time
 from pathlib import Path
 
 import pytest
@@ -20,11 +21,15 @@ def test_scaffold(test_cwd):
 
     # test cwd
     scaffold(target=None, force=False)
-    assert (Path(test_cwd) / "config/00-meta.yaml").exists()
+    meta = Path(test_cwd) / "config/00-meta.yaml"
+    assert meta.exists()
+    expect = meta.stat().st_ctime_ns
 
-    # test exists meta fail
-    with pytest.raises(SystemExit):
-        scaffold(target=None, force=False)
+    # assert no overwrite
+    time.sleep(0.1)
+    scaffold(target=None, force=False)
+    got = meta.stat().st_ctime_ns
+    assert expect == got
 
     # test target folder
     with tempfile.TemporaryDirectory() as td:

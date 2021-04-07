@@ -6,6 +6,8 @@ def reset_config():
     """Reset config singletons on each test"""
     from gamma.config.globalconfig import reset_config
 
+    yield
+
     reset_config()
 
 
