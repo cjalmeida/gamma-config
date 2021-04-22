@@ -1,3 +1,3 @@
 # flake8: noqa
 from .dispatchsystem import DispatchError, dispatch
-from .parametric import ParametricMeta, Val, parametric
+from .parametric_types import ParametricMeta, Val, parametric

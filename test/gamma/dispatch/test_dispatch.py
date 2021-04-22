@@ -324,7 +324,7 @@ def test_specialize1():
 
 
 def test_specialize2():
-    sig1 = Sig(Foo,)
+    sig1 = Sig(Foo)
     sig2 = Sig(SuperFoo, bool)
     table = SigSet([sig1, sig2])
 
@@ -333,7 +333,7 @@ def test_specialize2():
     assert len(got) == 1
     assert got[0] == sig2
 
-    call = Sig(Foo,)
+    call = Sig(Foo)
     got = methods_matching(call, table)
     assert len(got) == 1
     assert got[0] == sig1
@@ -352,7 +352,6 @@ def test_varargs_dispatch():
 
 
 def test_caching():
-
     @dispatch
     def temp(a):
         return 1
@@ -365,5 +364,3 @@ def test_caching():
 
     assert temp("a") == 2
     assert temp(True) == 1
-
-
