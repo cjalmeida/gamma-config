@@ -105,7 +105,7 @@ class dispatch:
                     except ValueError:
                         pass
                     lst.append(sig)
-
+            return self
         except NameError:
             if allow_pending:
                 self.pending.add((func, overwrite))
