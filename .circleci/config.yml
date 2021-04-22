@@ -81,7 +81,8 @@ jobs:
           name: build wheel
           command: |
             . .venv/bin/activate
-            python setup.py bdist_wheel
+            rm *.egg-info -rf; python setup.py bdist_wheel
+            rm *.egg-info -rf; python setup.py sdist
 
       - run:
           name: publish dist
@@ -109,6 +110,6 @@ workflows:
           requires: [build]
           filters:
             branches:
-              only: [master]
-            # tags:
-            #   only: /^v.*/
+              ignore: [master]
+            tags:
+              only: /^v.*/
