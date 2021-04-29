@@ -11,3 +11,4 @@ pdbpp
 pip-tools
 wheel
 ipython
+pydantic
