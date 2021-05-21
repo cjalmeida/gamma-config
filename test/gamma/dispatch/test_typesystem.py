@@ -1,4 +1,5 @@
 from typing import Tuple, Union
+import typing
 
 from gamma.dispatch.typesystem import Sig, SigSet, Vararg, is_more_specific, issubtype
 
@@ -76,7 +77,9 @@ def test_partial_order_nary():
     assert issubtype(call, target)
 
     # check arity
-    call = Sig(Foo,)
+    call = Sig(
+        Foo,
+    )
     target = Sig(Foo, Foo)
     assert not (issubtype(call, target))
 
@@ -96,7 +99,9 @@ def test_issubtype():
 
 def test_equality():
     a = Sig(float, str)
-    b = Sig(float,)
+    b = Sig(
+        float,
+    )
     assert not a == b
 
 
@@ -123,8 +128,18 @@ def test_poset():
         pass
 
     s1 = Sig(Node, Tag)
-    s2 = Sig(Node,)
+    s2 = Sig(
+        Node,
+    )
     s3 = Sig(ScalarNode, ATag)
     assert issubtype(s3, s1)
     assert is_more_specific(s3, s1)
     assert not is_more_specific(s2, s1)
+
+
+def test_type_lit():
+    assert issubtype(typing.Type[str], typing.Type[object])
+    assert issubtype(typing.Type[str], type)
+    assert not issubtype(type, typing.Type[str])
+    assert issubtype(typing.Type[Foo], typing.Type[SuperFoo])
+    assert not issubtype(typing.Type[Foo], typing.Type[Bar])

@@ -1,6 +1,6 @@
 from typing import List
 
-from gamma.config.pydantic import DictConfigType
+from gamma.config.pydantic import ConfigStruct, URIConfigStruct
 from pydantic import BaseModel
 from ruamel.yaml import YAML
 
@@ -19,12 +19,16 @@ lists:
       value: 100
     - kind: bar
       custom: 200
+
+myuri: abc:hello/world
+myuri2:
+    uri: abc:hello/world
 """
 
 yaml = YAML()
 
 
-class CustomType(DictConfigType):
+class CustomType(ConfigStruct):
     @classmethod
     def parse_scalar(cls, value):
         return Foo(value=value)
@@ -46,9 +50,15 @@ class Objects(BaseModel):
     foo_str: CustomType
 
 
+class MyURI(URIConfigStruct):
+    scheme: str = "abc"
+
+
 class _TestConfig(BaseModel):
     objects: Objects
     lists: List[CustomType]
+    myuri: MyURI
+    myuri2: MyURI
 
 
 def test_load_pydantic():
@@ -62,3 +72,6 @@ def test_load_pydantic():
     lists = config.lists
     lists[0].kind == "foo"
     lists[1].kind == "bar"
+
+    assert config.myuri.scheme == "abc"
+    assert config.myuri2.scheme == "abc"
