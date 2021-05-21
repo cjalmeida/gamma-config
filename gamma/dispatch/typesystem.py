@@ -44,7 +44,7 @@ class Sig:
                 return f"Type[{t.__args__[0].__name__}]"
             elif origin:
                 return origin.__name__
-            elif not hasattr(t, '__name__'):
+            elif not hasattr(t, "__name__"):
                 return repr(t)
             else:
                 return t.__name__

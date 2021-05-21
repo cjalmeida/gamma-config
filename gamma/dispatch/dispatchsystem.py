@@ -210,7 +210,7 @@ class dispatch:
     def _msg_multiple_definitions_same_name(self, msg, key):
         other = []
         for name, _dispatch in _dispatch_by_name.items():
-            if name == self.name and not _dispatch is self:
+            if name == self.name and _dispatch is not self:
                 other.append(_dispatch.find_method(key))
 
         if other:

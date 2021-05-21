@@ -2,7 +2,7 @@
 
 import multiprocessing
 import threading
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 from .cache import cache
 from .confignode import RootConfig, push_entry
