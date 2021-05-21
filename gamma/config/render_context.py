@@ -1,6 +1,6 @@
 """Module handling rendering context variables (eg. for !expr and !j2)"""
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Union
-
+from functools import partial
 from .cache import cache
 
 
@@ -33,7 +33,10 @@ def default_context_provider():
     import os
     from .globalconfig import get_config
 
-    return [ContextVar("env", os.environ), ContextVar("c", function=get_config)]
+    return [
+        ContextVar("env", os.environ),
+        ContextVar("c", function=partial(get_config, False)),
+    ]
 
 
 context_providers: List[Union[Callable, List[ContextVar]]] = [default_context_provider]
