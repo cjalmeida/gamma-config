@@ -28,7 +28,11 @@ class ConfigNode(collections.abc.Mapping):
     """
 
     def __init__(
-        self, node: MappingNode, root=Optional["RootConfig"], key=None
+        self,
+        node: MappingNode,
+        root: Optional["RootConfig"] = None,
+        parent: Optional["ConfigNode"] = None,
+        key=None,
     ) -> None:
         """
         Args:
@@ -41,6 +45,7 @@ class ConfigNode(collections.abc.Mapping):
         self._root = root
         self._key = key
         self._frozen = True
+        self._parent = parent
 
     def __getitem__(self, key):
         ctx = dict(config=self, dump=False)
@@ -62,7 +67,7 @@ class ConfigNode(collections.abc.Mapping):
             return self[key]
         except KeyError:
             empty = MappingNode(tags.Map, [])
-            return ConfigNode(empty, self._root, key=key)
+            return ConfigNode(empty, self._root, parent=self, key=key)
 
     def __call__(self, *args, **kwds):
         raise TypeError(
@@ -97,7 +102,7 @@ class RootConfig(ConfigNode):
         [`push_entry`](api?id=push_entry).
         """
         self._root_nodes: Dict[str, MappingNode] = collections.OrderedDict()
-        super().__init__(node=None, root=self)
+        super().__init__(node=None, root=self, parent=None)
 
         if entry_key is not None:
             if entry is None:
@@ -215,7 +220,7 @@ def resolve_item(item: MappingNode, tag: tags.Map, **ctx):
     """Wrap a plain `map` node as a child `ConfigNode` object"""
     cfg = ctx.get("config")
     root = cfg._root if cfg is not None else None
-    return ConfigNode(item, root=root)
+    return ConfigNode(item, root=root, parent=cfg)
 
 
 @dispatch

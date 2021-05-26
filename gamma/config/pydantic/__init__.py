@@ -75,14 +75,6 @@ class ConfigStruct(BaseModel):
     def __get_validators__(cls):
         yield cls.parse_obj
 
-    # def __hash__(self) -> int:
-    #     return hash((type(self), *self.__dict__.values()))
-
-    # def __eq__(self, other) -> bool:
-    #     _this = (type(self), *self.dict().values())
-    #     _other = (type(other), *other.__dict__.values())
-    #     return _this == _other
-
     class Config:
         frozen = True
 

@@ -12,23 +12,34 @@ dotenv.load_dotenv(".local.env")
 BASE = "https://github.gamma.bcg.com/api/v3"
 REPO = "BCG/gamma-config"
 
+AZURE_BASE_URL = "https://gammatools.blob.core.windows.net/config"
+
 gh_user = os.getenv("GITHUB_USER")
 gh_token = os.getenv("GITHUB_TOKEN")
+azure_token = os.getenv("AZURE_TOKEN")
+skip_github = os.getenv("SKIP_GITHUB", "0") in ("1", "true")
+skip_azure = os.getenv("SKIP_AZURE", "0") in ("1", "true")
+allow_dirty = os.getenv("ALLOW_DIRTY", "0") in ("1", "true")
 
 
 def publish():
-    if not gh_token:
+    if not gh_token and not skip_github:
         print("ERROR: Missing GITHUB_TOKEN. You need a Github personal access token.")
         raise SystemExit(1)
 
-    if not gh_user:
+    if not gh_user and not skip_github:
         print("ERROR: Missing GITHUB_USER. You need a Github personal access token.")
+        raise SystemExit(1)
+
+    if not azure_token and not skip_azure:
+        msg = "ERROR: Missing AZURE_TOKEN. You need a SAS token for the storage account"
+        print(msg)
         raise SystemExit(1)
 
     cp = subprocess.run("git status -s", shell=True, check=True, stdout=subprocess.PIPE)
     dirty = cp.stdout.strip() != b""
 
-    if dirty:
+    if dirty and not allow_dirty:
         print("ERROR: Repository is dirty")
         raise SystemExit(1)
 
@@ -40,23 +51,37 @@ def publish():
     else:
         version = os.getenv("VERSION")
 
-    # create a release
-    auth = (gh_user, gh_token)
-    body = {"tag_name": version}
-    r = httpx.post(f"{BASE}/repos/{REPO}/releases", json=body, auth=auth)
-    r.raise_for_status()
-    upload_url = r.json()["upload_url"]
-    upload_url = upload_url[: upload_url.index("{")]  # get URL up to the first {
+    # create a GitHub release
+    if not skip_github:
+        gh_auth = (gh_user, gh_token)
+        body = {"tag_name": version}
+        r = httpx.post(f"{BASE}/repos/{REPO}/releases", json=body, auth=gh_auth)
+        r.raise_for_status()
+        upload_url = r.json()["upload_url"]
+        upload_url = upload_url[: upload_url.index("{")]  # get URL up to the first {
 
-    # upload releases
-    headers = {"content-type": "application/tar+gzip"}
     for item in Path("dist").iterdir():
         print(f"Uploading: {item}")
         name = item.name
-        url = upload_url + f"?name={name}"
-        with item.open("rb") as fo:
-            r = httpx.post(url, content=fo, headers=headers, auth=auth)
-            r.raise_for_status()
+
+        if not skip_github:
+            # upload releases to GitHub
+            url = upload_url + f"?name={name}"
+            headers = {"content-type": "application/tar+gzip"}
+            with item.open("rb") as fo:
+                print("Uploading to GitHub Enterprise")
+                r = httpx.post(url, content=fo, headers=headers, auth=gh_auth)
+                r.raise_for_status()
+
+        if not skip_azure:
+            # upload released to Azure
+            url = f"{AZURE_BASE_URL}/{item.name}?{azure_token}"
+            size = item.stat().st_size
+            headers = {"x-ms-blob-type": "BlockBlob", "content-length": str(size)}
+            with item.open("rb") as fo:
+                print("Uploading to Azure Storage")
+                r = httpx.put(url, content=fo, headers=headers)
+                r.raise_for_status()
 
 
 publish()

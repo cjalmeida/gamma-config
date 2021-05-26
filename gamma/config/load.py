@@ -46,7 +46,7 @@ def load_node(entry: Path, content_type=None) -> Node:
     """Load path's content, defaults to YAML content"""
     content: str = entry.read_text().strip()
     if not content:
-        return None
+        return load_node({})
     return load_node(content, content_type)
 
 
