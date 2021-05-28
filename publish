@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 import os
+import re
 import subprocess
+from collections import defaultdict
+from io import BytesIO
 from pathlib import Path
 
 import dotenv
 import httpx
+import jinja2
+from azure.storage.blob import BlobServiceClient, ContentSettings
 
 dotenv.load_dotenv(".env")
 dotenv.load_dotenv(".local.env")
@@ -12,7 +17,9 @@ dotenv.load_dotenv(".local.env")
 BASE = "https://github.gamma.bcg.com/api/v3"
 REPO = "BCG/gamma-config"
 
-AZURE_BASE_URL = "https://gammatools.blob.core.windows.net/config"
+AZURE_ACCOUNT = "https://gammatools.blob.core.windows.net"
+AZURE_CONTAINER = "config"
+AZURE_BASE_URL = f"{AZURE_ACCOUNT}/{AZURE_CONTAINER}"
 
 gh_user = os.getenv("GITHUB_USER")
 gh_token = os.getenv("GITHUB_TOKEN")
@@ -83,5 +90,60 @@ def publish():
                 r = httpx.put(url, content=fo, headers=headers)
                 r.raise_for_status()
 
+    if not skip_azure:
+        update_azure_index()
+
+
+def update_azure_index():
+    # read existing info if exists
+    cl = BlobServiceClient(account_url=f"{AZURE_ACCOUNT}?{azure_token}")
+    cc = cl.get_container_client(AZURE_CONTAINER)
+
+    groups = set()
+    wheels = defaultdict(lambda: list())
+    wheels_count = 0
+    for blob in cc.list_blobs():
+        if blob.name.endswith(".whl"):
+            group = blob.name.split("-", 1)[0]
+            group = re.sub(r"[-_.]+", "-", group).lower()
+            groups.add((f"simple/{group}/", group))
+            href = f"{AZURE_BASE_URL}/{blob.name}"
+            wheels[group].append((href, blob.name))
+            wheels_count += 1
+
+    print(f"Azure: Found {wheels_count} wheels to index in {len(groups)} groups")
+
+    def upload(loc, idx):
+        content = jinja2.Template(INDEX_TEMPLATE).render(idx=idx)
+        data = BytesIO(content.encode())
+        data.seek(0)
+        simple = cc.get_blob_client(loc)
+        simple.upload_blob(
+            data=data,
+            overwrite=True,
+            content_settings=ContentSettings(content_type="text/html"),
+        )
+        print(f"Uploaded index at {AZURE_BASE_URL}/{loc}")
+
+    # add groups
+    for loc, group in groups:
+        idx = wheels[group]
+        upload(loc, idx)
+
+
+INDEX_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="pypi:repository-version" content="1.0">
+    <title>Simple index</title>
+  </head>
+  <body>
+  {% for href, text in idx %}
+    <a href="{{ href }}">{{ text }}</a>
+  {% endfor %}
+  </body>
+</html>
+  """
 
 publish()
