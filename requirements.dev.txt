@@ -12,3 +12,4 @@ pip-tools
 wheel
 ipython
 pydantic
+azure-storage-blob~=12.8.1
