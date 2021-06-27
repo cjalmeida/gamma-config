@@ -204,7 +204,7 @@ def render_node(
     """
 
     func = _py_tag_get_func("py", path)
-    val = to_dict(node)
+    val = to_dict(node, **ctx)
     return func(val)
 
 

@@ -154,12 +154,12 @@ def render_node(node: SequenceNode, tag: tags.Seq, **args):
 
 @dispatch
 def render_node(node: MappingNode, tag: tags.Map, **args):
-    """Render `seq` nodes recursively"""
+    """Render `map` nodes recursively"""
     subargs = args.copy()
 
     out = {}
     for subkeynode, subvaluenode in get_entries(node):
-        subkey = render_node(subkeynode)
+        subkey = render_node(subkeynode, **args)
         subargs["key"] = subkeynode
         subvalue = render_node(subvaluenode, **subargs)
         out[subkey] = subvalue
