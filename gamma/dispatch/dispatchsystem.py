@@ -1,5 +1,6 @@
 import functools
 import inspect
+import typing
 import warnings
 from collections import defaultdict
 from typing import Callable, Dict, Iterable, List, Set, Tuple
@@ -32,8 +33,12 @@ def methods_matching(call, table) -> List:
 
 
 def get_type(val):
-    valuetype = isinstance(val, type) and getattr(val, "__valuetype__", False)
-    return valuetype and val or type(val)
+    if isinstance(val, type) and getattr(val, "__valuetype__", False):
+        return val
+    elif isinstance(val, type):
+        return typing.Type[val]
+    else:
+        return type(val)
 
 
 class dispatch:
@@ -76,6 +81,8 @@ class dispatch:
             self.name = func.__name__
             self.arg_names = defaultdict(list)
             self.register(func, overwrite=overwrite)
+
+            _dispatch_by_name[self.name] = self
             return self
 
         if args and callable(args[0]):
@@ -195,9 +202,28 @@ class dispatch:
         raise DispatchError(msg)
 
     def _except_no_method_found(self, key):
-        names = ", ".join(":" + t.__name__ for t in key)
+        names = ", ".join(":" + getattr(t, "__name__", repr(t)) for t in key)
         msg = f"{self}: no method found for call ({names})"
+        msg = self._msg_multiple_definitions_same_name(msg, key)
         raise DispatchError(msg)
+
+    def _msg_multiple_definitions_same_name(self, msg, key):
+        other = []
+        for name, _dispatch in _dispatch_by_name.items():
+            if name == self.name and _dispatch is not self:
+                other.append(_dispatch.find_method(key))
+
+        if other:
+            msg += (
+                "\n\nNote: found maching method(s) with the same name "
+                "but in another module. This may be an error due to a missing import."
+            )
+            for func in other:
+                co = func.__code__
+                msg += f"\n\n    -> {co.co_filename}:{co.co_firstlineno}"
+
+            msg += "\n"
+        return msg
 
     def __call__(self, *args, **kwargs):
         """Resolve and dispatch to best method."""
@@ -212,10 +238,12 @@ class dispatch:
             try:
                 return func(*args, **kwargs)
             except TypeError as ex:
+                if "keyword argument" not in ex.args[0]:
+                    raise
                 file = func.__code__.co_filename
                 line = func.__code__.co_firstlineno
                 msg = f"{ex.args[0]}\n    in function {file}:{line}"
-                raise DispatchError(msg) from ex
+                raise TypeError(msg) from ex
 
         except DispatchError as ex:
             file = inspect.currentframe().f_back.f_code.co_filename
@@ -277,3 +305,6 @@ class dispatch:
         if n == 1:
             p = "(s)"
         return f"<function '{self.__name__}' with {n} method{p}>"
+
+
+_dispatch_by_name: Dict[str, dispatch] = defaultdict(lambda: [])

@@ -1,3 +1,4 @@
+import typing
 from typing import Tuple, Union
 
 from gamma.dispatch.typesystem import Sig, SigSet, Vararg, is_more_specific, issubtype
@@ -128,3 +129,11 @@ def test_poset():
     assert issubtype(s3, s1)
     assert is_more_specific(s3, s1)
     assert not is_more_specific(s2, s1)
+
+
+def test_type_lit():
+    assert issubtype(typing.Type[str], typing.Type[object])
+    assert issubtype(typing.Type[str], type)
+    assert not issubtype(type, typing.Type[str])
+    assert issubtype(typing.Type[Foo], typing.Type[SuperFoo])
+    assert not issubtype(typing.Type[Foo], typing.Type[Bar])

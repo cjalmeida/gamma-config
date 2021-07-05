@@ -35,18 +35,23 @@ Allow the use of Jinja2 templates. The default variables available are:
 
 -   `env`: a dict of the system environment variables
 -   `c`: a reference to the root config object
+-   Anything under a `_context` map in a parent node
 
 In practice, in the snippet bellow:
 
 ```yaml
 myvar: 100
-foo1: !j2 Number = {c.myvar}
+foo1: !j2 Number = {{ c.myvar }}
+level0:
+  _context:
+    custom_var: myvalue
+
+  bar1: !j2 Custom = {{ custom_var }}
 ```
 
-The value of `foo1` is the string `Number = 100`. See the section on [extending the render context](tags?id=extending-the-render-context) to add your own variables.
+The value of `foo1` is the string `Number = 100`. The value of `level0.bar1` is `Custom = myvalue` because we defined `_context` in a parent node. See the section on [extending the render context](tags?id=extending-the-render-context) to add your own variables.
 
 We also provide `!j2_secret` to be used when dealing with sensitive data
-
 
 !> Jinja2 **is not installed by default**, you should install yourself by
 running `pip install jinja2` or, more generally adding the `jinja2` extra package
@@ -79,6 +84,7 @@ Allows you to evalute arbitrary Python expressions, using the `eval()` built-in.
 
 -   `env`: a dict of the system environment variables
 -   `c`: a reference to the root config object
+-   Anything under a `_context` map in a parent node
 
 Example usage:
 
@@ -164,6 +170,17 @@ The following holds:
     config = get_config()
     section = config["foo"]
     assert section.a == 1 and section.b == 2
+```
+
+### !path
+
+Return an absolute path string, relative to the **parent of the config root folder**.
+
+For example, consider you have a `data` folder located as a sibling to
+`config` and want to reference a file in it:
+
+```yaml
+my_var: !path data/hello_world.csv
 ```
 
 ## Writing custom tags
@@ -255,11 +272,25 @@ foo: !mytag:mypath 1
 
 will dispatch first on `(node: ScalarNode, tag: Tag["!mytag:mypath"])` and, failing to find such method, will also try `(node: ScalarNode, tag: Tag["!mytag"])` with `path = "mypath"` as extra keyword argument.
 
-## Customize the render context variables
+## Extending the render context
 
-Some tags like `!j2` and `!expr` allow you to refer to variables in the *render context*.
+Some tags like `!j2` and `!expr` allow you to refer to variables in the _render context_.
 By default, we provide `env` and `c`, refering to a dict of environment variables, and
 to the root config itself.
+
+We also allow you to add a `_context` mapping entry to any parent node to extend the
+render context without needing to write any code. This is useful to provide contextual
+parameters in a concise way in some scenarios. Example:
+
+```yaml
+
+catalog:
+  _context:
+    inputs: s3://mybucket/myproject/inputs
+
+  datasets:
+    customers: !j2 "{{ inputs }}/customers"   # will reference the context above
+```
 
 If you need to extend the render context, please refer to docstrings in the source file
 `gamma/config/render_context.py` [APIDocs here](/api?id=gammaconfigrender_context)

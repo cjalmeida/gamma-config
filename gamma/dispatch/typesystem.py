@@ -40,9 +40,14 @@ class Sig:
             if origin is typing.Union:
                 _names = " | ".join(x.__name__ for x in t.__args__)
                 return f"[{_names}]"
+            elif origin is type:
+                return f"Type[{t.__args__[0].__name__}]"
             elif origin:
                 return origin.__name__
-            return t.__name__
+            elif not hasattr(t, "__name__"):
+                return repr(t)
+            else:
+                return t.__name__
 
         names = ", ".join(f":{name(t)}" for t in self.types.__args__)
         return f"Sig[{names}]"
@@ -121,6 +126,19 @@ def issubtype(_type: Union[Type, Sig], _super: Union[Type, Sig]):
         `issubtype(List[int], List[int]) == True`
         `issubtype(list, List[object]) == False`
 
+    The exceptions are:
+        * `Tuple`: these are covariant. Eg:
+            - `issubtype(Tuple[Foo], Tuple[Super]) == True` where `Foo -> Super`
+
+        * `Union`: match if there's a covariant intersection, including non-union types
+            - `issubtype(Foo, Union[str, Super]) == True` where `Foo -> Super`
+            - `issubtype(str, Union[str, Super]) == True`
+
+        * `typing.Type`: is covariant on the type argument. `type` is treated as
+          `typing.Type[object]`
+            - `issubtype(typing.Type[str], typing.Type[object]) == True`
+            - `issubtype(typing.Type[str], type) == True`
+
     Since Python don't tag container instances with the type paramemeters
     (eg. `type([1,2,3]) == list`) this means that we can't dispatch lists as we would
     with arrays in Julia. The multiple dispatch system must then erase method signature
@@ -146,10 +164,18 @@ def issubtype(_type: Union[Type, Sig], _super: Union[Type, Sig]):
     except TypeError:
         pass
 
+    # normalize Type[type]
+    _type = typing.Type[object] if _type is type else _type
+    _super = typing.Type[object] if _super is type else _super
+
     type_orig = get_origin(_type)
     super_orig = get_origin(_super)
 
-    if type_orig is tuple and super_orig is tuple:
+    if (
+        type_orig == super_orig
+        and type_orig in (tuple, type)
+        and super_orig in (tuple, type)
+    ):
         # normalize params accounting for varargs
         type_params, super_params = pad_varargs(_type, _super)
         # check component-wise, Tuple types are covariant
@@ -197,8 +223,7 @@ def is_more_specific(a, b):
 
 
 def signatures_from(func: Callable) -> Iterable[Sig]:
-    """Parse a callable to extract the dispatchable type tuple.
-    """
+    """Parse a callable to extract the dispatchable type tuple."""
 
     hints = typing.get_type_hints(func)
     kinds = {
@@ -212,7 +237,7 @@ def signatures_from(func: Callable) -> Iterable[Sig]:
             return Vararg
         _type = hints.get(p.name, object)
         origin = getattr(_type, "__origin__", None)
-        if origin and origin is not typing.Union:
+        if origin and origin not in (typing.Union, type):
             return origin
         return _type
 

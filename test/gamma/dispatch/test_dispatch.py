@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Type, Union
 
 import pytest
 from gamma.dispatch import DispatchError, dispatch
@@ -67,7 +67,7 @@ def test_wrong_kwarg_call():
     with pytest.raises(DispatchError, match="[Rr]eserved"):
         temp(a=1)
 
-    with pytest.raises(DispatchError, match="unexpected keyword"):
+    with pytest.raises(TypeError, match="unexpected keyword"):
         temp(b=1)
 
     assert temp(c=1) == "noarg"
@@ -173,7 +173,7 @@ def test_dispatch_exception():
     def temp(x: float):  # noqa
         return "float"
 
-    with pytest.raises(DispatchError, match="test_dispatch.py"):
+    with pytest.raises(TypeError, match="foo"):
         # invalid number of args, check source file is part of the exception args
         temp(1, foo=1)
 
@@ -364,3 +364,26 @@ def test_caching():
 
     assert temp("a") == 2
     assert temp(True) == 1
+
+
+def test_dispatch_on_types():
+    @dispatch
+    def temp(a):
+        return "fallback"
+
+    @dispatch
+    def temp(a: type):
+        return "anytype"
+
+    @dispatch
+    def temp(a: Type[Bar]):
+        return "bar"
+
+    @dispatch
+    def temp(a: Type[Foo]):
+        return "foo"
+
+    assert temp(1) == "fallback"
+    assert temp(Foo) == "foo"
+    assert temp(Bar) == "bar"
+    assert temp(str) == "anytype"

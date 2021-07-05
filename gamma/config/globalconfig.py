@@ -2,7 +2,7 @@
 
 import multiprocessing
 import threading
-from typing import Tuple
+from typing import Optional, Tuple
 
 from .cache import cache
 from .confignode import RootConfig, push_entry
@@ -80,14 +80,15 @@ class _GlobalStore:
 _global_store = _GlobalStore()
 
 
-def get_config() -> RootConfig:
-    """Get the global config root object, loading if needed.
+def get_config(initialize: bool = True) -> Optional[RootConfig]:
+    """Get the global config root object, loading if needed and `initialize` is `True`.
 
     This global object is cached and safe to call multiple times, from multiple
     threads.
     """
-
-    if _global_store.empty():
+    if _global_store.empty() and not initialize:
+        return None
+    elif _global_store.empty() and initialize:
         entries = sorted(get_entries())
         root = RootConfig()
         for entry_key, entry in entries:

@@ -6,18 +6,18 @@ from .tags import Map, Seq
 
 
 @dispatch
-def to_dict(node):
+def to_dict(node, **ctx):
     """Converts a node to a dictionary"""
-    return render_node(node)
+    return render_node(node, **ctx)
 
 
 @dispatch
-def to_dict(node: MappingNode):
+def to_dict(node: MappingNode, **ctx):
     """Render MappingNodes as dict regardless of tag value"""
-    return render_node(node, Map())
+    return render_node(node, Map(), **ctx)
 
 
 @dispatch
-def to_dict(node: SequenceNode):
+def to_dict(node: SequenceNode, **ctx):
     """Render SequenceNodes as list regardless of tag value"""
-    return render_node(node, Seq())
+    return render_node(node, Seq(), **ctx)

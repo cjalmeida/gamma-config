@@ -9,6 +9,7 @@ from gamma.dispatch import dispatch
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
+from .findconfig import get_config_root
 from .render import render_node
 from .render_context import get_render_context
 from .tags import Tag, TagException
@@ -25,6 +26,7 @@ J2Tag = Tag["!j2"]
 J2SecretTag = Tag["!j2_secret"]
 PyTag = Tag["!py"]
 ObjTag = Tag["!obj"]
+PathTag = Tag["!path"]
 
 j2_cache = threading.local()
 
@@ -72,12 +74,12 @@ def render_node(node: Node, tag: ExprTag, **ctx) -> Any:
     """
 
     _locals = {}
-    _globals = get_render_context()
+    _globals = get_render_context(node=node, tag=tag, **ctx)
     return eval(node.value, _globals, _locals)
 
 
 @dispatch
-def render_node(node: Node, tag: J2Tag, **ctx) -> Any:
+def render_node(node: Node, tag: J2Tag, *, config=None, key=None, **ctx) -> Any:
     """[!j2] Treats the value a Jinj2 Template
 
     See ``gamma.config.render_context.context_providers`` documentation to add your
@@ -91,20 +93,32 @@ def render_node(node: Node, tag: J2Tag, **ctx) -> Any:
 
     Notes:
         * Jinja2 is not installed by default, you should install it manually.
+        * Undefined behavior is `StrictUndefined`. You can change this with
+          the `j2_undefined` entry in `00-meta.yaml`
     """
     try:
         import jinja2
+        import jinja2.exceptions
     except ModuleNotFoundError:  # pragma: no cover
         raise Exception(
             "Could not find Jinja2 installed. You must manually install it with "
             "`pip install jinja2` if you want to use the !j2 tag"
         )
 
-    render_ctx = get_render_context()
-    if not hasattr(j2_cache, "env"):
-        j2_cache.env = jinja2.Environment()
+    render_ctx = get_render_context(node=node, tag=tag, config=config, key=key, **ctx)
 
-    res = j2_cache.env.from_string(node.value).render(**render_ctx)
+    if not hasattr(j2_cache, "env"):
+        root = config and config._root
+        undefined_class = root.get("j2_undefined", "StrictUndefined")
+        undefined = getattr(jinja2, undefined_class)
+        j2_cache.env = jinja2.Environment(undefined=undefined)
+
+    try:
+        res = j2_cache.env.from_string(node.value).render(**render_ctx)
+    except jinja2.exceptions.UndefinedError as ex:
+        msg = f'Error rendering key `{key.value}: "{node.value}"` -> {ex.message}'
+        raise ValueError(msg)
+
     return res
 
 
@@ -190,7 +204,7 @@ def render_node(
     """
 
     func = _py_tag_get_func("py", path)
-    val = to_dict(node)
+    val = to_dict(node, **ctx)
     return func(val)
 
 
@@ -266,6 +280,21 @@ def render_node(
     func = _py_tag_get_func("obj", path, default_module=default_module)
     val = to_dict(node)
     return func(**val)
+
+
+# process: !path
+@dispatch
+def render_node(node: Node, tag: PathTag, **ctx) -> str:
+    """[!path] Construct an absolute file path by joining a path
+    fragment to the known path of the *parent* of config root directory
+
+    Examples:
+        # should point to `<config-root>/../data/hello_world.csv`
+        my_var: !path data/hello_world.csv
+    """
+    path_fragment = node.value
+    base = get_config_root().parent
+    return str(base.joinpath(path_fragment).absolute())
 
 
 ###

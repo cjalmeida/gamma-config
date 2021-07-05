@@ -4,7 +4,7 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.0.0
     hooks:
-      - id: trailing-whitespace
+      # - id: trailing-whitespace
       - id: end-of-file-fixer
       # - id: check-yaml
       - id: check-added-large-files
@@ -19,6 +19,7 @@ repos:
       - id: check-case-conflict
       - id: check-byte-order-marker
       - id: debug-statements
+        exclude: gamma/dispatch/__init__.py
       - id: flake8
   - repo: https://github.com/psf/black
     rev: 19.10b0

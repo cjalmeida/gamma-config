@@ -10,3 +10,6 @@
 # by the 'ENVIRONMENT' environment variable.
 include_folders:
   - !env ENVIRONMENT|None
+
+# The "undefined" behavior of !j2 rendered templates
+# j2_undefined: StrictUndefined

@@ -2,8 +2,10 @@ import pytest
 
 
 def test_default_ctx():
+    from gamma.config import get_config
     from gamma.config.render_context import get_render_context
 
+    get_config()  # requires initialization
     ctx = get_render_context()
 
     assert "include_folders" in ctx["c"]  # from 00-meta.yaml
