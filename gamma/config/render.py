@@ -25,6 +25,7 @@ def render_node(
     key: Optional[Node] = None,
     config: "ConfigNode" = None,
     dump: bool = False,
+    recursive: bool = False,
     path: Optional[str] = None,
 ):
     """Spec for tag handling functions.
@@ -57,6 +58,7 @@ def render_node(
         config: The current ConfigNode object.
         dump: Flag indicating we're dumping the data to a potentially insecure
             destination, so sensitive data should not be returned.
+        recursive: If true, tag handlers should recursively render nodes.
         path: The URI path for URI fallback dispatch
 
     Return:
@@ -168,24 +170,28 @@ def render_node(node: MappingNode, tag: tags.Map, **args):
 
 
 @dispatch
-def render_node(cfg: "RootConfig"):
+def render_node(cfg: "RootConfig", **args):
     """Render the resulting node of merging all entries"""
 
     from gamma.config.merge import merge_nodes
 
     nodes = list(cfg._root_nodes.values())
     _, node = merge_nodes(nodes)
-    return render_node(node, config=cfg)
+    args.setdefault("config", cfg)
+    args.setdefault("dump", False)
+    return render_node(node, **args)
 
 
 @dispatch
-def render_node(cfg: "ConfigNode", *, dump=False):
+def render_node(cfg: "ConfigNode", **args):
     """Render the config node.
 
     Args:
         dump: If true, assume it's "dump mode" where secrets are not to be rendered.
     """
-    return render_node(cfg._node, config=cfg, dump=dump)
+    args.setdefault("config", cfg)
+    args.setdefault("dump", False)
+    return render_node(cfg._node, **args)
 
 
 from . import builtin_tags  # noqa isort:skip
