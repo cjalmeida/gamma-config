@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import NamedTuple
 
-from gamma.config import RootConfig, ScalarNode, render_node
+from gamma.config import RootConfig, ScalarNode, render_node, to_dict
 from gamma.config.builtin_tags import RefTag
 
 
@@ -33,6 +33,23 @@ def test_ref_sibling():
     assert cfg.b.ref_a == "foo"
     assert cfg.a == "foo"
     assert cfg.b.sib == "foo"
+
+
+def test_ref_to_dict():
+    src = """
+    a: foo
+    c:
+      sub: bar
+    b:
+      ref_a: !ref a
+      sib: !ref b.ref_a
+      ref_c: !ref c
+    """
+
+    cfg = RootConfig("dummy", src)
+    d = to_dict(cfg, dump=True)
+    assert d["b"]["ref_a"] == "foo"
+    assert isinstance(d["b"]["ref_c"], dict)
 
 
 class MyObj(NamedTuple):

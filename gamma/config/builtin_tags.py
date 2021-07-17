@@ -4,6 +4,7 @@ import os
 import threading
 from typing import Any, Union
 
+from gamma.config.confignode import ConfigNode
 from gamma.config.dump_dict import to_dict
 from gamma.dispatch import dispatch
 from ruamel.yaml import YAML
@@ -133,7 +134,7 @@ def render_node(node: Node, tag: J2SecretTag, *, dump=False, **ctx) -> Any:
 
 
 @dispatch
-def render_node(node: Node, tag: RefTag, *, config=None, **ctx) -> Any:
+def render_node(node: Node, tag: RefTag, *, config=None, recursive=False, **ctx) -> Any:
     """[!ref] References other entries in the config object.
 
     Navigate the object using the dot notation. Complex named keys can be accessed
@@ -152,15 +153,15 @@ def render_node(node: Node, tag: RefTag, *, config=None, **ctx) -> Any:
         tokens.append(token)
         token = lex.get_token()
 
-    # old_mode = root.dump_mode
-    try:
-        # root.dump_mode = False
-        parent = functools.reduce(operator.getitem, tokens[:-1], config._root)
-    finally:
-        1
-        # root.dump_mode = old_mode
+    parent = functools.reduce(operator.getitem, tokens[:-1], config._root)
+    val = parent[tokens[-1]]
 
-    return parent[tokens[-1]]
+    if recursive:
+        while isinstance(val, (ConfigNode, Node)):
+            # chain dump if needed
+            val = render_node(val, config=config, recursive=recursive, **ctx)
+
+    return val
 
 
 # process: !py

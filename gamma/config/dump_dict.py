@@ -7,17 +7,20 @@ from .tags import Map, Seq
 
 @dispatch
 def to_dict(node, **ctx):
-    """Converts a node to a dictionary"""
+    """Converts a node to a dictionary."""
+    ctx.setdefault("recursive", True)
     return render_node(node, **ctx)
 
 
 @dispatch
 def to_dict(node: MappingNode, **ctx):
     """Render MappingNodes as dict regardless of tag value"""
+    ctx.setdefault("recursive", True)
     return render_node(node, Map(), **ctx)
 
 
 @dispatch
 def to_dict(node: SequenceNode, **ctx):
     """Render SequenceNodes as list regardless of tag value"""
+    ctx.setdefault("recursive", True)
     return render_node(node, Seq(), **ctx)
