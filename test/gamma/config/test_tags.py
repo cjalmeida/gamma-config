@@ -47,7 +47,7 @@ def test_ref_to_dict():
     """
 
     cfg = RootConfig("dummy", src)
-    d = to_dict(cfg, dump=True)
+    d = to_dict(cfg, recursive=True)
     assert d["b"]["ref_a"] == "foo"
     assert isinstance(d["b"]["ref_c"], dict)
 

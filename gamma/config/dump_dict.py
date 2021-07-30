@@ -1,3 +1,4 @@
+from gamma.config.confignode import ConfigNode
 from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, SequenceNode
 
@@ -16,6 +17,14 @@ def _prepare_ctx(**ctx):
 @dispatch
 def to_dict(node, **ctx):
     """Converts a node to a dictionary."""
+    ctx = _prepare_ctx(**ctx)
+    return render_node(node, **ctx)
+
+
+@dispatch
+def to_dict(node: ConfigNode, **ctx):
+    """Converts a ConfigNode to a dictionary."""
+    ctx.setdefault("config", node)
     ctx = _prepare_ctx(**ctx)
     return render_node(node, **ctx)
 
