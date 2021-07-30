@@ -5,11 +5,10 @@ import os
 import threading
 from typing import Any, Union
 
-from jinja2.runtime import StrictUndefined
-
 from gamma.config.confignode import ConfigNode
 from gamma.config.dump_dict import to_dict
 from gamma.dispatch import dispatch
+from jinja2.runtime import StrictUndefined
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 

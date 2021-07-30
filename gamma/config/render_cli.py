@@ -1,7 +1,8 @@
-from gamma.config.load import load_node
-from gamma.config import to_dict
 import json
 from argparse import ArgumentParser, RawTextHelpFormatter
+
+from gamma.config import to_dict
+from gamma.config.load import load_node
 
 
 def render_cli(parser: ArgumentParser):

@@ -7,6 +7,7 @@ from .tags import Map, Seq
 
 def _prepare_ctx(**ctx):
     from gamma.config import get_config
+
     ctx.setdefault("recursive", True)
     ctx.setdefault("config", get_config())
     return ctx
