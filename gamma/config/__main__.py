@@ -10,4 +10,8 @@ if __name__ == "__main__":
     render_cli(subparsers.add_parser("render", help="Render config values"))
 
     args = parser.parse_args()
-    args.func(args)
+    func = getattr(args, "func", None)
+    if func:
+        func(args)
+    else:
+        parser.print_help()
