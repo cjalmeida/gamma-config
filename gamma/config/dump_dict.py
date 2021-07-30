@@ -5,22 +5,29 @@ from .render import render_node
 from .tags import Map, Seq
 
 
+def _prepare_ctx(**ctx):
+    from gamma.config import get_config
+    ctx.setdefault("recursive", True)
+    ctx.setdefault("config", get_config())
+    return ctx
+
+
 @dispatch
 def to_dict(node, **ctx):
     """Converts a node to a dictionary."""
-    ctx.setdefault("recursive", True)
+    ctx = _prepare_ctx(**ctx)
     return render_node(node, **ctx)
 
 
 @dispatch
 def to_dict(node: MappingNode, **ctx):
     """Render MappingNodes as dict regardless of tag value"""
-    ctx.setdefault("recursive", True)
+    ctx = _prepare_ctx(**ctx)
     return render_node(node, Map(), **ctx)
 
 
 @dispatch
 def to_dict(node: SequenceNode, **ctx):
     """Render SequenceNodes as list regardless of tag value"""
-    ctx.setdefault("recursive", True)
+    ctx = _prepare_ctx(**ctx)
     return render_node(node, Seq(), **ctx)

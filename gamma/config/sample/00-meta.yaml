@@ -11,5 +11,5 @@
 include_folders:
   - !env ENVIRONMENT|None
 
-# The "undefined" behavior of !j2 rendered templates
-# j2_undefined: StrictUndefined
+# Custom Jinja2 environment provider
+# j2_env: my_app.my_module:my_env_func

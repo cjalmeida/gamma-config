@@ -1,8 +1,11 @@
 """Module that implements renderers for builtin-tags"""
 
+import importlib
 import os
 import threading
 from typing import Any, Union
+
+from jinja2.runtime import StrictUndefined
 
 from gamma.config.confignode import ConfigNode
 from gamma.config.dump_dict import to_dict
@@ -92,10 +95,13 @@ def render_node(node: Node, tag: J2Tag, *, config=None, key=None, **ctx) -> Any:
         foo1: !expr f"This is a number = {c.myvar}"
         foo2: !j2 This is a number = {c.myvar}
 
+    You can customize the Jinja2 environment by providing a reference to a Python
+    function in the `j2_env` key in `00-meta.yaml`. Example
+
+        j2_env: my_app.my_module:my_func
+
     Notes:
         * Jinja2 is not installed by default, you should install it manually.
-        * Undefined behavior is `StrictUndefined`. You can change this with
-          the `j2_undefined` entry in `00-meta.yaml`
     """
     try:
         import jinja2
@@ -110,9 +116,14 @@ def render_node(node: Node, tag: J2Tag, *, config=None, key=None, **ctx) -> Any:
 
     if not hasattr(j2_cache, "env"):
         root = config and config._root
-        undefined_class = root.get("j2_undefined", "StrictUndefined")
-        undefined = getattr(jinja2, undefined_class)
-        j2_cache.env = jinja2.Environment(undefined=undefined)
+        env_factory = root.get("j2_env")
+        if env_factory:
+            module_name, func_name = env_factory.split(":", 1)
+            mod = importlib.import_module(module_name)
+            func = getattr(mod, func_name)
+            j2_cache.env = func()
+        else:
+            j2_cache.env = jinja2.Environment(undefined=StrictUndefined)
 
     try:
         res = j2_cache.env.from_string(node.value).render(**render_ctx)
@@ -212,7 +223,7 @@ def render_node(
 def _py_tag_get_func(tag, path, default_module=None):
     """Get the callable for a given tag `path` argument
 
-    Used by `!py` and `!obj` tags
+    Used by `!py`, `!obj` tags meta config.
 
     Args:
         tag: either "obj" or "py"
