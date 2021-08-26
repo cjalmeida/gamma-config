@@ -37,7 +37,7 @@ def test_simple_dispatch():
     print(base_t)
     print(test_t1)
     print(test_t1 / base_t)
-    assert test_t1 / base_t < 10
+    assert test_t1 / base_t < 16
 
 
 def test_kwargs():
