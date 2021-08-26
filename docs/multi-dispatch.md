@@ -131,6 +131,80 @@ assert foo(1) == "second"           # it has changed!
 To minimize confusion, this will log a "warning" telling you about the side-effect.
 If you do want to overwrite the method, you can pass `@dispatch(overwrite=True)`.
 
+### Namespaced dispatch
+
+In some applications, having to import all functions into the local scope in order to
+register a dispatch can be annoying. An alternative is to use a "configuration module"
+where you can register your own "namespaced" dispatch function.
+
+```py
+# in myapp/__init__.py
+from gamma.dispatch import dispatch as base_dispatch
+
+dispatch = base_dispatch(namespace="myapp")
+
+# load dependent modules
+import myapp.foo
+import myapp.bar
+```
+
+Then you can use the namespaced dispatch decorator to register dispatch methods without
+needing to import them
+
+```py
+# in myapp/foo.py
+
+from myapp import dispatch
+
+@dispatch
+def my_func(a: int):
+    ...
+
+```
+
+```py
+# in myapp/bar.py
+
+@dispatch          # <-- note that no import of `my_func` is needed!
+def my_func(a: str):
+    ...
+```
+
+### Ensure specialization
+
+We also added the `specialize` keyword to ensure a dispatch specializes a function.
+This is useful when writing modular applications to enforce some form of contract
+between components.
+
+```py
+# will break if no dispatched `my_func` exists in the local context / namespace.
+@dispatch(specialize=True)
+def my_func(a: str):
+    ...
+```
+
+This also works in conjunction with the "namespace" feature.
+
+```py
+# in myapp/__init__.py
+from gamma.dispatch import dispatch as base_dispatch
+
+dispatch = base_dispatch(namespace="myapp")
+specialize = base_dispatch(namespace="myapp", specialize=True)
+
+@dispatch  # base function
+def my_func(a):
+    ...
+
+@specialize  # specialization
+def my_func(a):
+    ...
+```
+
+The check is applied on function loading, so **import order matters**. So you should
+architect your application to ensure base modules are loaded before specialized modules.
+
+
 ### Parametric dispatch
 
 _TODO_

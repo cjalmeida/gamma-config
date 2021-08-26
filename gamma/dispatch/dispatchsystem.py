@@ -41,8 +41,19 @@ def get_type(val):
         return type(val)
 
 
+_namespaces = dict()
+
+
 class dispatch:
-    """Function wrapper to dispatch methods"""
+    """Function wrapper to dispatch methods.
+
+    Args:
+        namespace: If set, use a shared namespace with `namespace` as key, otherwise
+            try to find matching functions in `locals`.
+        specialize: If set, will throw an error if this function is not a specialization
+            of an already existing function.
+        overwrite: When `True`, won't issue a warning about overwriting a method.
+    """
 
     #: Pending methods register due to forward references
     pending: Set
@@ -62,8 +73,13 @@ class dispatch:
     #: set of reserved argument names
     arg_names: Dict[str, List[Sig]]
 
-    def __new__(cls, *args, overwrite=False):
-        namespace = inspect.currentframe().f_back.f_locals
+    def __new__(cls, *args, namespace=None, specialize=False, overwrite=False):
+        if isinstance(namespace, str):
+            namespace: dict = _namespaces.setdefault(namespace, {})
+            add_to_namespace = True
+        else:
+            namespace = inspect.currentframe().f_back.f_locals
+            add_to_namespace = False
 
         def wrapped(func):
             # check if function with the same name exists in scope
@@ -71,6 +87,12 @@ class dispatch:
             if existing and isinstance(existing, dispatch):
                 existing.register(func, overwrite=overwrite)
                 return existing
+
+            if specialize:
+                raise DispatchError(
+                    f"This method has `specialize=True` but no existing "
+                    f"function named `{func.__name__}` exists."
+                )
 
             # create a new dispatch table wrapper
             self: dispatch = functools.update_wrapper(object.__new__(cls), func)
@@ -83,6 +105,10 @@ class dispatch:
             self.register(func, overwrite=overwrite)
 
             _dispatch_by_name[self.name] = self
+
+            if add_to_namespace:
+                namespace[func.__name__] = self
+
             return self
 
         if args and callable(args[0]):
