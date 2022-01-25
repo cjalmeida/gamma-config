@@ -1,6 +1,6 @@
 # flake8: noqa
 
-__version__ = "0.4.16"
+__version__ = "0.4.17"
 
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
