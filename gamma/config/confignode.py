@@ -275,8 +275,10 @@ def create_last_entry_key(cfg: RootConfig) -> str:
 def config_context(cfg: RootConfig, partial) -> None:
     entry_key = create_last_entry_key(cfg)
     push_entry(cfg, entry_key, partial, _allow_unsafe=True)
-    yield
-    remove_entry(cfg, entry_key)
+    try:
+        yield
+    finally:
+        remove_entry(cfg, entry_key)
 
 
 @dispatch

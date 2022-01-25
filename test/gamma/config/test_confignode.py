@@ -69,3 +69,11 @@ def test_config_context():
     set_config(cfg)
     with config_context("foo: 3"):
         get_config()["foo"] == 3
+
+    assert cfg["foo"] == 1
+
+    with pytest.raises(Exception):
+        with config_context("foo: 3"):
+            raise ValueError("Random exception")
+
+    assert cfg["foo"] == 1
