@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from gamma.config.confignode import ConfigNode, RootConfig, config_context, push_entry
 from gamma.config.globalconfig import get_config, set_config
@@ -77,3 +79,11 @@ def test_config_context():
             raise ValueError("Random exception")
 
     assert cfg["foo"] == 1
+
+    # stress testing
+    for _ in range(10):
+        with pytest.raises(Exception):
+            with config_context("foo: 3"):
+                raise ValueError("Random exception")
+        time.sleep(0.05)
+        assert cfg["foo"] == 1
