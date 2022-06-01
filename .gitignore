@@ -110,3 +110,4 @@ ENV/
 .vscode/
 
 cov.xml
+test-results

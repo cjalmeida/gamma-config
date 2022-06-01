@@ -1,10 +1,17 @@
-<a name="gamma.config"></a>
+<a id="gamma.config"></a>
+
 # gamma.config
 
-<a name="gamma.config.confignode"></a>
+<a id="gamma.config.__main__"></a>
+
+# gamma.config.\_\_main\_\_
+
+<a id="gamma.config.confignode"></a>
+
 # gamma.config.confignode
 
-<a name="gamma.config.confignode.ConfigNode"></a>
+<a id="gamma.config.confignode.ConfigNode"></a>
+
 ## ConfigNode Objects
 
 ```python
@@ -19,11 +26,12 @@ object. This class should be safe to pickle and pass to subprocesses.
 You when accessing keys by attribute `eg: config.foo` they'll return an empty
 `ConfigNode` instead of raising an `AttributeError`.
 
-<a name="gamma.config.confignode.ConfigNode.__init__"></a>
+<a id="gamma.config.confignode.ConfigNode.__init__"></a>
+
 #### \_\_init\_\_
 
 ```python
- | __init__(node: MappingNode, root=Optional["RootConfig"], key=None) -> None
+def __init__(node: MappingNode, root: Optional["RootConfig"] = None, parent: Optional["ConfigNode"] = None, key=None) -> None
 ```
 
 **Arguments**:
@@ -32,7 +40,8 @@ You when accessing keys by attribute `eg: config.foo` they'll return an empty
 - `root` - the root of the config tree
 - `key` - the node key in the config tree
 
-<a name="gamma.config.confignode.RootConfig"></a>
+<a id="gamma.config.confignode.RootConfig"></a>
+
 ## RootConfig Objects
 
 ```python
@@ -49,22 +58,24 @@ New entries should be inserted with the push_entry` function.
 The entries are always iterated in `entry_key` lexicographical
 sort order and this affects merge results.
 
-<a name="gamma.config.confignode.RootConfig.__init__"></a>
+<a id="gamma.config.confignode.RootConfig.__init__"></a>
+
 #### \_\_init\_\_
 
 ```python
- | __init__(entry_key: Optional[str] = None, entry=None) -> None
+def __init__(entry_key: Optional[str] = None, entry=None) -> None
 ```
 
 Initialize the object, optionally adding a single entry. See
 [`push_entry`](api?id=push_entry).
 
-<a name="gamma.config.confignode.push_entry"></a>
+<a id="gamma.config.confignode.push_entry"></a>
+
 #### push\_entry
 
 ```python
 @dispatch
-push_entry(root: RootConfig, entry_key: str, entry, *, _allow_unsafe=False, content_type=None) -> None
+def push_entry(root: RootConfig, entry_key: str, entry, *, _allow_unsafe=False, content_type=None) -> None
 ```
 
 Add an entry to the root config.
@@ -72,12 +83,13 @@ Add an entry to the root config.
 The entry itself can be of any supported format by ``load_node``. You can
 disambiguate between string/bytes values by providing an optional ``content_type``
 
-<a name="gamma.config.confignode.push_entry"></a>
+<a id="gamma.config.confignode.push_entry"></a>
+
 #### push\_entry
 
 ```python
 @dispatch
-push_entry(root: RootConfig, entry_key: str, node: Node, *, _allow_unsafe=False) -> None
+def push_entry(root: RootConfig, entry_key: str, node: Node, *, _allow_unsafe=False) -> None
 ```
 
 Add a `Node` entry to the root config object.
@@ -86,32 +98,35 @@ Entries are loaded in sorted order.
 
 Note: the global root object can only be modified by the thread that created it.
 
-<a name="gamma.config.confignode.remove_entry"></a>
+<a id="gamma.config.confignode.remove_entry"></a>
+
 #### remove\_entry
 
 ```python
 @dispatch
-remove_entry(cfg: RootConfig, entry_key: str)
+def remove_entry(cfg: RootConfig, entry_key: str)
 ```
 
 Remove an entry from the RootConfig object.
 
-<a name="gamma.config.confignode.config_getitem"></a>
+<a id="gamma.config.confignode.config_getitem"></a>
+
 #### config\_getitem
 
 ```python
 @dispatch
-config_getitem(cfg: ConfigNode, key, **ctx)
+def config_getitem(cfg: ConfigNode, key, **ctx)
 ```
 
 Get an item from config by key.
 
-<a name="gamma.config.confignode.config_getitem"></a>
+<a id="gamma.config.confignode.config_getitem"></a>
+
 #### config\_getitem
 
 ```python
 @dispatch
-config_getitem(cfg: RootConfig, key, **ctx)
+def config_getitem(cfg: RootConfig, key, **ctx)
 ```
 
 Get an item from a root config by key.
@@ -119,111 +134,123 @@ Get an item from a root config by key.
 We find all entries matching the key and merge them dynamically using
 `merge_nodes`.
 
-<a name="gamma.config.confignode.resolve_item"></a>
+<a id="gamma.config.confignode.resolve_item"></a>
+
 #### resolve\_item
 
 ```python
 @dispatch
-resolve_item(item: Node, **ctx)
+def resolve_item(item: Node, **ctx)
 ```
 
 Resolve a config item from a ruamel.yaml `Node`
 
 This method delegates to a more specific method dispatched on (Node, Tag) types
 
-<a name="gamma.config.confignode.resolve_item"></a>
+<a id="gamma.config.confignode.resolve_item"></a>
+
 #### resolve\_item
 
 ```python
 @dispatch
-resolve_item(item: Node, tag: Tag, **ctx)
+def resolve_item(item: Node, tag: Tag, **ctx)
 ```
 
 Resolve a config item from a ruamel.yaml `Node`
 
 Fallback to rendering the node using `render_node`
 
-<a name="gamma.config.confignode.resolve_item"></a>
+<a id="gamma.config.confignode.resolve_item"></a>
+
 #### resolve\_item
 
 ```python
 @dispatch
-resolve_item(item: MappingNode, tag: tags.Map, **ctx)
+def resolve_item(item: MappingNode, tag: tags.Map, **ctx)
 ```
 
 Wrap a plain `map` node as a child `ConfigNode` object
 
-<a name="gamma.config.confignode.resolve_item"></a>
+<a id="gamma.config.confignode.resolve_item"></a>
+
 #### resolve\_item
 
 ```python
 @dispatch
-resolve_item(item: SequenceNode, tag: tags.Seq, **ctx)
+def resolve_item(item: SequenceNode, tag: tags.Seq, **ctx)
 ```
 
 Iterates on a `seq` node, resolving each child item node.
 
-<a name="gamma.config.confignode.get_keys"></a>
+<a id="gamma.config.confignode.get_keys"></a>
+
 #### get\_keys
 
 ```python
 @dispatch
-get_keys(cfg: ConfigNode) -> Iterable[Node]
+def get_keys(cfg: ConfigNode) -> Iterable[Node]
 ```
 
 Return all keys in a config node
 
-<a name="gamma.config.confignode.get_keys"></a>
+<a id="gamma.config.confignode.get_keys"></a>
+
 #### get\_keys
 
 ```python
 @dispatch
-get_keys(cfg: RootConfig) -> Iterable[Node]
+def get_keys(cfg: RootConfig) -> Iterable[Node]
 ```
 
 Return all *distinct* keys in a config node
 
-<a name="gamma.config.confignode.config_len"></a>
+<a id="gamma.config.confignode.config_len"></a>
+
 #### config\_len
 
 ```python
 @dispatch
-config_len(cfg: ConfigNode) -> int
+def config_len(cfg: ConfigNode) -> int
 ```
 
 Number of keys in a config node
 
-<a name="gamma.config.confignode.config_len"></a>
+<a id="gamma.config.confignode.config_len"></a>
+
 #### config\_len
 
 ```python
 @dispatch
-config_len(cfg: RootConfig) -> int
+def config_len(cfg: RootConfig) -> int
 ```
 
 Number of *distinct* keys in a config node
 
-<a name="gamma.config.confignode.create_last_entry_key"></a>
+<a id="gamma.config.confignode.create_last_entry_key"></a>
+
 #### create\_last\_entry\_key
 
 ```python
 @dispatch
-create_last_entry_key(cfg: RootConfig) -> str
+def create_last_entry_key(cfg: RootConfig) -> str
 ```
 
 Create an entry_key guaranteed to be the last entry for the object.
 
-<a name="gamma.config.tags"></a>
+<a id="gamma.config.tags"></a>
+
 # gamma.config.tags
 
 Definition of base Tag class and standard YAML derived tag types
 
-<a name="gamma.config.cache"></a>
+<a id="gamma.config.cache"></a>
+
 # gamma.config.cache
 
 Module declaring a cache utility for gamma.config
 
-<a name="gamma.config.cache.Cache"></a>
+<a id="gamma.config.cache.Cache"></a>
+
 ## Cache Objects
 
 ```python
@@ -232,81 +259,98 @@ class Cache(Mapping)
 
 A cache backed by a in-memory `dict`
 
-<a name="gamma.config.cache.Cache.clear"></a>
+<a id="gamma.config.cache.Cache.clear"></a>
+
 #### clear
 
 ```python
- | clear()
+def clear()
 ```
 
 Clear cache contents
 
-<a name="gamma.config.load"></a>
+<a id="gamma.config.pydantic"></a>
+
+# gamma.config.pydantic
+
+<a id="gamma.config.render_cli"></a>
+
+# gamma.config.render\_cli
+
+<a id="gamma.config.load"></a>
+
 # gamma.config.load
 
 Module for loading content as `ruamel.yaml` `Node` instances
 
-<a name="gamma.config.load.load_node"></a>
+<a id="gamma.config.load.load_node"></a>
+
 #### load\_node
 
 ```python
 @dispatch
-load_node(val: str, content_type=None) -> Node
+def load_node(val: str, content_type=None) -> Node
 ```
 
 Load a string as `Node`, defaults to YAML content
 
-<a name="gamma.config.load.load_node"></a>
+<a id="gamma.config.load.load_node"></a>
+
 #### load\_node
 
 ```python
 @dispatch
-load_node(stream: IOBase, content_type=None) -> Node
+def load_node(stream: IOBase, content_type=None) -> Node
 ```
 
 Load a stream as `Node`, defaults to YAML content
 
-<a name="gamma.config.load.load_node"></a>
+<a id="gamma.config.load.load_node"></a>
+
 #### load\_node
 
 ```python
 @dispatch
-load_node(stream: IOBase, _: YAMLContent) -> Node
+def load_node(stream: IOBase, _: YAMLContent) -> Node
 ```
 
 Load a YAML stream
 
-<a name="gamma.config.load.load_node"></a>
+<a id="gamma.config.load.load_node"></a>
+
 #### load\_node
 
 ```python
 @dispatch
-load_node(entry: Path, content_type=None) -> Node
+def load_node(entry: Path, content_type=None) -> Node
 ```
 
 Load path's content, defaults to YAML content
 
-<a name="gamma.config.load.load_node"></a>
+<a id="gamma.config.load.load_node"></a>
+
 #### load\_node
 
 ```python
 @dispatch
-load_node(val: Dict, content_type=None) -> Node
+def load_node(val: Dict, content_type=None) -> Node
 ```
 
 Load dict as node
 
-<a name="gamma.config.render"></a>
+<a id="gamma.config.render"></a>
+
 # gamma.config.render
 
 Base render_node methods
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: Node, tag: tags.Tag, *, key: Optional[Node] = None, config: "ConfigNode" = None, dump: bool = False, path: Optional[str] = None)
+def render_node(node: Node, tag: tags.Tag, *, key: Optional[Node] = None, config: "ConfigNode" = None, dump: bool = False, recursive: bool = False, path: Optional[str] = None)
 ```
 
 Spec for tag handling functions.
@@ -341,19 +385,21 @@ foo: !mytag:bar 1
 - `config` - The current ConfigNode object.
 - `dump` - Flag indicating we're dumping the data to a potentially insecure
   destination, so sensitive data should not be returned.
+- `recursive` - If true, tag handlers should recursively render nodes.
 - `path` - The URI path for URI fallback dispatch
-
+  
 
 **Returns**:
 
   any value
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: Node, **args) -> Any
+def render_node(node: Node, **args) -> Any
 ```
 
 Render node.
@@ -361,103 +407,113 @@ Render node.
 Construct a parameterized `Tag` class from `node.tag` and call
 `render_node(Node, Tag)`
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: ScalarNode, tag: tags.Str, **args)
+def render_node(node: ScalarNode, tag: tags.Str, **args)
 ```
 
 Render scalar string
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: ScalarNode, tag: tags.Int, **args)
+def render_node(node: ScalarNode, tag: tags.Int, **args)
 ```
 
 Render scalar int
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: ScalarNode, tag: tags.Float, **args)
+def render_node(node: ScalarNode, tag: tags.Float, **args)
 ```
 
 Render scalar float
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: ScalarNode, tag: tags.Null, **args)
+def render_node(node: ScalarNode, tag: tags.Null, **args)
 ```
 
 Render scalar null
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: ScalarNode, tag: tags.Bool, **args)
+def render_node(node: ScalarNode, tag: tags.Bool, **args)
 ```
 
 Render scalar boolean. Accepts YAML extended interpretation of `bool`s, like
 `ruamel.yaml`
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: ScalarNode, tag: tags.Timestamp, **args)
+def render_node(node: ScalarNode, tag: tags.Timestamp, **args)
 ```
 
 Render timestamp node as `datetime.datetime`. Use `dateutil.parser` module
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: SequenceNode, tag: tags.Seq, **args)
+def render_node(node: SequenceNode, tag: tags.Seq, **args)
 ```
 
 Render `seq` nodes recursively
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: MappingNode, tag: tags.Map, **args)
+def render_node(node: MappingNode, tag: tags.Map, **args)
 ```
 
-Render `seq` nodes recursively
+Render `map` nodes recursively
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(cfg: "RootConfig")
+def render_node(cfg: "RootConfig", **args)
 ```
 
 Render the resulting node of merging all entries
 
-<a name="gamma.config.render.render_node"></a>
+<a id="gamma.config.render.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(cfg: "ConfigNode", *, dump=False)
+def render_node(cfg: "ConfigNode", **args)
 ```
 
 Render the config node.
@@ -466,27 +522,30 @@ Render the config node.
 
 - `dump` - If true, assume it's "dump mode" where secrets are not to be rendered.
 
-<a name="gamma.config.findconfig"></a>
+<a id="gamma.config.findconfig"></a>
+
 # gamma.config.findconfig
 
 Module for discovering configuration files (entries)
 
-<a name="gamma.config.findconfig.get_entries"></a>
+<a id="gamma.config.findconfig.get_entries"></a>
+
 #### get\_entries
 
 ```python
 @dispatch
-get_entries() -> List[Tuple[str, Any]]
+def get_entries() -> List[Tuple[str, Any]]
 ```
 
 Discover the config root folder and get all entries
 
-<a name="gamma.config.findconfig.get_entries"></a>
+<a id="gamma.config.findconfig.get_entries"></a>
+
 #### get\_entries
 
 ```python
 @dispatch
-get_entries(folder: Path, *, meta_include_folders=True) -> List[Tuple[str, Any]]
+def get_entries(folder: Path, *, meta_include_folders=True) -> List[Tuple[str, Any]]
 ```
 
 Get all entries in a given folder.
@@ -496,22 +555,24 @@ Get all entries in a given folder.
 - `meta_include_folder` - If `True`, try to load the `00-meta.yaml` file in the
   folder and follow `include_folder` entries.
 
-<a name="gamma.config.findconfig.load_meta"></a>
+<a id="gamma.config.findconfig.load_meta"></a>
+
 #### load\_meta
 
 ```python
 @dispatch
-load_meta(config_root: Path) -> ConfigNode
+def load_meta(config_root: Path) -> ConfigNode
 ```
 
 Load the `00-meta.yaml` file in a given folder
 
-<a name="gamma.config.findconfig.get_config_root"></a>
+<a id="gamma.config.findconfig.get_config_root"></a>
+
 #### get\_config\_root
 
 ```python
 @dispatch
-get_config_root() -> Path
+def get_config_root() -> Path
 ```
 
 Return the location for config root path.
@@ -519,32 +580,35 @@ Return the location for config root path.
 The mechanisms used to find the config root are set in the ``CONFIG_LOAD_ORDER``
 module variable.
 
-<a name="gamma.config.findconfig.get_config_root"></a>
+<a id="gamma.config.findconfig.get_config_root"></a>
+
 #### get\_config\_root
 
 ```python
 @dispatch
-get_config_root(_: FindLocal) -> Optional[Path]
+def get_config_root(_: FindLocal) -> Optional[Path]
 ```
 
 Try the path `$PWD/config` as root config folder
 
-<a name="gamma.config.findconfig.get_config_root"></a>
+<a id="gamma.config.findconfig.get_config_root"></a>
+
 #### get\_config\_root
 
 ```python
 @dispatch
-get_config_root(_: FindJupyter) -> Optional[Path]
+def get_config_root(_: FindJupyter) -> Optional[Path]
 ```
 
 Try `<parent>/config` folders iteratively if we're in a Jupyter (IPython)
 environment
 
-<a name="gamma.config.findconfig.load_dotenv"></a>
+<a id="gamma.config.findconfig.load_dotenv"></a>
+
 #### load\_dotenv
 
 ```python
-load_dotenv(root: Path = None)
+def load_dotenv(root: Path = None)
 ```
 
 Load dotenv files located in:
@@ -554,12 +618,14 @@ Load dotenv files located in:
 - `$PWD/config.env`
 - `{config_root}/../config.env`
 
-<a name="gamma.config.render_context"></a>
+<a id="gamma.config.render_context"></a>
+
 # gamma.config.render\_context
 
 Module handling rendering context variables (eg. for !expr and !j2)
 
-<a name="gamma.config.render_context.ContextVar"></a>
+<a id="gamma.config.render_context.ContextVar"></a>
+
 ## ContextVar Objects
 
 ```python
@@ -571,64 +637,83 @@ A specification for a context variable used for rendering dynamic values.
 Either if ``function`` is specified, we'll call the function to get the actual
 value.
 
-<a name="gamma.config.render_context.ContextVar.name"></a>
+<a id="gamma.config.render_context.ContextVar.name"></a>
+
 #### name
 
 The name of the variable
 
-<a name="gamma.config.render_context.ContextVar.value"></a>
+<a id="gamma.config.render_context.ContextVar.value"></a>
+
 #### value
 
 The value of the variable
 
-<a name="gamma.config.render_context.ContextVar.function"></a>
+<a id="gamma.config.render_context.ContextVar.function"></a>
+
 #### function
 
 Function to call to resolve the variable
 
-<a name="gamma.config.render_context.ContextVar.cacheable"></a>
+<a id="gamma.config.render_context.ContextVar.cacheable"></a>
+
 #### cacheable
 
 If True, will cache the function result, otherwise will call on each render.
 
-<a name="gamma.config.render_context.default_context_provider"></a>
-#### default\_context\_provider
+<a id="gamma.config.render_context.get_render_context"></a>
 
-```python
-default_context_provider()
-```
-
-Render context some defaults.
-
-- `env` -> os.environ
-- `c` -> the global RootConfig
-
-<a name="gamma.config.render_context.context_providers"></a>
-#### context\_providers
-
-Provides a list of context providers. You can add your own if needed by appending
-a function with the signature `() -> List[ContextVar]` or adding a list of
-`ContextVar` objects
-
-<a name="gamma.config.render_context.get_render_context"></a>
 #### get\_render\_context
 
 ```python
-get_render_context() -> Dict[str, Any]
+def get_render_context(**kwargs) -> Dict[str, Any]
 ```
 
 Return the render context by calling each function in ``context_provider``.
 
 A context provider must be a function with the signature:
-    () -> List[ContextVar]
-or simply a list of [ContextVar] objects
+    `(**kwargs) -> List[ContextVar]`
+or simply a list of `ContextVar` objects
 
-<a name="gamma.config.globalconfig"></a>
+The provided `**kwargs` are the same available in the `render_node` function
+
+<a id="gamma.config.render_context.base_provider"></a>
+
+#### base\_provider
+
+```python
+def base_provider(**kwargs)
+```
+
+Defaults to context
+
+- `env` -> os.environ
+- `c` -> the global RootConfig
+
+<a id="gamma.config.render_context.underscore_context_provider"></a>
+
+#### underscore\_context\_provider
+
+```python
+def underscore_context_provider(*, config: ConfigNode = None, **kwargs)
+```
+
+Look in parent config nodes and add all entries under the `_context` key
+
+<a id="gamma.config.render_context.context_providers"></a>
+
+#### context\_providers
+
+Provides a list of context providers. See :func:get_render_context() for details
+
+<a id="gamma.config.globalconfig"></a>
+
 # gamma.config.globalconfig
 
 Module dealing with the lifecycle of the global `RootConfig` object
 
-<a name="gamma.config.globalconfig._GlobalStore"></a>
+<a id="gamma.config.globalconfig._GlobalStore"></a>
+
 ## \_GlobalStore Objects
 
 ```python
@@ -640,11 +725,12 @@ Implements a global store holder object.
 This store operates as a restricted version of a thread-local, where you can only
 ovewrite the value in the same thread/processes where it was first set.
 
-<a name="gamma.config.globalconfig._GlobalStore.set"></a>
+<a id="gamma.config.globalconfig._GlobalStore.set"></a>
+
 #### set
 
 ```python
- | set(root, force=False) -> None
+def set(root, force=False) -> None
 ```
 
 Set the new root config.
@@ -657,11 +743,12 @@ only by the same thread that created it.
 - `root` - the RootConfig to store
 - `force` - if True, do not check for thread safety
 
-<a name="gamma.config.globalconfig._GlobalStore.check_can_modify"></a>
+<a id="gamma.config.globalconfig._GlobalStore.check_can_modify"></a>
+
 #### check\_can\_modify
 
 ```python
- | check_can_modify(key=None) -> None
+def check_can_modify(key=None) -> None
 ```
 
 Raises an Exception modifying the config would break the same thread rule.
@@ -670,23 +757,25 @@ Raises an Exception modifying the config would break the same thread rule.
 
 - `key` - the key to check, fetches one if `None`
 
-<a name="gamma.config.globalconfig.get_config"></a>
+<a id="gamma.config.globalconfig.get_config"></a>
+
 #### get\_config
 
 ```python
-get_config() -> RootConfig
+def get_config(initialize: bool = True) -> Optional[RootConfig]
 ```
 
-Get the global config root object, loading if needed.
+Get the global config root object, loading if needed and `initialize` is `True`.
 
 This global object is cached and safe to call multiple times, from multiple
 threads.
 
-<a name="gamma.config.globalconfig.reset_config"></a>
+<a id="gamma.config.globalconfig.reset_config"></a>
+
 #### reset\_config
 
 ```python
-reset_config(force: bool = False) -> None
+def reset_config(force: bool = False) -> None
 ```
 
 Clear the global store and cache.
@@ -699,11 +788,12 @@ writing tests.
 - `force` - if True, will reset the global store regardless of the current
   thread/process.
 
-<a name="gamma.config.globalconfig.set_config"></a>
+<a id="gamma.config.globalconfig.set_config"></a>
+
 #### set\_config
 
 ```python
-set_config(cfg: RootConfig) -> None
+def set_config(cfg: RootConfig) -> None
 ```
 
 Forces a root config.
@@ -713,11 +803,12 @@ Call `reset_config`.
 NOTE: This is not meant to be used regularly by applications, but can be useful
 when writing tests.
 
-<a name="gamma.config.globalconfig.check_can_modify"></a>
+<a id="gamma.config.globalconfig.check_can_modify"></a>
+
 #### check\_can\_modify
 
 ```python
-check_can_modify(cfg: RootConfig) -> None
+def check_can_modify(cfg: RootConfig) -> None
 ```
 
 Check if this root config object can be modified.
@@ -725,15 +816,17 @@ Check if this root config object can be modified.
 As specified, the **global** root config object can only be modified by the thread
 that first created it.
 
-<a name="gamma.config.dump_yaml"></a>
+<a id="gamma.config.dump_yaml"></a>
+
 # gamma.config.dump\_yaml
 
-<a name="gamma.config.dump_yaml.to_yaml"></a>
+<a id="gamma.config.dump_yaml.to_yaml"></a>
+
 #### to\_yaml
 
 ```python
 @dispatch
-to_yaml(cfg: RootConfig, resolve_tags: bool)
+def to_yaml(cfg: RootConfig, resolve_tags: bool)
 ```
 
 Dump a config/node to the YAML representation.
@@ -742,134 +835,160 @@ Dump a config/node to the YAML representation.
 
 - `resolve_tags` - if True, will render tags, otherwise, dump tags unrendered.
 
-<a name="gamma.config.dump_yaml.to_yaml"></a>
+<a id="gamma.config.dump_yaml.to_yaml"></a>
+
 #### to\_yaml
 
 ```python
 @dispatch
-to_yaml(cfg: ConfigNode)
+def to_yaml(cfg: ConfigNode)
 ```
 
 Render a ConfigNode assuming default of `resolve_tags` = True
 
-<a name="gamma.config.dump_yaml.dump_node"></a>
+<a id="gamma.config.dump_yaml.dump_node"></a>
+
 #### dump\_node
 
 ```python
 @dispatch
-dump_node(node: ScalarNode, *, config=None)
+def dump_node(node: ScalarNode, *, config=None)
 ```
 
 Dump a `scalar` node as raw YAML node
 
-<a name="gamma.config.dump_yaml.dump_node"></a>
+<a id="gamma.config.dump_yaml.dump_node"></a>
+
 #### dump\_node
 
 ```python
 @dispatch
-dump_node(node: SequenceNode, *, config=None)
+def dump_node(node: SequenceNode, *, config=None)
 ```
 
 Dump a `seq` node as raw YAML node
 
-<a name="gamma.config.dump_yaml.dump_node"></a>
+<a id="gamma.config.dump_yaml.dump_node"></a>
+
 #### dump\_node
 
 ```python
 @dispatch
-dump_node(node: MappingNode, *, config=None)
+def dump_node(node: MappingNode, *, config=None)
 ```
 
 Dump a `scalar` node as raw YAML node
 
-<a name="gamma.config.dump_dict"></a>
+<a id="gamma.config.dump_dict"></a>
+
 # gamma.config.dump\_dict
 
-<a name="gamma.config.dump_dict.to_dict"></a>
+<a id="gamma.config.dump_dict.to_dict"></a>
+
 #### to\_dict
 
 ```python
 @dispatch
-to_dict(node)
+def to_dict(node, **ctx)
 ```
 
-Converts a node to a dictionary
+Converts a node to a dictionary.
 
-<a name="gamma.config.dump_dict.to_dict"></a>
+<a id="gamma.config.dump_dict.to_dict"></a>
+
 #### to\_dict
 
 ```python
 @dispatch
-to_dict(node: MappingNode)
+def to_dict(node: ConfigNode, **ctx)
+```
+
+Converts a ConfigNode to a dictionary.
+
+<a id="gamma.config.dump_dict.to_dict"></a>
+
+#### to\_dict
+
+```python
+@dispatch
+def to_dict(node: MappingNode, **ctx)
 ```
 
 Render MappingNodes as dict regardless of tag value
 
-<a name="gamma.config.dump_dict.to_dict"></a>
+<a id="gamma.config.dump_dict.to_dict"></a>
+
 #### to\_dict
 
 ```python
 @dispatch
-to_dict(node: SequenceNode)
+def to_dict(node: SequenceNode, **ctx)
 ```
 
 Render SequenceNodes as list regardless of tag value
 
-<a name="gamma.config.scaffold"></a>
+<a id="gamma.config.scaffold"></a>
+
 # gamma.config.scaffold
 
-Module to 'scaffold' a simple config folder from the command-line
+Module to 'scaffold' append bootstrap config for gamma-io
 
-<a name="gamma.config.scaffold.scaffold"></a>
+<a id="gamma.config.scaffold.scaffold"></a>
+
 #### scaffold
 
 ```python
-scaffold(target, force)
+def scaffold(target, force)
 ```
 
 Initialize the config folder with samples
 
-<a name="gamma.config.merge"></a>
+<a id="gamma.config.merge"></a>
+
 # gamma.config.merge
 
 Implements the node merging functionality
 
-<a name="gamma.config.merge.merge_nodes"></a>
+<a id="gamma.config.merge.merge_nodes"></a>
+
 #### merge\_nodes
 
 ```python
 @dispatch
-merge_nodes(nodes: List)
+def merge_nodes(nodes: List)
 ```
 
 Merge nodes iterable, ignoring key
 
-<a name="gamma.config.merge.merge_nodes"></a>
+<a id="gamma.config.merge.merge_nodes"></a>
+
 #### merge\_nodes
 
 ```python
 @dispatch
-merge_nodes(l_node: MappingNode, r_node: MappingNode)
+def merge_nodes(l_node: MappingNode, r_node: MappingNode)
 ```
 
 Merge map nodes ignoring key
 
-<a name="gamma.config.merge.merge_nodes"></a>
+<a id="gamma.config.merge.merge_nodes"></a>
+
 #### merge\_nodes
 
 ```python
 @dispatch
-merge_nodes(left: Tuple, r_node: MappingNode)
+def merge_nodes(left: Tuple, r_node: MappingNode)
 ```
 
 Merge map nodes ignoring key (for assymetric fold-left)
 
-<a name="gamma.config.merge.merge_nodes"></a>
+<a id="gamma.config.merge.merge_nodes"></a>
+
 #### merge\_nodes
 
 ```python
 @dispatch
-merge_nodes(left: Tuple, right: Tuple)
+def merge_nodes(left: Tuple, right: Tuple)
 ```
 
 Merge map nodes (symetric fold-left)
@@ -878,24 +997,26 @@ Merge map nodes (symetric fold-left)
 
   left, right: Tuple of (key: Node, value: Node)
 
-<a name="gamma.config.merge.merge_nodes"></a>
+<a id="gamma.config.merge.merge_nodes"></a>
+
 #### merge\_nodes
 
 ```python
 @dispatch
-merge_nodes(l_key, l_node: Union[None, Node], r_key, r_node: Union[None, Node])
+def merge_nodes(l_key, l_node: Union[None, Node], r_key, r_node: Union[None, Node])
 ```
 
 Merge scalars.
 
 Return "right", or "left" if "right" is `None`
 
-<a name="gamma.config.merge.merge_nodes"></a>
+<a id="gamma.config.merge.merge_nodes"></a>
+
 #### merge\_nodes
 
 ```python
 @dispatch
-merge_nodes(l_key, l_node: MappingNode, r_key, r_node: MappingNode)
+def merge_nodes(l_key, l_node: MappingNode, r_key, r_node: MappingNode)
 ```
 
 Merge `map` nodes recursively.
@@ -903,12 +1024,13 @@ Merge `map` nodes recursively.
 Right side has precedence. `@hint: merge_replace` overrides merging, returning
 right.
 
-<a name="gamma.config.merge.merge_nodes"></a>
+<a id="gamma.config.merge.merge_nodes"></a>
+
 #### merge\_nodes
 
 ```python
 @dispatch
-merge_nodes(l_key, l_node: SequenceNode, r_key, r_node: SequenceNode)
+def merge_nodes(l_key, l_node: SequenceNode, r_key, r_node: SequenceNode)
 ```
 
 Merge `sequence` nodes recursively.
@@ -916,29 +1038,32 @@ Merge `sequence` nodes recursively.
 Right side has precedence. `@hint: merge_replace` overrides merging, returning
 right.
 
-<a name="gamma.config.merge.has_replace_hint"></a>
+<a id="gamma.config.merge.has_replace_hint"></a>
+
 #### has\_replace\_hint
 
 ```python
 @dispatch
-has_replace_hint(node: Node) -> bool
+def has_replace_hint(node: Node) -> bool
 ```
 
 Check for existence of config "hint" in the node's comments.
 
 Only `@hint: merge_replace` is supported.
 
-<a name="gamma.config.builtin_tags"></a>
+<a id="gamma.config.builtin_tags"></a>
+
 # gamma.config.builtin\_tags
 
 Module that implements renderers for builtin-tags
 
-<a name="gamma.config.builtin_tags.render_node"></a>
+<a id="gamma.config.builtin_tags.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: Node, tag: EnvTag, **ctx) -> str
+def render_node(node: Node, tag: EnvTag, **ctx) -> str
 ```
 
 [!env] Maps the value to an environment variable of the same name.
@@ -948,25 +1073,27 @@ name.
 
 **Examples**:
 
-
+  
 - `my_var` - !env MYVAR|my_default
 
-<a name="gamma.config.builtin_tags.render_node"></a>
+<a id="gamma.config.builtin_tags.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: Node, tag: EnvSecretTag, *, dump=False, **ctx) -> str
+def render_node(node: Node, tag: EnvSecretTag, *, dump=False, **ctx) -> str
 ```
 
 [!env_secret] Similar to !env, but never returns the value when dumping.
 
-<a name="gamma.config.builtin_tags.render_node"></a>
+<a id="gamma.config.builtin_tags.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: Node, tag: ExprTag, **ctx) -> Any
+def render_node(node: Node, tag: ExprTag, **ctx) -> Any
 ```
 
 [!expr] Uses ``eval()`` to render arbitrary Python expressions.
@@ -976,12 +1103,13 @@ By default, we add the root configuration as `c` variable.
 See ``gamma.config.render_context.context_providers`` documentation to add your
 own variables to the context.
 
-<a name="gamma.config.builtin_tags.render_node"></a>
+<a id="gamma.config.builtin_tags.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: Node, tag: J2Tag, **ctx) -> Any
+def render_node(node: Node, tag: J2Tag, *, config=None, key=None, **ctx) -> Any
 ```
 
 [!j2] Treats the value a Jinj2 Template
@@ -995,26 +1123,33 @@ myvar: 100
 foo1: !expr f"This is a number = {c.myvar}"
 foo2: !j2 This is a number = {c.myvar}
 
+You can customize the Jinja2 environment by providing a reference to a Python
+function in the `j2_env` key in `00-meta.yaml`. Example
+
+j2_env: my_app.my_module:my_func
+
 **Notes**:
 
   * Jinja2 is not installed by default, you should install it manually.
 
-<a name="gamma.config.builtin_tags.render_node"></a>
+<a id="gamma.config.builtin_tags.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: Node, tag: J2SecretTag, *, dump=False, **ctx) -> Any
+def render_node(node: Node, tag: J2SecretTag, *, dump=False, **ctx) -> Any
 ```
 
 [!j2_secret] Similar to !j2, but never returns the value when dumping.
 
-<a name="gamma.config.builtin_tags.render_node"></a>
+<a id="gamma.config.builtin_tags.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: Node, tag: RefTag, *, config=None, **ctx) -> Any
+def render_node(node: Node, tag: RefTag, *, config=None, recursive=False, **ctx) -> Any
 ```
 
 [!ref] References other entries in the config object.
@@ -1022,12 +1157,13 @@ render_node(node: Node, tag: RefTag, *, config=None, **ctx) -> Any
 Navigate the object using the dot notation. Complex named keys can be accessed
 using quotes.
 
-<a name="gamma.config.builtin_tags.render_node"></a>
+<a id="gamma.config.builtin_tags.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: ScalarNode, tag: PyTag, *, path=None, **ctx) -> Any
+def render_node(node: ScalarNode, tag: PyTag, *, path=None, **ctx) -> Any
 ```
 
 [!py] Pass the node value to a Python callable.
@@ -1048,12 +1184,13 @@ Will call the function `myfunc` in `myapp.mymodule` module with the arguments:
 - `type(value) == str; value == "100"` for `bar`
 - `type(value) == str; value == "a value"` for `zig`
 
-<a name="gamma.config.builtin_tags.render_node"></a>
+<a id="gamma.config.builtin_tags.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: Union[SequenceNode, MappingNode], tag: PyTag, *, path=None, **ctx) -> Any
+def render_node(node: Union[SequenceNode, MappingNode], tag: PyTag, *, path=None, **ctx) -> Any
 ```
 
 [!py] Pass the node value to a Python callable.
@@ -1063,12 +1200,13 @@ This tag should be used as a URI-style tag on the form `!py:<module>:<callable>`
 The `map` or `seq` node value is first converted to a Python `dict`/`list`
 recursively using the `to_dict` method.
 
-<a name="gamma.config.builtin_tags.render_node"></a>
+<a id="gamma.config.builtin_tags.render_node"></a>
+
 #### render\_node
 
 ```python
 @dispatch
-render_node(node: MappingNode, tag: ObjTag, *, path=None, config=None, **ctx) -> Any
+def render_node(node: MappingNode, tag: ObjTag, *, path=None, config=None, **ctx) -> Any
 ```
 
 [!obj] Create a Python object by passing the mapping value as nested dicts to
@@ -1083,7 +1221,7 @@ scalar entry at the root of the config.
 
 **Examples**:
 
-
+  
 ```yaml
 foo: !obj:myapp.mymodule:MyClass
     a: 100
@@ -1098,37 +1236,58 @@ bar: !obj:MyClass
     b: a value
 ```
 
-<a name="gamma.config.rawnodes"></a>
+<a id="gamma.config.builtin_tags.render_node"></a>
+
+#### render\_node
+
+```python
+@dispatch
+def render_node(node: Node, tag: PathTag, **ctx) -> str
+```
+
+[!path] Construct an absolute file path by joining a path
+fragment to the known path of the *parent* of config root directory
+
+**Examples**:
+
+  # should point to `<config-root>/../data/hello_world.csv`
+- `my_var` - !path data/hello_world.csv
+
+<a id="gamma.config.rawnodes"></a>
+
 # gamma.config.rawnodes
 
 Module implementing convenience methods for dealing with `ruamel.yaml` `Node`s
 
-<a name="gamma.config.rawnodes.get_keys"></a>
+<a id="gamma.config.rawnodes.get_keys"></a>
+
 #### get\_keys
 
 ```python
 @dispatch
-get_keys(node: MappingNode) -> Iterable[Node]
+def get_keys(node: MappingNode) -> Iterable[Node]
 ```
 
 Get all keys on a `map` node
 
-<a name="gamma.config.rawnodes.get_item"></a>
+<a id="gamma.config.rawnodes.get_item"></a>
+
 #### get\_item
 
 ```python
 @dispatch
-get_item(node: MappingNode, key, *, default=...) -> Node
+def get_item(node: MappingNode, key, *, default=...) -> Node
 ```
 
 Get a single child node item from `map` node
 
-<a name="gamma.config.rawnodes.get_entry"></a>
+<a id="gamma.config.rawnodes.get_entry"></a>
+
 #### get\_entry
 
 ```python
 @dispatch
-get_entry(node: MappingNode, key, *, default=...) -> Entry
+def get_entry(node: MappingNode, key, *, default=...) -> Entry
 ```
 
 Get a (key, value) entry from a `map` node.
@@ -1136,115 +1295,127 @@ Get a (key, value) entry from a `map` node.
 **Arguments**:
 
 - `default` - return this value instead of `KeyError` if not found.
-
+  
   Raise:
   `KeyError` if key not found and `default` not provided
 
-<a name="gamma.config.rawnodes.is_equal"></a>
+<a id="gamma.config.rawnodes.is_equal"></a>
+
 #### is\_equal
 
 ```python
 @dispatch
-is_equal(a: ScalarNode, b) -> bool
+def is_equal(a: ScalarNode, b) -> bool
 ```
 
 Check if `a` is equal to `b`
 
-<a name="gamma.config.rawnodes.is_equal"></a>
+<a id="gamma.config.rawnodes.is_equal"></a>
+
 #### is\_equal
 
 ```python
 @dispatch
-is_equal(a, b: ScalarNode) -> bool
+def is_equal(a, b: ScalarNode) -> bool
 ```
 
 Check if `a` is equal to `b`
 
-<a name="gamma.config.rawnodes.as_node"></a>
+<a id="gamma.config.rawnodes.as_node"></a>
+
 #### as\_node
 
 ```python
 @dispatch
-as_node(a) -> Node
+def as_node(a) -> Node
 ```
 
 Return the `Node` representation of a given object.
 
 This method handle basic scalar types.
 
-<a name="gamma.config.rawnodes.get_id"></a>
+<a id="gamma.config.rawnodes.get_id"></a>
+
 #### get\_id
 
 ```python
 @dispatch
-get_id(a: ScalarNode) -> Hashable
+def get_id(a: ScalarNode) -> Hashable
 ```
 
 Return an object that allows to ScalarNodes to be hashed and compared
 
-<a name="gamma.config.rawnodes.is_in"></a>
+<a id="gamma.config.rawnodes.is_in"></a>
+
 #### is\_in
 
 ```python
 @dispatch
-is_in(node: Node, container: Iterable[Any]) -> bool
+def is_in(node: Node, container: Iterable[Any]) -> bool
 ```
 
 Return true if `node` is in `container`
 
-<a name="gamma.config.rawnodes.get_entries"></a>
+<a id="gamma.config.rawnodes.get_entries"></a>
+
 #### get\_entries
 
 ```python
 @dispatch
-get_entries(node: MappingNode) -> Iterable[Entry]
+def get_entries(node: MappingNode) -> Iterable[Entry]
 ```
 
 Return all entries (key, value) in this `map` node
 
-<a name="gamma.config.rawnodes.get_values"></a>
+<a id="gamma.config.rawnodes.get_values"></a>
+
 #### get\_values
 
 ```python
 @dispatch
-get_values(node: SequenceNode) -> Iterable[Node]
+def get_values(node: SequenceNode) -> Iterable[Node]
 ```
 
 Return all values in this `seq` node
 
-<a name="gamma.config.rawnodes.get_values"></a>
+<a id="gamma.config.rawnodes.get_values"></a>
+
 #### get\_values
 
 ```python
 @dispatch
-get_values(node: MappingNode) -> Iterable[Node]
+def get_values(node: MappingNode) -> Iterable[Node]
 ```
 
 Return all values in this `map` node
 
-<a name="gamma.config.rawnodes.union_nodes"></a>
+<a id="gamma.config.rawnodes.union_nodes"></a>
+
 #### union\_nodes
 
 ```python
 @dispatch
-union_nodes(first: Iterable, second: Iterable) -> Iterable
+def union_nodes(first: Iterable, second: Iterable) -> Iterable
 ```
 
 Union two sets of nodes.
 
 By default we keep the ones in `first` if equals.
 
-<a name="gamma.dispatch"></a>
+<a id="gamma.dispatch"></a>
+
 # gamma.dispatch
 
-<a name="gamma.dispatch.dispatchsystem"></a>
+<a id="gamma.dispatch.dispatchsystem"></a>
+
 # gamma.dispatch.dispatchsystem
 
-<a name="gamma.dispatch.dispatchsystem.methods_matching"></a>
+<a id="gamma.dispatch.dispatchsystem.methods_matching"></a>
+
 #### methods\_matching
 
 ```python
-methods_matching(call, table) -> List
+def methods_matching(call, table) -> List
 ```
 
 Given a method table, return the methods matching the call signature.
@@ -1254,50 +1425,66 @@ Given a method table, return the methods matching the call signature.
 - `table` - an iterable of methods ordered by `is_more_specific`
 - `call` - the call signature as a `Sig` object or `Tuple[...]` type
 
-<a name="gamma.dispatch.dispatchsystem.dispatch"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch"></a>
+
 ## dispatch Objects
 
 ```python
 class dispatch()
 ```
 
-Function wrapper to dispatch methods
+Function wrapper to dispatch methods.
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.pending"></a>
+**Arguments**:
+
+- `namespace` - If set, use a shared namespace with `namespace` as key, otherwise
+  try to find matching functions in `locals`.
+- `specialize` - If set, will throw an error if this function is not a specialization
+  of an already existing function.
+- `overwrite` - When `True`, won't issue a warning about overwriting a method.
+
+<a id="gamma.dispatch.dispatchsystem.dispatch.pending"></a>
+
 #### pending
 
 Pending methods register due to forward references
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.methods"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.methods"></a>
+
 #### methods
 
 The methods table for this function
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.cache"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.cache"></a>
+
 #### cache
 
 Cache from call signature to actual function
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.get_type"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.get_type"></a>
+
 #### get\_type
 
 Callable to get types from function arguments
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.name"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.name"></a>
+
 #### name
 
 function name
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.arg_names"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.arg_names"></a>
+
 #### arg\_names
 
 set of reserved argument names
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.register"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.register"></a>
+
 #### register
 
 ```python
- | register(func: Callable, *, overwrite=False, allow_pending=True) -> Callable
+def register(func: Callable, *, overwrite=False, allow_pending=True) -> Callable
 ```
 
 Register a new method to this function's dispatch table.
@@ -1309,38 +1496,42 @@ Register a new method to this function's dispatch table.
   existing registration.
 - `allow_pending` - if True, won't error on forward references
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.clear"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.clear"></a>
+
 #### clear
 
 ```python
- | clear()
+def clear()
 ```
 
 Empty the cache.
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.__setitem__"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.__setitem__"></a>
+
 #### \_\_setitem\_\_
 
 ```python
- | __setitem__(key, func: Callable)
+def __setitem__(key, func: Callable)
 ```
 
 Manually map a call signature to a callable
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.__delitem__"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.__delitem__"></a>
+
 #### \_\_delitem\_\_
 
 ```python
- | __delitem__(types: Tuple)
+def __delitem__(types: Tuple)
 ```
 
 Remove a method registration
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.find_method"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.find_method"></a>
+
 #### find\_method
 
 ```python
- | find_method(key: Tuple) -> Callable
+def find_method(key: Tuple) -> Callable
 ```
 
 Find and cache the next applicable method of given types.
@@ -1349,20 +1540,22 @@ Find and cache the next applicable method of given types.
 
 - `key` - A call args types tuple.
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.__call__"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.__call__"></a>
+
 #### \_\_call\_\_
 
 ```python
- | __call__(*args, **kwargs)
+def __call__(*args, **kwargs)
 ```
 
 Resolve and dispatch to best method.
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.resolve_pending"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.resolve_pending"></a>
+
 #### resolve\_pending
 
 ```python
- | resolve_pending()
+def resolve_pending()
 ```
 
 Evaluate any pending forward references.
@@ -1370,45 +1563,26 @@ Evaluate any pending forward references.
 This can be called explicitly when using forward references,
 otherwise cache misses will evaluate.
 
-<a name="gamma.dispatch.dispatchsystem.dispatch.dump"></a>
+<a id="gamma.dispatch.dispatchsystem.dispatch.dump"></a>
+
 #### dump
 
 ```python
- | dump() -> str
+def dump() -> str
 ```
 
 Pretty-print debug information about this function
 
-<a name="gamma.dispatch.parametric"></a>
-# gamma.dispatch.parametric
+<a id="gamma.dispatch.typesystem"></a>
 
-<a name="gamma.dispatch.parametric.parametric"></a>
-## parametric Objects
-
-```python
-class parametric(Generic[T])
-```
-
-Decorator to create new parametric base classes
-
-<a name="gamma.dispatch.parametric.Val"></a>
-## Val Objects
-
-```python
-@parametric
-class Val()
-```
-
-Generic parametric class
-
-<a name="gamma.dispatch.typesystem"></a>
 # gamma.dispatch.typesystem
 
 Module implementing core rules in Julia's dispatch system. For reference,
 check Jeff Bezanson's PhD thesis at
 https://github.com/JeffBezanson/phdthesis/blob/master/main.pdf
 
-<a name="gamma.dispatch.typesystem.Sig"></a>
+<a id="gamma.dispatch.typesystem.Sig"></a>
+
 ## Sig Objects
 
 ```python
@@ -1418,20 +1592,22 @@ class Sig()
 Represent a Tuple type with extra features, mostly used for method signature
 dispatching
 
-<a name="gamma.dispatch.typesystem.pad_varargs"></a>
+<a id="gamma.dispatch.typesystem.pad_varargs"></a>
+
 #### pad\_varargs
 
 ```python
-pad_varargs(a, b) -> Tuple[Tuple[Type], Tuple[Type]]
+def pad_varargs(a, b) -> Tuple[Tuple[Type], Tuple[Type]]
 ```
 
 Extract Tuple args and pad with `object`, accounting for varargs
 
-<a name="gamma.dispatch.typesystem.issubtype"></a>
+<a id="gamma.dispatch.typesystem.issubtype"></a>
+
 #### issubtype
 
 ```python
-issubtype(_type: Union[Type, Sig], _super: Union[Type, Sig])
+def issubtype(_type: Union[Type, Sig], _super: Union[Type, Sig])
 ```
 
 Check if `_type` is a subtype of `_super`.
@@ -1445,6 +1621,19 @@ Generic (aka parametric) types are invariant. For instance:
     `issubtype(List[int], List[int]) == True`
     `issubtype(list, List[object]) == False`
 
+The exceptions are:
+    * `Tuple`: these are covariant. Eg:
+        - `issubtype(Tuple[Foo], Tuple[Super]) == True` where `Foo -> Super`
+
+    * `Union`: match if there's a covariant intersection, including non-union types
+        - `issubtype(Foo, Union[str, Super]) == True` where `Foo -> Super`
+        - `issubtype(str, Union[str, Super]) == True`
+
+    * `typing.Type`: is covariant on the type argument. `type` is treated as
+      `typing.Type[object]`
+        - `issubtype(typing.Type[str], typing.Type[object]) == True`
+        - `issubtype(typing.Type[str], type) == True`
+
 Since Python don't tag container instances with the type paramemeters
 (eg. `type([1,2,3]) == list`) this means that we can't dispatch lists as we would
 with arrays in Julia. The multiple dispatch system must then erase method signature
@@ -1455,19 +1644,22 @@ See the `parametric` module for a way to declare and dispatch on parametric type
 Also, we don't currently support the equivalent of `UnionAll`. This is not an issue
 since we don't support parametric dispatch, ie. `TypeVar`s in method signatures.
 
-<a name="gamma.dispatch.typesystem.signatures_from"></a>
+<a id="gamma.dispatch.typesystem.signatures_from"></a>
+
 #### signatures\_from
 
 ```python
-signatures_from(func: Callable) -> Iterable[Sig]
+def signatures_from(func: Callable) -> Iterable[Sig]
 ```
 
 Parse a callable to extract the dispatchable type tuple.
 
-<a name="gamma.dispatch.poset"></a>
+<a id="gamma.dispatch.poset"></a>
+
 # gamma.dispatch.poset
 
-<a name="gamma.dispatch.poset.PODict"></a>
+<a id="gamma.dispatch.poset.PODict"></a>
+
 ## PODict Objects
 
 ```python
@@ -1476,3 +1668,47 @@ class PODict(MutableMapping,  Generic[KT, VT])
 
 Dictionary that stores keys sorted (like a prio queue) that works
 for partial orders
+
+<a id="gamma.dispatch.parametric_types"></a>
+
+# gamma.dispatch.parametric\_types
+
+<a id="gamma.dispatch.parametric_types.parametric"></a>
+
+## parametric Objects
+
+```python
+class parametric(Generic[T])
+```
+
+Decorator to create new parametric base classes
+
+<a id="gamma.dispatch.parametric_types.ValMeta"></a>
+
+## ValMeta Objects
+
+```python
+class ValMeta(ParametricMeta)
+```
+
+<a id="gamma.dispatch.parametric_types.ValMeta.values"></a>
+
+#### values
+
+```python
+@property
+def values(cls) -> Tuple
+```
+
+Return all values used to create the parametric value type
+
+<a id="gamma.dispatch.parametric_types.Val"></a>
+
+## Val Objects
+
+```python
+class Val(, metaclass=ValMeta)
+```
+
+Generic parametric class with easy value accessors
+

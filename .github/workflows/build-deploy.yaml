@@ -1,0 +1,80 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.8"
+
+      - name: create venv
+        run: python3 -m venv .venv
+
+      - name: install requirements
+        run: |
+          . .venv/bin/activate
+          make install
+
+      - name: run tests
+        run: |
+          . .venv/bin/activate
+          export PYTHONPATH=$PWD
+          make test
+
+      - name: archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-report
+          path: test-results/junit.xml
+
+      - name: archive whl
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/*.whl
+
+  Docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: "npm"
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+
+  Publish:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    steps:
+      - uses: actions/checkout@v3
+          
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+
+      - name: pypi publish
+        uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*

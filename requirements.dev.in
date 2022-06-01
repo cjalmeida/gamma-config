@@ -1,0 +1,14 @@
+-c requirements.txt
+bump2version
+httpx
+jinja2
+pre-commit
+pytest
+pytest-cov
+flake8
+black
+pdbpp
+pip-tools
+wheel
+ipython
+pydantic
