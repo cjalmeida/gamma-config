@@ -14,14 +14,13 @@ build:
 
 .PHONY: publish
 publish:
-#   # PyPI Release
-	. .env && \
-	twine check dist/* && \
-	twine upload --verbose -r testpypi -u __token__ -p "$$TEST_PYPY_TOKEN" dist/*
-
 #   # GH Release
 	gh release create `git describe` --notes "New release" dist/*
 
+#   # PyPI Release
+	. .env && \
+	twine check dist/* && \
+	twine upload --verbose -u __token__ -p "$$PYPY_TOKEN" dist/*
 
 .PHONY: test
 test:
