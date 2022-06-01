@@ -12,3 +12,5 @@ pip-tools
 wheel
 ipython
 pydantic
+build
+twine
