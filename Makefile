@@ -19,6 +19,9 @@ build:
 
 .PHONY: publish
 publish:
+
+	@$(MAKE) build
+
 #   # GH Release
 	gh release create `git describe` --notes "New release" dist/*
 
@@ -26,6 +29,14 @@ publish:
 	. .env && \
 	twine check dist/* && \
 	twine upload --verbose -u __token__ -p "$$PYPY_TOKEN" dist/*
+
+#	# Docs
+	@$(MAKE) publish-docs
+
+.PHONY: publish-docs
+publish-docs:
+	mkdocs build
+	npx gh-pages@2.0.1 -d site -t
 
 .PHONY: test
 test:
