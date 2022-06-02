@@ -20,10 +20,16 @@ markdown_extensions:
 
 nav:
   - Home: README.md
-  - Writing configuration files: writing-config.md
-  - Using gamma-config: using.md
-  - Environment specific config: environment.md
-  - Built-in and custom tags: tags.md
-  - Multiple dispatch: multi-dispatch.md
-  - "Guide: structured configuration": structured.md 
-  - API Reference: api.md
+  
+  - "User Guide":
+    - Writing configuration files: writing-config.md
+    - Using gamma-config: using.md
+    - Environment specific config: environment.md
+    - Built-in and custom tags: tags.md
+  
+  - "How-to":
+    - "Structured configuration": structured.md 
+  
+  - "Advanced":
+    - Multiple dispatch: multi-dispatch.md
+    - API Reference: api.md
