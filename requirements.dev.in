@@ -14,3 +14,5 @@ ipython
 pydantic
 build
 twine
+mkdocs
+mkdocs-material

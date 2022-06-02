@@ -60,14 +60,13 @@ class ConfigNode(collections.abc.Mapping):
         return config_len(self)
 
     def __getattr__(self, key):
-        if key.startswith("_"):
+        if key.startswith("__"):
             return object.__getattribute__(self, key)
 
         try:
             return self[key]
-        except KeyError:
-            empty = MappingNode(tags.Map, [])
-            return ConfigNode(empty, self._root, parent=self, key=key)
+        except KeyError as err:
+            raise AttributeError(key) from err
 
     def __call__(self, *args, **kwds):
         raise TypeError(

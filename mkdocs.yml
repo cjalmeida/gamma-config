@@ -1,0 +1,29 @@
+site_name: Gamma Config
+theme:
+  name: material
+  palette:
+    primary: teal
+  font:
+    text: Nunito Sans
+    code: Source Code Pro
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - admonition
+
+
+nav:
+  - Home: README.md
+  - Writing configuration files: writing-config.md
+  - Using gamma-config: using.md
+  - Environment specific config: environment.md
+  - Built-in and custom tags: tags.md
+  - Multiple dispatch: multi-dispatch.md
+  - "Guide: structured configuration": structured.md 
+  - API Reference: api.md

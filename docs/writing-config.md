@@ -5,7 +5,8 @@ _Static_ configuration should be written as one or many YAML files.
 and treat the folder as the _configuration root_. All YAML files in the base folder
 of this configuration root are loaded and merged into a single data structure.
 
-!>Sub-folders of the config root **are not** loaded by default.
+!!! note
+    Sub-folders of the config root **are not** loaded by default.
 
 By convention, configurations are prefixed with two digits to ensure they're loaded
 and merged in the correct order. Below is an example of a config folder structure:
@@ -62,7 +63,8 @@ sample_key:
 If you want change the merge behavior for sequences (list) and mappings (dicts), you can pass the special _hint_ comment `@hint: merge_replace` to fully replace the old value
 with the new instead of trying to merge.
 
-!> The `@hint` comment must be placed on the same line of the key you want to it to act on.
+!!! note
+    The `@hint` comment must be placed on the same line of the key you want to it to act on.
 
 Example:
 

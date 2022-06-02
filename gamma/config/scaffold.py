@@ -27,7 +27,24 @@ def get_files(module, src):
 
 
 def scaffold(target, force):
-    """Initialize the config folder with samples"""
+    """Initialize the config folder with samples.
+
+    The set of files to be deployed on scaffolding can be extended via the Python
+    "entrypoint" plugin system.
+
+    First you need to add your the directives in `setup.cfg` pointing to the
+    `gamma.config.scaffold` group. Example:
+
+    ```ini
+    [options.entry_points]
+    gamma.config.scaffold =
+        gamma-io = gamma.io.scaffold:setup
+    ```
+
+    In the example above, `setup` function under `gamma.io.scaffold` module should
+    return an instance of any class that will be used for dispatching the `get_files`
+    and `get_source` functions.
+    """
 
     colorama.init()  # for fellow windows users
 

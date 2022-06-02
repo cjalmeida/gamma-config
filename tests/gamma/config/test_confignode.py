@@ -32,13 +32,9 @@ def test_attribute_access():
     assert cfg.foo.bar == 1
     assert cfg.foo.zoo == [1, 2, 3]
     assert cfg.foo.sub.bar == 10
-    assert cfg.foo.zit is None
-    assert isinstance(cfg.foo.notexist, ConfigNode)
-    assert bool(cfg.foo.notexist) is False
-    assert bool(cfg.foo) is True
 
-    with pytest.raises(Exception):
-        cfg.foo.notexist()
+    with pytest.raises(AttributeError):
+        assert bool(cfg.foo.notexist) == False  # noqa
 
 
 def test_guards():

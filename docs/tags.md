@@ -53,9 +53,10 @@ The value of `foo1` is the string `Number = 100`. The value of `level0.bar1` is 
 
 We also provide `!j2_secret` to be used when dealing with sensitive data
 
-!> Jinja2 **is not installed by default**, you should install yourself by
-running `pip install jinja2` or, more generally adding the `jinja2` extra package
-dependency.
+!!! note 
+    Jinja2 **is not installed by default**, you should install yourself by
+    running `pip install jinja2` or, more generally adding the `jinja2` extra package
+    dependency.
 
 ### !ref
 
@@ -139,10 +140,10 @@ a `obj_default_module` entry in the root of the config file.
 
 Unlike the `!py` tag, it only support mapping nodes.
 
-> [!TIP]
-> This tag is particularly useful when integrating with validation libraries.
-> [Pydantic](https://pydantic-docs.helpmanual.io/) in particular supports parsing
-> nested `dict`s into an object tree.
+!!! tip
+    This tag is particularly useful when integrating with validation libraries.
+    [Pydantic](https://pydantic-docs.helpmanual.io/) in particular supports parsing
+    nested `dict`s into an object tree. See [structured configuration](/structured).
 
 Example usage:
 

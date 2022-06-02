@@ -1,7 +1,6 @@
 # Gamma Config
 
 ![python](https://img.shields.io/badge/python-3.7%2B-blue)
-[![CircleCI](https://cci.gamma.bcg.com/gh/BCG/gamma-config/tree/master.svg?style=shield&circle-token=8106c47ad7a019907079adc538ec98b9ba6b0e95)](https://cci.gamma.bcg.com/gh/BCG/gamma-config/tree/master "master") [![CircleCI](https://cci.gamma.bcg.com/gh/BCG/gamma-config/tree/develop.svg?style=shield&circle-token=8106c47ad7a019907079adc538ec98b9ba6b0e95)](https://cci.gamma.bcg.com/gh/BCG/gamma-config/tree/develop "develop")
 
 An opinionated way of setting up configuration for data science projects.
 
@@ -18,6 +17,16 @@ configuration primarily based on YAML files. It promotes best practices by:
 
 Another benefit of a standard config mechanism is allowing Gamma extension
 libraries to provide configuration in a common way.
+
+## New in 0.5
+
+- We're now in PyPI!
+- Options for installing extra dependencies (eg. `jinja2`, `pydantic`)
+
+## Breaking changes in 0.5
+
+- When using the dot (`.`) syntax, missing values raise `AttributeError` instead of returning
+  a false-y object.
 
 ## Features
 
@@ -36,49 +45,30 @@ libraries to provide configuration in a common way.
 -   Simplified key access via dot (`.`). Eg. for `config: {foo: {bar: 100}}`,
     this is True: `config.foo.bar == 100`
 
-## Full documentation
 
-Link: https://github.gamma.bcg.com/pages/BCG/gamma-config/
+[Click here to view the full documentation](https://github.gamma.bcg.com/pages/BCG/gamma-config/)
 
 ## Getting started
 
-Currently the recommended way of installing `gamma-config` is downloading the `tar.gz`
-asset file in the [Releases](https://github.gamma.bcg.com/BCG/gamma-config/releases)
-and install it using `pip`.
+Using pip:
 
 ```bash
-pip install ./gamma-config-<release>.tar.gz
+pip install gamma-config
 ```
-
-To use it in your project, you can place the _tar.gz_ files in a `vendor` folder and
-reference it either via pip's `-f` flag or by setting `PIP_FIND_LINKS` env var:
-
-```bash
-# requirements.txt:
-gamma-config
-
-# then explicity set -f (--find-links) flag
-pip install -r requirements.txt -f ./vendor
-```
-
-Poetry currently does not support the equivalent of `--find-links` so you may need to
-explicity add the path/version to `pyproject.toml`
-
-```toml
-[tool.poetry.dependencies]
-gamma-config = { path = "./vendor/gamma-config-<release>.tar.gz" }
-```
-
-This technique is called "vendoring" the dependency. For client work this also
-provides the library source should they wish to modify it later.
 
 In most cases, you'll want to use the `!j2` tag to interpolate values using Jinja2.
 This requires manually installing the `jinja2` package or using the `jinja2` extras.
 
 ```bash
-# when using pip
 pip install gamma-config[jinja2]
 ```
+
+You must install `pydantic` if using the [structured configuration][structured] feature.
+
+```bash
+pip install gamma-config[pydantic]
+```
+
 
 ## Basic Usage
 
@@ -121,3 +111,5 @@ Most of the magic happen via tags. Look at the documentation for info on the [bu
 ## Copyright
 
 Copyright 2021 Boston Consulting Group, all rights reserved.
+
+[structured]: https://github.gamma.bcg.com/pages/BCG/gamma-config/structured

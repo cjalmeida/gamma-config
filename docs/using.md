@@ -18,9 +18,11 @@ In the section below we'll discuss some patterns and caveats.
 ## Safe navigation using attribute (dot) access
 
 If you try to access a non-existing value from the returned config object using the
-dictionary style `config['missing']`, it will throw a `KeyError` as expected. However,
-accessing using attribute style `config.missing` **will return an empty sub config**
-object that (like regular dict) is _falsy_.
+dictionary style `config['missing']` or dot (`.`) access style `config.missing` 
+it will throw a `KeyError` as expected.
+
+!!! note
+    Behavior changed from 0.4 where `config.missing` would return a false-y object.
 
 ```python
 config = get_config()
@@ -30,8 +32,10 @@ try:
 except KeyError:
     pass
 
-val = config.missing                    # val is an empty ConfigNode object
-assert not val                          # and is 'falsey' like empty dict
+try:
+    val = config.missing                   # this will also throw KeyError
+except KeyError:
+    pass
 ```
 
 This behavior allows you to conveniently navigate deep across nodes, but can be
@@ -112,9 +116,10 @@ Config objects (`RootConfig` and `ConfigNode` classes) are read-only and effecti
 immutable. They're also fully pickable and you can pass them to child processes and
 thread following the usual rules and they'll keep their dynamic behavior.
 
-!>Note that in distributed processing, you're still required to be able to provide
-`gamma-config` lib and dependencies as usual. In that case, rendering the (sub)config
-to plain dict using `to_dict` is recommended.
+!!! note 
+    In distributed processing, you're still required to be able to provide
+    `gamma-config` lib and dependencies as usual. In that case, rendering the (sub)config
+    to plain dict using `to_dict` is recommended.
 
 The only way to mutate a config object is by using the `push_entry`. For the global
 config returned from `get_config()`, you **must** modify it from the main thread;
@@ -166,49 +171,5 @@ def do_something():
 
 We don't force any specific validation method. But you're encouraged to validate and/or
 enforce a schema in your configuration. And we try to play nice with most popular
-validation libraries.
-
-### Using Pydantic
-
-One of the most convenient validation libraries is [Pydantic](https://pydantic-docs.helpmanual.io/).
-While you can manually call `to_dict` or create [custom tags](/tags?id=writing-custom-tags),
-a simple way is to use the [!obj](/tags?id=obj) tag pointing to `Pydantic` class.
-
-Example:
-
-```py
-# in file myapp.config
-from pydantic import BaseModel
-
-class MySection(BaseModel):
-    entry_a: int
-    entry_b: str
-    sub_obj: SubObj
-
-class SubObj(BaseModel):
-    foo: str
-```
-
-You can get a `MySection` instance directly:
-
-```yaml
-my_section: !obj:myapp.config:MySection
-    entry_a: 1
-    entry_b: "this is b"
-    sub_obj:
-        foo: bar
-```
-
-And in your application code:
-
-```py
-from gamma.config import get_config
-from myapp.config import MySection
-
-def do_something():
-    config = get_config()
-
-    val = config["my_section"]
-    assert type(val) == MySection
-    assert val.sub_obj.foo == "bar"
-```
+validation libraries. In particular we have support for [Pydantic](https://pydantic-docs.helpmanual.io/), 
+see our [structured configuration](/structured) guide.

@@ -37,11 +37,13 @@ of precedence:
 -   `config.local.env`
 -   `config.env`
 
-!> We recommend you adding `*.local.*` to your `.gitignore` file
+!!! note 
+    We recommend you adding `*.local.*` to your `.gitignore` file
 
-!> With built-in support for environment specific configuration, the need for
-environment variables in parameterization is minimized, prefer directly writing
-YAML config instead.
+!!! note 
+    With built-in support for environment specific configuration, the need for
+    environment variables in parameterization is minimized, prefer directly writing
+    YAML config instead.
 
 Secrets and credentials are another thing. Due to their sensitvity, even during
 development, you **should never commit credentials to Git repo**! In this particular

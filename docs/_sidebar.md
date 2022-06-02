@@ -1,7 +1,0 @@
-* [Home](/ "Gamma Config")
-* [Writing configuration files](/writing-config.md)
-* [Using gamma-config](/using.md)
-* [Environment specific config](/environment.md)
-* [Built-in and custom tags](/tags.md)
-* [Multiple dispatch](/multi-dispatch.md)
-* [API Reference](/api.md)

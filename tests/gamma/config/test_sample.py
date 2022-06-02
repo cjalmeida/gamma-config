@@ -27,8 +27,9 @@ def test_load_sample(caplog, monkeypatch):
 
     # assert dot access
     assert config.sample_list_1 == [1, 2, 3]
-    assert not config.missing
-    assert not config.missing.subkey
+
+    with pytest.raises(AttributeError):
+        assert not config.missing
 
     with pytest.raises(AttributeError):
         assert not config._missing_underscore
