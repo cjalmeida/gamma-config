@@ -29,7 +29,7 @@ publish:
 
 .PHONY: test
 test:
-	pytest --junitxml=test-results/junit.xml --cov-report xml --cov=gamma tests/
+	pytest
 
 .PHONY: lint
 lint:

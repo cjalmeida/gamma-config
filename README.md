@@ -1,6 +1,6 @@
 # Gamma Config
 
-![python](https://img.shields.io/badge/python-3.7%2B-blue)
+![python](https://img.shields.io/badge/python-3.8%2B-blue)
 
 An opinionated way of setting up configuration for data science projects.
 
@@ -27,6 +27,7 @@ libraries to provide configuration in a common way.
 
 - When using the dot (`.`) syntax, missing values raise `AttributeError` instead of returning
   a false-y object.
+- Dropped support for Python 3.7
 
 ## Features
 
