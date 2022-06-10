@@ -50,7 +50,6 @@ jobs:
       - uses: actions/setup-node@master
         with:
           node-version: 14
-          cache: "npm"
 
       - name: Deploy
         uses: ./actions/actions-gh-pages@master
