@@ -52,7 +52,7 @@ jobs:
           node-version: 14
 
       - name: Deploy
-        uses: ./actions/actions-gh-pages@master
+        uses: ./.github/actions/actions-gh-pages@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
