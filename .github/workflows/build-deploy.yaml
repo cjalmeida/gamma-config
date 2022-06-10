@@ -30,6 +30,12 @@ jobs:
           export PYTHONPATH=$PWD
           make test
 
+      - name: build docs
+        run: |
+          . .venv/bin/activate
+          export PYTHONPATH=$PWD
+          make docs
+
       - name: archive code coverage results
         uses: actions/upload-artifact@master
         with:
@@ -53,11 +59,11 @@ jobs:
         with:
           node-version: 14
 
-      - name: Deploy
-        uses: ./.github/actions/actions-gh-pages
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+      - name: Publish
+        run: |
+          . .venv/bin/activate
+          export PYTHONPATH=$PWD
+          make publish-docs
 
   Publish:
     runs-on: [self-hosted, linux]
