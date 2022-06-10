@@ -52,7 +52,7 @@ jobs:
         run: |
           . .venv/bin/activate
           export PYTHONPATH=$PWD
-          make publish-docs
+          make publish-docs GH_AUTH="-u ${{ secrets.GITHUB_TOKEN }}"
 
 
   Publish:

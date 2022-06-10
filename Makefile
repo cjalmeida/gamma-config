@@ -36,7 +36,7 @@ publish:
 .PHONY: publish-docs
 publish-docs:
 	@$(MAKE) docs
-	npx gh-pages@2.0.1 -d site -t
+	npx gh-pages@2.0.1 -d site -t $(GH_AUTH)
 
 .PHONY: test
 test:
