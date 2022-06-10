@@ -25,17 +25,18 @@ jobs:
           . .venv/bin/activate
           make install
 
-      - name: run tests
+      - name: build / run tests
         run: |
           . .venv/bin/activate
           export PYTHONPATH=$PWD
+          make build
           make test
 
       - name: archive code coverage results
         uses: actions/upload-artifact@master
         with:
           name: code-coverage-report
-          path: test-results/junit.xml
+          path: cov.xml
 
       - name: archive whl
         uses: actions/upload-artifact@master
