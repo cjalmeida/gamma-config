@@ -53,7 +53,7 @@ jobs:
           cache: "npm"
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@master
+        uses: ./actions/actions-gh-pages@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public

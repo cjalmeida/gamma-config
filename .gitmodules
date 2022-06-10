@@ -1,0 +1,3 @@
+[submodule ".github/actions/actions-gh-pages"]
+	path = .github/actions/actions-gh-pages
+	url = https://github.com/peaceiris/actions-gh-pages.git
