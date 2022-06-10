@@ -48,5 +48,5 @@ lint:
 
 .PHONY: docs
 docs:
-	mkdocs build
+	python -m mkdocs build
 	

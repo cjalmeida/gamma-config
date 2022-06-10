@@ -14,7 +14,7 @@ plugins:
   - mkdocstrings
   - gen-files:
       scripts:
-        - docs/gen_api.py #
+        - docs/gen_api.py
   - section-index
   - literate-nav:
       nav_file: SUMMARY.md
