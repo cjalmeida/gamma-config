@@ -48,7 +48,8 @@ except:
     print("None")
 """
     )
-    env = {"PYTHONPATH": prepare_fixture["here"]}
+    env = os.environ.copy()
+    env["PYTHONPATH"] = prepare_fixture["here"]
     cwd = "_tmp"
     python = shutil.which("python")
     cmd = [python, "script.py"]
