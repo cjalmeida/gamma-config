@@ -11,6 +11,7 @@ jobs:
     runs-on: [self-hosted, linux]
     steps:
       - uses: actions/checkout@master
+
       - name: Set up Python
         uses: actions/setup-python@master
         with:
@@ -30,12 +31,6 @@ jobs:
           export PYTHONPATH=$PWD
           make test
 
-      - name: build docs
-        run: |
-          . .venv/bin/activate
-          export PYTHONPATH=$PWD
-          make docs
-
       - name: archive code coverage results
         uses: actions/upload-artifact@master
         with:
@@ -48,22 +43,17 @@ jobs:
           name: dist
           path: dist/*.whl
 
-  Docs:
-    runs-on: [self-hosted, linux]
-    steps:
-      - uses: actions/checkout@master
-        with:
-          submodules: recursive
-
-      - uses: actions/setup-node@master
+      - name: Set up Node
+        uses: actions/setup-node@master
         with:
           node-version: 14
 
-      - name: Publish
+      - name: Publish docs
         run: |
           . .venv/bin/activate
           export PYTHONPATH=$PWD
           make publish-docs
+
 
   Publish:
     runs-on: [self-hosted, linux]
@@ -75,13 +65,8 @@ jobs:
         with:
           name: dist
 
-      - name: pypi publish
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-
-      - name: Release
-        uses: softprops/action-gh-release@master
-        with:
-          files: dist/*
+      - name: Publish docs
+        run: |
+          . .venv/bin/activate
+          export PYTHONPATH=$PWD
+          make publish
