@@ -46,6 +46,8 @@ jobs:
     runs-on: [self-hosted, linux]
     steps:
       - uses: actions/checkout@master
+        with:
+          submodules: recursive
 
       - uses: actions/setup-node@master
         with:
