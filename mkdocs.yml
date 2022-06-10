@@ -9,7 +9,16 @@ theme:
   features:
     - navigation.instant
     - navigation.tracking
-    - navigation.expand
+
+plugins:
+  - mkdocstrings
+  - gen-files:
+      scripts:
+        - docs/gen_api.py #
+  - section-index
+  - literate-nav:
+      nav_file: SUMMARY.md
+
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -17,19 +26,19 @@ markdown_extensions:
   - pymdownx.superfences
   - admonition
 
-
 nav:
   - Home: README.md
-  
+
   - "User Guide":
-    - Writing configuration files: writing-config.md
-    - Using gamma-config: using.md
-    - Environment specific config: environment.md
-    - Built-in and custom tags: tags.md
-  
+      - Writing configuration files: writing-config.md
+      - Using gamma-config: using.md
+      - Environment specific config: environment.md
+      - Built-in tags: built-in-tags.md
+      - Custom tags: custom-tags.md
+
   - "How-to":
-    - "Structured configuration": structured.md 
-  
+      - "Structured configuration": structured.md
+
   - "Advanced":
-    - Multiple dispatch: multi-dispatch.md
-    - API Reference: api.md
+      - Multiple dispatch: multi-dispatch.md
+      - API Reference: api/

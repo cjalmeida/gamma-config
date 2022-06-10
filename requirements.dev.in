@@ -7,7 +7,6 @@ pytest
 pytest-cov
 flake8
 black
-pdbpp
 pip-tools
 wheel
 ipython
@@ -16,3 +15,7 @@ build
 twine
 mkdocs
 mkdocs-material
+mkdocs-gen-files
+mkdocstrings[python]
+mkdocs-literate-nav
+mkdocs-section-index
