@@ -1,6 +1,6 @@
 # Gamma Config
 
-![python](https://img.shields.io/badge/python-3.8%2B-blue)
+![python](https://img.shields.io/badge/python-3.8%2B-blue) ![build](https://github.gamma.bcg.com/BCG/gamma-config/actions/workflows/build-deploy.yaml/badge.svg)
 
 An opinionated way of setting up configuration for data science projects.
 
