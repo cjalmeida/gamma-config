@@ -1,3 +1,6 @@
 [submodule ".github/actions/actions-gh-pages"]
 	path = .github/actions/actions-gh-pages
 	url = https://github.com/peaceiris/actions-gh-pages.git
+[submodule ".github/actions/CodeCoverageSummary"]
+	path = .github/actions/CodeCoverageSummary
+	url = https://github.com/irongut/CodeCoverageSummary.git

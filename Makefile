@@ -41,6 +41,7 @@ publish-docs:
 .PHONY: test
 test:
 	pytest
+	python scripts/update-coverage.py
 
 .PHONY: lint
 lint:

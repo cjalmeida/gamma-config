@@ -62,4 +62,4 @@ except:
     cmd = [ipython, "script.py"]
     cp = subprocess.run(cmd, check=True, capture_output=True, env=env, cwd=cwd)
     out = cp.stdout.decode().strip()
-    assert out == expected_root
+    assert out.endswith(expected_root)
