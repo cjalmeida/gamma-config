@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@master
         with:
           python-version: "3.8"
 
@@ -31,13 +31,13 @@ jobs:
           make test
 
       - name: archive code coverage results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@master
         with:
           name: code-coverage-report
           path: test-results/junit.xml
 
       - name: archive whl
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@master
         with:
           name: dist
           path: dist/*.whl
@@ -45,15 +45,15 @@ jobs:
   Docs:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@master
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@master
         with:
           node-version: 14
           cache: "npm"
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
@@ -64,17 +64,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
           
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@master
         with:
           name: dist
 
       - name: pypi publish
-        uses: pypa/gh-action-pypi-publish@v1.5.0
+        uses: pypa/gh-action-pypi-publish@master
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@master
         with:
           files: dist/*
