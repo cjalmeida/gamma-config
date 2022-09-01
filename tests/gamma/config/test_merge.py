@@ -45,6 +45,12 @@ def test_merge():
     expect = {"foo": [1, 2, 3]}
     _test(a, b, expect)
 
+    # tes list of objects merging
+    a = "foo: [{a: 1, b: 1}, {c: 1, d: 1}]"
+    b = "foo: [{a: 2, b: 1}, {c: 1, d: 1}]"
+    expect = {"foo": [{"a": 1, "b": 1}, {"c": 1, "d": 1}, {"a": 2, "b": 1}]}
+    _test(a, b, expect)
+
     # test type replacement (1)
     a = "foo: [1, 2]"
     b = "foo: {b: 20, c: 30}"
