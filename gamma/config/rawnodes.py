@@ -48,9 +48,9 @@ def get_entry(node: MappingNode, key, *, default=...) -> Entry:
 
 
 @dispatch
-def is_equal(**kwargs) -> bool:
+def is_equal(a, b) -> bool:
     """Check if `a` is equal to `b`"""
-    return False
+    return a == b
 
 
 @dispatch
