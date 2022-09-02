@@ -48,37 +48,7 @@ def get_entry(node: MappingNode, key, *, default=...) -> Entry:
 
 
 @dispatch
-def is_equal(a: ScalarNode, b: MappingNode) -> bool:
-    """Check if `a` is equal to `b`"""
-    return False
-
-
-@dispatch
-def is_equal(a: MappingNode, b: ScalarNode) -> bool:
-    """Check if `a` is equal to `b`"""
-    return False
-
-
-@dispatch
-def is_equal(a: ScalarNode, b: SequenceNode) -> bool:
-    """Check if `a` is equal to `b`"""
-    return False
-
-
-@dispatch
-def is_equal(a: SequenceNode, b: ScalarNode) -> bool:
-    """Check if `a` is equal to `b`"""
-    return False
-
-
-@dispatch
-def is_equal(a: SequenceNode, b: MappingNode) -> bool:
-    """Check if `a` is equal to `b`"""
-    return False
-
-
-@dispatch
-def is_equal(a: MappingNode, b: SequenceNode) -> bool:
+def is_equal(**kwargs) -> bool:
     """Check if `a` is equal to `b`"""
     return False
 
