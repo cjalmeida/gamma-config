@@ -48,6 +48,38 @@ def get_entry(node: MappingNode, key, *, default=...) -> Entry:
 
 
 @dispatch
+def is_equal(**kwargs) -> bool:
+    """Check if `a` is equal to `b`"""
+    return False
+
+
+@dispatch
+def is_equal(a: SequenceNode, b: SequenceNode) -> bool:
+    """Check if `a` is equal to `b`"""
+    a_values = get_values(a)
+    b_values = get_values(b)
+    for value in a_values:
+        if value not in b_values:
+            return False
+    return True
+
+
+@dispatch
+def is_equal(a: MappingNode, b: MappingNode) -> bool:
+    """Check if `a` is equal to `b`"""
+    if a.tag != b.tag:
+        return False
+    a_keys = get_keys(a)
+    b_keys = get_keys(b)
+    for key in union_nodes(a_keys, b_keys):
+        _, a_entry = get_entry(a, key, default=None)
+        _, b_entry = get_entry(b, key, default=None)
+        if a_entry is None or b_entry is None or not is_equal(a_entry, b_entry):
+            return False
+    return True
+
+
+@dispatch
 def is_equal(a: ScalarNode, b) -> bool:
     """Check if `a` is equal to `b`"""
     return is_equal(a, as_node(b))
