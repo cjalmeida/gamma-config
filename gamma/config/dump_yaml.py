@@ -46,7 +46,7 @@ def to_yaml(cfg: ConfigNode, resolve_tags: bool):
 @dispatch
 def to_yaml(cfg: ConfigNode):
     """Render a ConfigNode assuming default of `resolve_tags` = True"""
-    return to_yaml(cfg, True, config=cfg)
+    return to_yaml(cfg, True)
 
 
 @dispatch

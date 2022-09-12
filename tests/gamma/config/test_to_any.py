@@ -1,9 +1,9 @@
-from gamma.config import RootConfig
-from gamma.config.dump_dict import to_dict
+import io
+from gamma.config import RootConfig, to_yaml, to_dict
 from gamma.config.tags import Tag
 from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode
-
+from ruamel.yaml import YAML
 
 def test_to_dict_basic():
 
@@ -59,3 +59,12 @@ def test_custom_dict_tag():
         assert d["a"] == 1
     finally:
         del render_node[MappingNode, CustomTag]
+
+
+def test_to_yaml_basic():
+    # test simple case
+    src = dict(a=1, b=2)
+    cfg = RootConfig("dummy", src)
+    content = to_yaml(cfg)
+    d = dict(YAML().load(io.StringIO(content)))
+    assert d == src
