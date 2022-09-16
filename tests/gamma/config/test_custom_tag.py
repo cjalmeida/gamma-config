@@ -39,7 +39,7 @@ def folder_fixture(monkeypatch):
         plugin.write_text(src.read_text())
 
         # copy config envs
-        for src in (here / "config.env", here / "config.local.env"):
+        for src in (here / ".env", here / ".env"):
             dst = base / src.name
             dst.write_text(src.read_text())
 
@@ -56,7 +56,6 @@ def folder_fixture(monkeypatch):
 
         # cleanup os.environ
         del os.environ["DUMMY_ENV"]
-        del os.environ["DUMMY_LOCAL_ENV"]
 
 
 def test_custom_plugins(folder_fixture):
@@ -72,4 +71,3 @@ def test_custom_plugins(folder_fixture):
     assert config["test"] == os.getenv("USER")
     assert config["test2"] == os.getenv("USER")
     assert os.getenv("DUMMY_ENV")
-    assert os.getenv("DUMMY_LOCAL_ENV")

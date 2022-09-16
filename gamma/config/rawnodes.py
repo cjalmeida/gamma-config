@@ -105,13 +105,10 @@ def as_node(a: Node) -> Node:
 def as_node(a) -> Node:
     """Return the `Node` representation of a given object.
 
-    This method handle basic scalar types.
+    This method handle primitive scalar types.
     """
 
-    # handle base types
-    if isinstance(a, str):
-        return ScalarNode("tag:yaml.org,2002:str", value=a)
-    elif isinstance(a, bool):
+    if isinstance(a, bool):
         return ScalarNode("tag:yaml.org,2002:bool", value=str(a))
     elif isinstance(a, int):
         return ScalarNode("tag:yaml.org,2002:int", value=str(a))
@@ -121,6 +118,14 @@ def as_node(a) -> Node:
         return ScalarNode("tag:yaml.org,2002:null", value="null")
     else:
         raise Exception(f"Can't handle type {type(a)} for value {a}")
+
+@dispatch
+def as_node(a: str) -> Node:
+    return ScalarNode("tag:yaml.org,2002:str", value=a)
+
+@dispatch
+def as_node(a: Iterable) -> Node:
+    return SequenceNode("tag:yaml.org,2002:seq", value=[as_node(x) for x in a])
 
 
 @dispatch

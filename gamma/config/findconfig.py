@@ -146,6 +146,8 @@ def load_dotenv(root: Path = None):
     import dotenv
 
     home = root.parent
+    dotenv.load_dotenv("./.env")
+    dotenv.load_dotenv(f"{home}/.env")
     dotenv.load_dotenv("./config.local.env")
     dotenv.load_dotenv(f"{home}/config.local.env")
     dotenv.load_dotenv("./config.env")

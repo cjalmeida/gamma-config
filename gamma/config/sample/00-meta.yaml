@@ -8,8 +8,7 @@
 
 # Extra folders to load. By default we include a relative folder dynamically set
 # by the 'ENVIRONMENT' environment variable.
-include_folders:
-  - !env ENVIRONMENT|None
+include_folders: !expr env.get('ENVIRONMENT', '').strip().split()
 
 # Custom Jinja2 environment provider
 # j2_env: my_app.my_module:my_env_func
