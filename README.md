@@ -18,12 +18,22 @@ configuration primarily based on YAML files. It promotes best practices by:
 Another benefit of a standard config mechanism is allowing Gamma extension
 libraries to provide configuration in a common way.
 
-## New in 0.5
+## Changelog
+
+### Breaking in 0.6 (unreleased)
+
+- `.env` files are loaded automatically and get precedence over `config.env`
+  and `config.local.env`.
+- Use of `config.env` and `config.local.env` is deprecated.
+- Default scaffolded `include_folder` interpret `ENVIRONMENT` variable string like
+  `foo bar` as two separate environment subfolders.
+
+### New in 0.5
 
 - We're now in PyPI!
 - Options for installing extra dependencies (eg. `jinja2`, `pydantic`)
 
-## Breaking changes in 0.5
+### Breaking changes in 0.5
 
 - When using the dot (`.`) syntax, missing values raise `AttributeError` instead of returning
   a false-y object.
