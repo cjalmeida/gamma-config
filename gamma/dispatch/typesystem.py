@@ -134,8 +134,8 @@ def issubtype(_type: Union[Type, Sig], _super: Union[Type, Sig]):
             - `issubtype(Foo, Union[str, Super]) == True` where `Foo -> Super`
             - `issubtype(str, Union[str, Super]) == True`
 
-        * `typing.Type`: is covariant on the type argument. `type` is treated as
-          `typing.Type[object]`
+        * `typing.Type`: is covariant on the type argument. `type` and `typing.Type` are
+        treated as `typing.Type[object]`
             - `issubtype(typing.Type[str], typing.Type[object]) == True`
             - `issubtype(typing.Type[str], type) == True`
 
@@ -165,8 +165,8 @@ def issubtype(_type: Union[Type, Sig], _super: Union[Type, Sig]):
         pass
 
     # normalize Type[type]
-    _type = typing.Type[object] if _type is type else _type
-    _super = typing.Type[object] if _super is type else _super
+    _type = typing.Type[object] if _type in (type, typing.Type) else _type
+    _super = typing.Type[object] if _super in (type, typing.Type) else _super
 
     type_orig = get_origin(_type)
     super_orig = get_origin(_super)

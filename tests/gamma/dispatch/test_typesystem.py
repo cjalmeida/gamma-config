@@ -1,5 +1,5 @@
 import typing
-from typing import Tuple, Union
+from typing import Tuple, Type, Union
 
 from gamma.dispatch.typesystem import Sig, SigSet, Vararg, is_more_specific, issubtype
 
@@ -95,6 +95,11 @@ def test_issubtype():
     assert issubtype(Foo, Union[SuperFoo, SuperBar])
     assert issubtype(Bar, Union[SuperFoo, SuperBar])
     assert issubtype(Bar, Union[Foo, Bar])
+
+
+def test_issubtype_type():
+    assert issubtype(Type[int], type)
+    assert issubtype(Type[int], Type)
 
 
 def test_equality():
