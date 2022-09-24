@@ -6,7 +6,7 @@ https://github.com/JeffBezanson/phdthesis/blob/master/main.pdf
 import inspect
 import itertools
 import typing
-from typing import Callable, Iterable, Optional, Tuple, Type, TypeVar, Union
+from typing import Callable, Iterable, Optional, Tuple, Type, TypeVar, Union, Any
 
 from .poset import VT, PODict, POSet
 
@@ -127,6 +127,7 @@ def issubtype(_type: Union[Type, Sig], _super: Union[Type, Sig]):
         `issubtype(list, List[object]) == False`
 
     The exceptions are:
+        * `typing.Any` is treated like `object`
         * `Tuple`: these are covariant. Eg:
             - `issubtype(Tuple[Foo], Tuple[Super]) == True` where `Foo -> Super`
 
@@ -149,6 +150,10 @@ def issubtype(_type: Union[Type, Sig], _super: Union[Type, Sig]):
     Also, we don't currently support the equivalent of `UnionAll`. This is not an issue
     since we don't support parametric dispatch, ie. `TypeVar`s in method signatures.
     """
+
+    # normalize Any
+    _type = object if _type is Any else _type
+    _super = object if _super is Any else _super
 
     # quick test of equality
     if _type is _super:
