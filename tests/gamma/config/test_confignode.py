@@ -1,7 +1,13 @@
 import time
 
 import pytest
-from gamma.config.confignode import ConfigNode, RootConfig, config_context, push_entry
+from gamma.config.confignode import (
+    ConfigNode,
+    RootConfig,
+    config_context,
+    push_entry,
+    push_folder,
+)
 from gamma.config.globalconfig import get_config, set_config
 from gamma.config.load import load_node
 
@@ -83,3 +89,20 @@ def test_config_context():
                 raise ValueError("Random exception")
         time.sleep(0.05)
         assert cfg["foo"] == 1
+
+
+def test_push_folder():
+    from pathlib import Path
+
+    folder = Path(__file__).parent / "config_folder"
+
+    cfg = RootConfig()
+    push_entry(cfg, "10-base.yaml", SIMPLE)
+
+    assert cfg["foo"]["bar"] != 1000
+    assert cfg["foo"]["zit"] != 1000
+
+    push_folder(cfg, folder)
+
+    assert cfg["foo"]["bar"] == 1000
+    assert cfg["foo"]["zit"] == 1000

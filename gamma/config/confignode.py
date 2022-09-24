@@ -2,7 +2,7 @@ import collections
 import re
 from contextlib import contextmanager
 from typing import Any, Dict, Iterable, Optional
-
+from pathlib import Path
 from gamma.config.load import load_node
 from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, Node, SequenceNode
@@ -107,6 +107,18 @@ class RootConfig(ConfigNode):
             if entry is None:
                 raise ValueError("Missing 'entry' argument")
             push_entry(self, entry_key, entry)
+
+
+@dispatch
+def push_folder(root: RootConfig, folder: Path) -> None:
+    """Push all entries in a given folder.
+
+    Note this will ignore any `00-meta.yaml` entries.
+    """
+    from .findconfig import get_entries
+
+    for key, entry in get_entries(folder, meta_include_folders=False):
+        push_entry(root, key, entry)
 
 
 @dispatch
