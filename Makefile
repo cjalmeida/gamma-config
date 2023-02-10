@@ -29,7 +29,6 @@ publish:
 .PHONY: publish-docs
 publish-docs:
 	@$(MAKE) docs
-	npm cache clean --force
 	npx gh-pages@2.0.1 -d site -t
 
 .PHONY: test
