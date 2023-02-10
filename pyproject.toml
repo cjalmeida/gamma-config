@@ -1,4 +1,5 @@
 [project]
+
 name = "gamma-config"
 dynamic = ["version"]
 description = "Config handling for data science projects"
@@ -16,21 +17,24 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
 ]
-
-
 [project.urls]
 Source = "https://github.gamma.bcg.com/BCG/gamma-config/"
 Documentation = "https://github.gamma.bcg.com/pages/BCG/gamma-config/"
 
+[project.optional-dependencies]
+jinja2 = ["jinja2 >= 3"]
+pydantic = ["pydantic >= 1.9"]
 
 [build-system]
 requires = ["pdm-pep517>=1.0.0"]
 build-backend = "pdm.pep517.api"
 
 [tool.pdm.version]
-source = "scm"
-write_to = "mypackage/__version__.py"
-write_template = "__version__ = '{}'"
+source = "file"
+path = "gamma/config/__version__.py"
+
+[tool.pdm.build]
+includes = ["gamma/config", "gamma/dispatch"]
 
 
 [tool.pdm.dev-dependencies]

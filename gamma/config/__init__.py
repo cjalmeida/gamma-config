@@ -1,5 +1,5 @@
 # flake8: noqa
-from .__version__ import __version__
+from gamma.config.__version__ import __version__
 
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 

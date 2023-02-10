@@ -1,4 +1,0 @@
-colorama >=0.4
-python-dateutil >=2,<3
-python-dotenv >=0.13
-ruamel.yaml >=0.16

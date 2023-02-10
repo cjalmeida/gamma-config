@@ -1,1 +1,1 @@
-__version__ = "dynamic"
+__version__ = "0.5.2"

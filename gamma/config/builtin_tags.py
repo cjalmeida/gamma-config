@@ -8,7 +8,6 @@ from typing import Any, Union
 from gamma.config.confignode import ConfigNode
 from gamma.config.dump_dict import to_dict
 from gamma.dispatch import dispatch
-from jinja2.runtime import StrictUndefined
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
@@ -105,6 +104,7 @@ def render_node(node: Node, tag: J2Tag, *, config=None, key=None, **ctx) -> Any:
     try:
         import jinja2
         import jinja2.exceptions
+        from jinja2.runtime import StrictUndefined
     except ModuleNotFoundError:  # pragma: no cover
         raise Exception(
             "Could not find Jinja2 installed. You must manually install it with "
