@@ -1,0 +1,54 @@
+[project]
+name = "gamma-config"
+dynamic = ["version"]
+description = "Config handling for data science projects"
+authors = [{ name = "Cloves Almeida", email = "cjalmeida@gmail.com" }]
+dependencies = [
+    "colorama>=0.4",
+    "python-dateutil<3,>=2",
+    "python-dotenv>=0.13",
+    "ruamel.yaml>=0.16",
+]
+requires-python = ">=3.8"
+readme = "README.md"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+]
+
+
+[project.urls]
+Source = "https://github.gamma.bcg.com/BCG/gamma-config/"
+Documentation = "https://github.gamma.bcg.com/pages/BCG/gamma-config/"
+
+
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
+
+[tool.pdm]
+version = { source = "scm" }
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "httpx>=0.23.3",
+    "jinja2>=3.1.2",
+    "pre-commit>=3.0.4",
+    "pytest>=7.2.1",
+    "pytest-cov>=4.0.0",
+    "black>=23.1.0",
+    "flake8>=5.0.4",
+    "ipython>=8.10.0",
+    "pydantic>=1.10.4",
+    "mkdocs>=1.4.2",
+    "mkdocs-material>=9.0.12",
+    "mkdocs-gen-files>=0.4.0",
+    "mkdocstrings[python]>=0.20.0",
+    "mkdocs-literate-nav>=0.6.0",
+    "mkdocs-section-index>=0.3.5",
+]
+
+[tool.pytest.ini_options]
+addopts = "--import-mode importlib --cov=gamma --cov-report term --cov-report xml:cov.xml"
+testpaths = "tests"
