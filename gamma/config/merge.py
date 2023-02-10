@@ -9,7 +9,7 @@ from ruamel.yaml.nodes import MappingNode, Node, SequenceNode
 
 from .rawnodes import get_item, get_keys, get_values, is_in, union_nodes
 
-hints_pattern = re.compile("^.*@hint: *?([A-Za-z0-9_]+) ?.*$")
+hints_pattern = re.compile("^.*@hint: *?([A-Za-z0-9_]+) ?.*$", re.MULTILINE)
 
 
 @dispatch
