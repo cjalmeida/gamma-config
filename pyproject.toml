@@ -27,8 +27,11 @@ Documentation = "https://github.gamma.bcg.com/pages/BCG/gamma-config/"
 requires = ["pdm-pep517>=1.0.0"]
 build-backend = "pdm.pep517.api"
 
-[tool.pdm]
-version = { source = "scm" }
+[tool.pdm.version]
+source = "scm"
+write_to = "mypackage/__version__.py"
+write_template = "__version__ = '{}'"
+
 
 [tool.pdm.dev-dependencies]
 dev = [
