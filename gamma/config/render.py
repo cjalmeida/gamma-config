@@ -103,13 +103,25 @@ def render_node(node: ScalarNode, tag: tags.Str, **args):
 @dispatch
 def render_node(node: ScalarNode, tag: tags.Int, **args):
     """Render scalar int"""
-    return int(node.value)
+    val = str(node.value)
+    if val.startswith("0o"):
+        return int(val, 8)
+    elif val.startswith("0x"):
+        return int(val, 16)
+    else:
+        return int(val)
 
 
 @dispatch
 def render_node(node: ScalarNode, tag: tags.Float, **args):
     """Render scalar float"""
-    return float(node.value)
+    val = str(node.value).lower()
+    if val == ".nan":
+        return float("nan")
+    elif val == ".inf":
+        return float("inf")
+    else:
+        return float(node.value)
 
 
 @dispatch
@@ -135,10 +147,8 @@ def render_node(node: ScalarNode, tag: tags.Bool, **args):
 
 @dispatch
 def render_node(node: ScalarNode, tag: tags.Timestamp, **args):
-    """Render timestamp node as `datetime.datetime`. Use `dateutil.parser` module"""
-    from dateutil import parser
-
-    return parser.parse(node.value)
+    """Timestamp is not part of Core Schema and are rendered as string."""
+    return str(node.value)
 
 
 @dispatch

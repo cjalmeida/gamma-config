@@ -21,10 +21,9 @@ def test_scalar_seq():
 
 
 def test_scalar_int():
-    node_a = load_node("foo: 1")
-    got = render_node(node_a)
-    want = {"foo": 1}
-    assert got == want
+    assert render_node(load_node("foo: 99"))["foo"] == 99
+    assert render_node(load_node("foo: 0o777"))["foo"] == 0o777
+    assert render_node(load_node("foo: 0xBEEF"))["foo"] == 0xBEEF
 
 
 def test_scalar_float():
@@ -32,6 +31,14 @@ def test_scalar_float():
     got = render_node(node_a)
     want = {"foo": 1.0}
     assert got == want
+
+
+def test_scalar_null():
+    assert render_node(load_node("foo: null"))["foo"] == None
+    assert render_node(load_node("foo: Null"))["foo"] == None
+    assert render_node(load_node("foo: NULL"))["foo"] == None
+    assert render_node(load_node("foo: "))["foo"] == None
+    assert render_node(load_node("foo: ~"))["foo"] == None
 
 
 def test_scalar_bool():
@@ -53,14 +60,24 @@ def test_scalar_bool():
     assert render_node(load_node("foo: !!bool no")) == {"foo": False}
 
 
-def test_scalar_timestamp():
-    from dateutil import parser
-
+def test_scalar_datetime():
     for v in ("2020-01-30", "2020-01-30T10:11:12", "2020-01-30T10:11:12Z"):
         node = load_node(f"foo: {v}")
         got = render_node(node)
-        want = {"foo": parser.parse(v)}
+        want = {"foo": v}  # should not render as date objects
         assert got == want
+
+
+def test_scalar_nan():
+    node = load_node(f"foo: .nan")
+    got = render_node(node)["foo"]
+    assert got != got  # NaN's are weird
+
+
+def test_scalar_inf():
+    node = load_node(f"foo: .inf")
+    got = render_node(node)["foo"]
+    assert got == float("inf")
 
 
 def test_render_uri():
