@@ -75,6 +75,7 @@ def test_hints():
     patch = load_node(
         """
         foo: # @hint: merge_replace
+          # this comment should be ok
           - 2
           - 3
         """
