@@ -1,4 +1,4 @@
-from typing import Dict, Type, Union
+from typing import Any, Dict, Type, Union
 
 import pytest
 from gamma.dispatch import DispatchError, dispatch
@@ -263,7 +263,6 @@ def test_cache_reset():
 
 
 def test_pending():
-
     # forward reference to types won't work for local classes
     assert global_temp(GlobalFoo()) == "foo"
 
@@ -294,7 +293,6 @@ def test_manual_setitem():
 
 
 def test_specialize1():
-
     sig1 = Sig(object, object)
     sig2 = Sig(SuperFoo, object)
     sig3 = Sig(Foo, object)
@@ -387,3 +385,28 @@ def test_dispatch_on_types():
     assert temp(Foo) == "foo"
     assert temp(Bar) == "bar"
     assert temp(str) == "anytype"
+
+
+def test_dispatch_on_any():
+    @dispatch
+    def temp1(a: Any):
+        return "fallback"
+
+    @dispatch
+    def temp1(a: int):
+        return 1
+
+    #
+
+    @dispatch
+    def temp2(a: Any, b: int):
+        return "fallback"
+
+    @dispatch
+    def temp2(a: int, b: int):
+        return 2
+
+    assert temp1(0) == 1
+    assert temp1(...) == "fallback"
+    assert temp2(0, 0) == 2
+    assert temp2(..., 0) == "fallback"
