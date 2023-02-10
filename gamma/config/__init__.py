@@ -1,6 +1,5 @@
 # flake8: noqa
-
-__version__ = "0.5.2"
+from gamma.config.__version__ import __version__
 
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 

@@ -1,0 +1,4 @@
+[flake8]
+exclude = docs,.git,tmp,.venv,_tmp,build,dist
+max-line-length = 88
+extend-ignore = F811

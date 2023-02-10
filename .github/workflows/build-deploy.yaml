@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - feat/pdm
     tags:
       - v*
 
@@ -10,6 +11,7 @@ jobs:
   Build:
     runs-on: [self-hosted, linux]
     steps:
+      - run: echo "${HOME}/.local/bin" >> $GITHUB_PATH
       - uses: actions/checkout@master
         with:
           submodules: recursive
@@ -24,14 +26,16 @@ jobs:
 
       - name: install requirements
         run: |
+          curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 -
           . .venv/bin/activate
-          make install
+          pdm install --dev
 
       - name: build / run tests
         run: |
           . .venv/bin/activate
           export PYTHONPATH=$PWD
           make build
+          make lint
           make test
 
       - name: archive whl
@@ -50,6 +54,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIT_AUTHOR_NAME: Github Actions
           GIT_AUTHOR_EMAIL: noreply@github.gamma.bcg.com
+          npm_config_cache: ./npm-cache
         run: |
           . .venv/bin/activate
           export PYTHONPATH=$PWD
@@ -66,7 +71,7 @@ jobs:
         with:
           name: dist
 
-      - name: Publish docs
+      - name: Publish
         run: |
           . .venv/bin/activate
           export PYTHONPATH=$PWD

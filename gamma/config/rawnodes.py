@@ -119,9 +119,11 @@ def as_node(a) -> Node:
     else:
         raise Exception(f"Can't handle type {type(a)} for value {a}")
 
+
 @dispatch
 def as_node(a: str) -> Node:
     return ScalarNode("tag:yaml.org,2002:str", value=a)
+
 
 @dispatch
 def as_node(a: Iterable) -> Node:
