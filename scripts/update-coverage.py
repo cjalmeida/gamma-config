@@ -1,7 +1,7 @@
-import xml.etree.ElementTree as ET
 import re
-from urllib.parse import quote
+import xml.etree.ElementTree as ET
 from pathlib import Path
+from urllib.parse import quote
 
 tree = ET.parse("cov.xml")
 root = tree.getroot()
@@ -17,7 +17,7 @@ else:
     color = "green"
 
 file = Path("README.md")
-old_part = r'badge/coverage-.+?-.+?\)'
+old_part = r"badge/coverage-.+?-.+?\)"
 new_part = rf"badge/coverage-{covp}-{color})"
 content = file.read_text()
 content = re.sub(old_part, new_part, content)

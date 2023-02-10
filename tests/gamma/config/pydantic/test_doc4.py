@@ -1,5 +1,6 @@
-from gamma.config import RootConfig
 from typing import List
+
+from gamma.config import RootConfig
 from gamma.config.pydantic import ConfigStruct
 
 

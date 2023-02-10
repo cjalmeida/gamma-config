@@ -1,6 +1,6 @@
-from gamma.config import RootConfig
 from typing import List
-from gamma.config import to_dict
+
+from gamma.config import RootConfig, to_dict
 from gamma.config.pydantic import ConfigStruct
 
 

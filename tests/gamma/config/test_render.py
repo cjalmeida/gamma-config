@@ -34,11 +34,11 @@ def test_scalar_float():
 
 
 def test_scalar_null():
-    assert render_node(load_node("foo: null"))["foo"] == None
-    assert render_node(load_node("foo: Null"))["foo"] == None
-    assert render_node(load_node("foo: NULL"))["foo"] == None
-    assert render_node(load_node("foo: "))["foo"] == None
-    assert render_node(load_node("foo: ~"))["foo"] == None
+    assert render_node(load_node("foo: null"))["foo"] is None
+    assert render_node(load_node("foo: Null"))["foo"] is None
+    assert render_node(load_node("foo: NULL"))["foo"] is None
+    assert render_node(load_node("foo: "))["foo"] is None
+    assert render_node(load_node("foo: ~"))["foo"] is None
 
 
 def test_scalar_bool():
@@ -69,13 +69,13 @@ def test_scalar_datetime():
 
 
 def test_scalar_nan():
-    node = load_node(f"foo: .nan")
+    node = load_node("foo: .nan")
     got = render_node(node)["foo"]
     assert got != got  # NaN's are weird
 
 
 def test_scalar_inf():
-    node = load_node(f"foo: .inf")
+    node = load_node("foo: .inf")
     got = render_node(node)["foo"]
     assert got == float("inf")
 

@@ -3,10 +3,10 @@ import shutil
 from pathlib import Path
 from typing import NamedTuple
 
-import pkg_resources
-
 import colorama
+import pkg_resources
 from colorama import Fore, Style
+
 from gamma.dispatch import dispatch
 
 ENTRYPOINT_GROUP = "gamma.config.scaffold"

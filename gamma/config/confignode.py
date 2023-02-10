@@ -1,8 +1,9 @@
 import collections
 import re
 from contextlib import contextmanager
-from typing import Any, Dict, Iterable, Optional
 from pathlib import Path
+from typing import Any, Dict, Iterable, Optional
+
 from gamma.config.load import load_node
 from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, Node, SequenceNode

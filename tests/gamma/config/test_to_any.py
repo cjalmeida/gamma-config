@@ -1,9 +1,10 @@
 import io
-from gamma.config import RootConfig, to_yaml, to_dict
+
+from gamma.config import RootConfig, to_dict, to_yaml
 from gamma.config.tags import Tag
 from gamma.dispatch import dispatch
-from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml import YAML
+from ruamel.yaml.nodes import MappingNode
 
 
 def test_to_dict_basic():

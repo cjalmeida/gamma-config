@@ -183,4 +183,3 @@ For example, consider you have a `data` folder located as a sibling to
 ```yaml
 my_var: !path data/hello_world.csv
 ```
-
