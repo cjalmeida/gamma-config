@@ -54,6 +54,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIT_AUTHOR_NAME: Github Actions
           GIT_AUTHOR_EMAIL: noreply@github.gamma.bcg.com
+          npm_config_cache: ./npm-cache
         run: |
           . .venv/bin/activate
           export PYTHONPATH=$PWD
