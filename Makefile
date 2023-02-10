@@ -1,5 +1,14 @@
 SHELL=/bin/bash
 
+.PHONY: install
+install:
+	pdm --version
+	pdm install
+
+.PHONY: build
+build:
+	pdm build
+
 
 .PHONY: publish
 publish:
@@ -12,7 +21,7 @@ publish:
 #   # PyPI Release
 	. .env && \
 	twine check dist/* && \
-	twine upload --verbose -u __token__ -p "$$TEST_PYPY_TOKEN" dist/*
+	twine upload --verbose -u __token__ -p "$$PYPY_TOKEN" dist/*
 
 #	# Docs
 	@$(MAKE) publish-docs

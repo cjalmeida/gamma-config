@@ -35,6 +35,7 @@ jobs:
           . .venv/bin/activate
           export PYTHONPATH=$PWD
           make build
+          make lint
           make test
 
       - name: archive whl
