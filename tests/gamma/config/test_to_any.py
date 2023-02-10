@@ -5,8 +5,8 @@ from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml import YAML
 
-def test_to_dict_basic():
 
+def test_to_dict_basic():
     # test simple case
     src = dict(a=1, b=2)
     cfg = RootConfig("dummy", src)
