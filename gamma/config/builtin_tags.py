@@ -188,17 +188,22 @@ def render_node(node: ScalarNode, tag: PyTag, *, path=None, **ctx) -> Any:
     foo: !py:myapp.mymodule:myfunc 100
     bar: !py:myapp.mymodule:myfunc "100"
     zig: !py:myapp.mymodule:myfunc a value
+    zag: !py:myapp.mymodule:myfunc
     ```
 
     Will call the function `myfunc` in `myapp.mymodule` module with the arguments:
     - `type(value) == int; value == 100` for `foo`
     - `type(value) == str; value == "100"` for `bar`
     - `type(value) == str; value == "a value"` for `zig`
+    - no argument passed
     """
 
     func = _py_tag_get_func("py", path)
     val = yaml.load(node.value)
-    return func(val)
+    if val:
+        return func(val)
+    else:
+        return func()
 
 
 # process: !py

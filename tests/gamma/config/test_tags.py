@@ -7,7 +7,6 @@ from gamma.config.builtin_tags import RefTag
 
 
 def test_ref():
-
     # simple access
     root = RootConfig("dummy", {"foo": {"bar": 100}})
     node = ScalarNode("!ref", "foo.bar")
@@ -69,6 +68,10 @@ def make_list(val):
     return [val]
 
 
+def hello():
+    return "world"
+
+
 def test_py_tag():
     mod = __name__
     src = f"""
@@ -76,13 +79,16 @@ def test_py_tag():
         a: !py:{mod}:make_list 1
         b: !py:{mod}:make_double
             - 2
+    hello: !py:{mod}:hello
     """
 
-    foo = RootConfig("dummy", src).foo
+    cfg = RootConfig("dummy", src)
+    foo = cfg["foo"]
     assert isinstance(foo, MyObj)
     assert isinstance(foo.val, dict)
     assert foo.val["a"] == [1]
     assert foo.val["b"] == [4]
+    assert cfg["hello"] == "world"
 
 
 def test_obj_tag():

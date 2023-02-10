@@ -33,6 +33,7 @@ libraries to provide configuration in a common way.
     `foo bar` as two separate environment subfolders.
 -   (dispatch) `Val` arguments passed as class (eg. `foo(Val['bar'])`) will be converted
     to instance, as if it were called `foo(Val['bar']())`
+-   The `!py:<module>:<func>` will no longer a single `None` argument
 
 ### New in 0.5
 
