@@ -11,6 +11,7 @@ jobs:
   Build:
     runs-on: [self-hosted, linux]
     steps:
+      - run: echo "${HOME}/.local/bin" >> $GITHUB_PATH
       - uses: actions/checkout@master
         with:
           submodules: recursive
@@ -25,8 +26,8 @@ jobs:
 
       - name: install requirements
         run: |
+          curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 -
           . .venv/bin/activate
-          pip install --user pdm
           pdm install --dev
 
       - name: build / run tests
