@@ -1,21 +1,5 @@
 SHELL=/bin/bash
 
-.PHONY: install
-install:
-	pip install -U pip wheel
-	pip install -r requirements.txt -r requirements.dev.txt
-	pip install -e .
-
-.PHONY: compile-deps
-compile-deps:
-	pip-compile requirements.in -q
-	pip-compile requirements.dev.in -q
-
-.PHONY: build
-build:
-	rm dist gamma_config.egg-info -rf
-	python -m build
-
 
 .PHONY: publish
 publish:
@@ -28,7 +12,7 @@ publish:
 #   # PyPI Release
 	. .env && \
 	twine check dist/* && \
-	twine upload --verbose -u __token__ -p "$$PYPY_TOKEN" dist/*
+	twine upload --verbose -u __token__ -p "$$TEST_PYPY_TOKEN" dist/*
 
 #	# Docs
 	@$(MAKE) publish-docs
@@ -50,4 +34,3 @@ lint:
 .PHONY: docs
 docs:
 	python -m mkdocs build
-	

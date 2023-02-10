@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - feat/pdm
     tags:
       - v*
 
@@ -25,7 +26,8 @@ jobs:
       - name: install requirements
         run: |
           . .venv/bin/activate
-          make install
+          pip install --user pdm
+          pdm install --dev
 
       - name: build / run tests
         run: |
@@ -66,7 +68,7 @@ jobs:
         with:
           name: dist
 
-      - name: Publish docs
+      - name: Publish
         run: |
           . .venv/bin/activate
           export PYTHONPATH=$PWD
