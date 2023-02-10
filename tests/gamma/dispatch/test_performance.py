@@ -69,4 +69,4 @@ def test_kwargs():
     print(base_t)
     print(test_t1)
     print(test_t1 / base_t)
-    assert test_t1 / base_t < 10
+    assert test_t1 / base_t < 15

@@ -251,6 +251,28 @@ class dispatch:
             msg += "\n"
         return msg
 
+    def _normalize_args(self, args):
+        """Normalize arguments prior to call, if needed.
+
+        We implement this by calling the `__normalize__(obj)` class method if it's
+        present.
+
+        This function exists mainly for conveniently passing `Val` types as class or
+        instance.
+        """
+
+        if not any(hasattr(x, "__normalize__") for x in args):
+            return args
+
+        newargs = []
+        for arg in args:
+            normalize = getattr(arg, "__normalize__", None)
+            if normalize:
+                newargs.append(normalize(arg))
+            else:
+                newargs.append(arg)
+        return newargs
+
     def __call__(self, *args, **kwargs):
         """Resolve and dispatch to best method."""
         try:
@@ -260,6 +282,8 @@ class dispatch:
             func = self.cache.get(key)
             if not func:
                 func = self.find_method(key)
+
+            args = self._normalize_args(args)
 
             try:
                 return func(*args, **kwargs)

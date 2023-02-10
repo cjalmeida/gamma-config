@@ -65,7 +65,6 @@ def test_parametric_deco():
 
 
 def test_parametric_dispatch():
-
     # create value type hierarchy
     @parametric
     class Tag:
@@ -164,13 +163,15 @@ def test_type_system():
 
 
 def test_dispatch_valuetype():
-
     ATag = Val["A"]
 
     @dispatch
     def fun(a):
+        # should return an instance regardless if a type was passed
+        assert isinstance(a, Val)
+        assert isinstance(a, ATag)
         return "ok"
 
     # should dispatch parametric types on instance or on the type itself
-    assert fun(ATag()) == "ok"
     assert fun(ATag) == "ok"
+    assert fun(ATag()) == "ok"

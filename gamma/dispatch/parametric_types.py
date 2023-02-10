@@ -84,6 +84,12 @@ class ValMeta(ParametricMeta):
         vals = cls.values
         return vals and vals[0] or None
 
+    def __normalize__(cls, obj):
+        """Convert Val types to instances prior to sending to function."""
+        if isinstance(obj, type):
+            return obj()
+        return obj
+
 
 class Val(metaclass=ValMeta):
     """Generic parametric class with easy value accessors"""
