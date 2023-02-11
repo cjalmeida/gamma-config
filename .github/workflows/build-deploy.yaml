@@ -65,6 +65,7 @@ jobs:
     environment: pypi
     runs-on: [self-hosted, linux]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs: Build
     steps:
       - uses: actions/checkout@v2.4.0
 
