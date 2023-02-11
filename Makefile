@@ -9,6 +9,11 @@ install:
 build:
 	pdm build
 
+.PHONY: tag-push
+	VERSION=$$(python -c 'from gamma.config import __version__; print(__version__)') && \
+	git tag -a $$VERSION
+	git push --follow-tags
+
 
 .PHONY: publish
 publish:

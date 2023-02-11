@@ -44,6 +44,11 @@ jobs:
           name: dist
           path: dist/*.whl
 
+      - name: Check archives
+        run: |
+          . .venv/bin/activate
+          twine check dist/*
+
       - name: Set up Node
         uses: actions/setup-node@master
         with:
@@ -73,8 +78,19 @@ jobs:
         with:
           name: dist
 
-      - name: Publish
+      - name: Set up Python
+        uses: actions/setup-python@master
+        with:
+          python-version: "3.8"
+
+      - name: create venv and install deps
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install twine
+
+      - name: Publish to GH and PyPI
         run: |
           . .venv/bin/activate
-          export PYTHONPATH=$PWD
-          make publish
+          gh release create `git describe` --notes "New release" dist/*
+          twine upload --verbose -u __token__ -p "$$PYPY_TOKEN" dist/*
