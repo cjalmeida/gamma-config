@@ -62,6 +62,7 @@ jobs:
           make publish-docs
 
   Publish:
+    environment: pypi
     runs-on: [self-hosted, linux]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     steps:
