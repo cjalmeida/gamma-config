@@ -20,6 +20,10 @@ CONFIG_FIND_ORDER = [FindEnv, FindLocal, FindJupyter]
 CONFIG_ROOT_ENV = "GAMMA_CONFIG_ROOT"
 
 
+class MissingMetaConfigFile(Exception):
+    pass
+
+
 @dispatch
 def get_entries() -> List[Tuple[str, Any]]:
     """Discover the config root folder and get all entries"""
@@ -70,6 +74,15 @@ def get_config_root() -> Path:
         root = get_config_root(mech())
         if root is not None:
             return root
+
+    config_folder = Path("config").absolute()
+    if config_folder.exists():
+        raise MissingMetaConfigFile(
+            f"We found a config folder at '{config_folder}' "
+            f"but no '00-meta.yaml' file. You must have a '00-meta.yaml' file at the "
+            f"config folder location even if it's empty."
+        )
+
     raise Exception("Cannot locate a gamma config root in any expected location.")
 
 

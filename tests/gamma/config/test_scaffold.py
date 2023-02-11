@@ -8,7 +8,6 @@ import pytest
 
 @pytest.fixture
 def test_cwd():
-
     with tempfile.TemporaryDirectory() as td:
         cwd = os.getcwd()
         os.chdir(td)
@@ -35,3 +34,21 @@ def test_scaffold(test_cwd):
     with tempfile.TemporaryDirectory() as td:
         scaffold(target=td, force=False)
         assert (Path(td) / "config/00-meta.yaml").exists()
+
+
+def test_missing_meta_warning(test_cwd):
+    from gamma.config.scaffold import scaffold
+    from gamma.config import get_config
+    from gamma.config.findconfig import MissingMetaConfigFile
+
+    # test cwd
+    scaffold(target=None, force=False)
+    meta = Path(test_cwd) / "config/00-meta.yaml"
+    assert meta.exists()
+
+    # remove meta for testing
+    meta.unlink()
+
+    # load config
+    with pytest.raises(MissingMetaConfigFile):
+        _ = get_config()
