@@ -98,7 +98,7 @@ Most of the magic happen via tags. Look at the documentation for info on the [bu
 
 ## Changelog
 
-### Breaking in 0.6 (unreleased)
+### Breaking in 0.6
 
 -   Strict support for [YAML 1.2 Core Schema](https://yaml.org/spec/1.2.1/#id2804923).
     In practice, unquoted ISO8610 dates (eg. `2022-12-20`) won't get converted
@@ -113,7 +113,7 @@ Most of the magic happen via tags. Look at the documentation for info on the [bu
     to instance, as if it were called `foo(Val['bar']())`
 -   The `!py:<module>:<func>` will no longer a single `None` argument
 
-### New in 0.6 (unreleased)
+### New in 0.6
 
 -   Support for [YAML Anchors and Aliases](https://www.educative.io/blog/advanced-yaml-syntax-cheatsheet#anchors)
 

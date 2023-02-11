@@ -100,4 +100,4 @@ jobs:
           . .venv/bin/activate
           twine check dist/*
           gh release create $GITHUB_REF_NAME --repo $GITHUB_REPOSITORY --notes "New release $GITHUB_REF_NAME" dist/*
-          twine upload --verbose -u __token__ -p "$$PYPY_TOKEN" dist/*
+          twine upload --verbose -u __token__ -p "$PYPY_TOKEN" dist/*
