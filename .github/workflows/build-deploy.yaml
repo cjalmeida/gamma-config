@@ -93,7 +93,7 @@ jobs:
       - name: Publish to GH and PyPI
         env:
           GH_HOST: github.gamma.bcg.com
-          GH_ENTERPRISE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ENTERPRISE_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
           PYPY_TOKEN: ${{ secrets.PYPY_TOKEN }}
           GH_DEBUG: 1
         run: |
