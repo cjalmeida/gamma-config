@@ -92,11 +92,11 @@ jobs:
 
       - name: Publish to GH and PyPI
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ENTERPRISE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_HOST: github.gamma.bcg.com
         run: |
           . .venv/bin/activate
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.gamma.bcg.com/${GITHUB_REPOSITORY}.git
           twine check dist/*
-          gh auth login --hostname github.gamma.bcg.com
           gh release create $GITHUB_REF_NAME --notes "New release $GITHUB_REF_NAME" dist/*
           twine upload --verbose -u __token__ -p "$$PYPY_TOKEN" dist/*
