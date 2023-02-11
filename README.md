@@ -18,34 +18,6 @@ configuration primarily based on YAML files. It promotes best practices by:
 Another benefit of a standard config mechanism is allowing Gamma extension
 libraries to provide configuration in a common way.
 
-## Changelog
-
-### Breaking in 0.6 (unreleased)
-
--   Strict support for [YAML 1.2 Core Schema](https://yaml.org/spec/1.2.1/#id2804923).
-    In practice, unquoted ISO8610 dates (eg. `2022-12-20`) won't get converted
-    to `datetime.date` or `datetime.datetime` objects. Use `!date` or `!datetime`
-    if needed.
--   `.env` files are loaded automatically and get precedence over `config.env`
-    and `config.local.env`.
--   Use of `config.env` and `config.local.env` is deprecated.
--   Default scaffolded `include_folder` interpret `ENVIRONMENT` variable string like
-    `foo bar` as two separate environment subfolders.
--   (dispatch) `Val` arguments passed as class (eg. `foo(Val['bar'])`) will be converted
-    to instance, as if it were called `foo(Val['bar']())`
--   The `!py:<module>:<func>` will no longer a single `None` argument
-
-### New in 0.5
-
--   We're now in PyPI!
--   Options for installing extra dependencies (eg. `jinja2`, `pydantic`)
-
-### Breaking changes in 0.5
-
--   When using the dot (`.`) syntax, missing values raise `AttributeError` instead of returning
-    a false-y object.
--   Dropped support for Python 3.7
-
 ## Features
 
 -   Configuration expressed as a set of YAML files (by defaul) inside a
@@ -123,6 +95,38 @@ def run():
 ```
 
 Most of the magic happen via tags. Look at the documentation for info on the [built-in tags](tags) available.
+
+## Changelog
+
+### Breaking in 0.6 (unreleased)
+
+-   Strict support for [YAML 1.2 Core Schema](https://yaml.org/spec/1.2.1/#id2804923).
+    In practice, unquoted ISO8610 dates (eg. `2022-12-20`) won't get converted
+    to `datetime.date` or `datetime.datetime` objects. Use `!date` or `!datetime`
+    if needed.
+-   `.env` files are loaded automatically and get precedence over `config.env`
+    and `config.local.env`.
+-   Use of `config.env` and `config.local.env` is deprecated.
+-   Default scaffolded `include_folder` interpret `ENVIRONMENT` variable string like
+    `foo bar` as two separate environment subfolders.
+-   (dispatch) `Val` arguments passed as class (eg. `foo(Val['bar'])`) will be converted
+    to instance, as if it were called `foo(Val['bar']())`
+-   The `!py:<module>:<func>` will no longer a single `None` argument
+
+### New in 0.6 (unreleased)
+
+-   Support for [YAML Anchors and Aliases](https://www.educative.io/blog/advanced-yaml-syntax-cheatsheet#anchors)
+
+### New in 0.5
+
+-   We're now in PyPI!
+-   Options for installing extra dependencies (eg. `jinja2`, `pydantic`)
+
+### Breaking changes in 0.5
+
+-   When using the dot (`.`) syntax, missing values raise `AttributeError` instead of returning
+    a false-y object.
+-   Dropped support for Python 3.7
 
 ## Copyright
 

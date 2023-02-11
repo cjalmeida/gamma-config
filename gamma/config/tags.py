@@ -17,6 +17,7 @@ Float = Tag.of("tag:yaml.org,2002:float")
 Bool = Tag.of("tag:yaml.org,2002:bool")
 Timestamp = Tag.of("tag:yaml.org,2002:timestamp")
 Null = Tag.of("tag:yaml.org,2002:null")
+Merge = Tag.of("tag:yaml.org,2002:merge")
 
 
 class TagException(Exception):

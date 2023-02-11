@@ -4,6 +4,8 @@ from typing import Any, Hashable, Iterable, Optional, Tuple
 from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
+from . import tags
+
 Entry = Tuple[Node, Optional[Node]]
 
 
@@ -37,7 +39,23 @@ def get_entry(node: MappingNode, key, *, default=...) -> Entry:
     Raise:
         `KeyError` if key not found and `default` not provided
     """
+
+    merge_tag = tags.Merge().name
+    map_tag = tags.Map().name
+
+    # collect possible values, handling anchors
+    values = []
     for item_key, item_value in node.value:
+        # handle anchor merge
+        if item_key.tag == merge_tag and item_value.tag == map_tag:
+            for sub_key, sub_value in item_value.value:
+                values.append((sub_key, sub_value))
+        else:
+            values.append((item_key, item_value))
+
+    # iterate on items in *reverse* order due to potential duplicates from anchor
+    # overrides
+    for item_key, item_value in values[::-1]:
         if is_equal(key, item_key):
             return item_key, item_value
 

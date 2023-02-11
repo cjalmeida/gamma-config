@@ -24,9 +24,17 @@ class ConfigNode(collections.abc.Mapping):
 
     You when accessing keys by attribute `eg: config.foo` they'll return an empty
     `ConfigNode` instead of raising an `AttributeError`.
-
-
     """
+
+    __slots__ = [
+        "_node",
+        "_root",
+        "_key",
+        "_frozen",
+        "_parent",
+        "_dot_access",
+        "_root_nodes",
+    ]
 
     def __init__(
         self,
@@ -50,7 +58,8 @@ class ConfigNode(collections.abc.Mapping):
 
     def __getitem__(self, key):
         ctx = dict(config=self, dump=False)
-        return config_getitem(self, key, **ctx)
+        with _allow_dot_access(self._root):
+            return config_getitem(self, key, **ctx)
 
     def __iter__(self):  # pragma: no cover
         from .render import render_node
@@ -61,8 +70,11 @@ class ConfigNode(collections.abc.Mapping):
         return config_len(self)
 
     def __getattr__(self, key):
-        if key.startswith("__"):
+        if key.startswith("__") or key in self.__slots__:
             return object.__getattribute__(self, key)
+
+        if not self._root._dot_access:
+            _except_dot_access()
 
         try:
             return self[key]
@@ -84,6 +96,14 @@ class ConfigNode(collections.abc.Mapping):
             object.__setattr__(self, name, value)
 
 
+def _except_dot_access():
+    raise ValueError(
+        "Accessing config entries via dot (.) is deprecated. "
+        "If you need the old behavior for compatibility, set "
+        "'__enable_dot_access__: true' in 'config/00-meta.yaml'"
+    )
+
+
 class RootConfig(ConfigNode):
     """A root config object.
 
@@ -94,20 +114,43 @@ class RootConfig(ConfigNode):
     New entries should be inserted with the push_entry` function.
     The entries are always iterated in `entry_key` lexicographical
     sort order and this affects merge results.
+
+    Initialize the object, optionally adding a single entry. See
+        [`push_entry`](api?id=push_entry).
+
+    If `entry_key` is `None`, a dynamically generated entry key will be created.
     """
 
     def __init__(self, entry_key: Optional[str] = None, entry=None) -> None:
-        """
-        Initialize the object, optionally adding a single entry. See
-        [`push_entry`](api?id=push_entry).
-        """
         self._root_nodes: Dict[str, MappingNode] = collections.OrderedDict()
+        self._dot_access = False
         super().__init__(node=None, root=self, parent=None)
 
-        if entry_key is not None:
+        if bool(entry_key) or bool(entry):
+            _allow_unsafe = False
+            if entry_key is None:
+                entry_key = create_last_entry_key(self)
+                _allow_unsafe = True
+
             if entry is None:
                 raise ValueError("Missing 'entry' argument")
-            push_entry(self, entry_key, entry)
+
+            push_entry(self, entry_key, entry, _allow_unsafe=_allow_unsafe)
+
+
+@contextmanager
+def _allow_dot_access(root: RootConfig):
+    """Context manager to temporarily allow dot access.
+
+    Used to enable dot access within renderer such as `!j2` and `!ref`."""
+
+    if root is not None:
+        state = root._dot_access
+        root._dot_access = True
+        yield
+        root._dot_access = state
+    else:
+        yield
 
 
 @dispatch
@@ -163,6 +206,18 @@ def push_entry(
     # sort by entry_key
     s = collections.OrderedDict(sorted(d.items(), key=lambda x: x[0]))
     root._root_nodes = s
+
+    if entry_key == "00-meta.yaml":
+        _update_meta_features(root)
+
+
+def _update_meta_features(root: RootConfig):
+    try:
+        root._dot_access = config_getitem(
+            root, "__enable_dot_access__", config=root, dump=False
+        )
+    except KeyError:
+        pass
 
 
 @dispatch

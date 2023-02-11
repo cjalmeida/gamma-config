@@ -26,6 +26,7 @@ def test_load_sample(caplog, monkeypatch):
     assert config["deep"]["lvl1"]["lvl2"]["lvl3"] == "foobar_dev"
 
     # assert dot access
+    config._dot_access = True
     assert config.sample_list_1 == [1, 2, 3]
 
     with pytest.raises(AttributeError):
@@ -33,6 +34,7 @@ def test_load_sample(caplog, monkeypatch):
 
     with pytest.raises(AttributeError):
         assert not config._missing_underscore
+    config._dot_access = False
 
     # reset config and test other env
     reset_config()

@@ -32,9 +32,9 @@ def test_simple_config():
     assert cfg["foo"]["zit"] is None
 
 
-def test_attribute_access():
-    node = load_node(SIMPLE)
-    cfg = ConfigNode(node)
+def test_attribute_dot_access():
+    META = SIMPLE + "\n__enable_dot_access__: True"
+    cfg = RootConfig("00-meta.yaml", META)
     assert cfg.foo.bar == 1
     assert cfg.foo.zoo == [1, 2, 3]
     assert cfg.foo.sub.bar == 10

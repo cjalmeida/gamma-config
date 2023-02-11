@@ -11,8 +11,8 @@ def test_root_config_merge():
     b = "{foo: baz, ping: pong}"
     push_entry(root, "a1", a)
     push_entry(root, "b1", b)
-    assert root.foo == "baz"
-    assert root.ping == "pong"
+    assert root["foo"] == "baz"
+    assert root["ping"] == "pong"
 
     keys = set([render_node(k) for k in get_keys(root)])
     assert keys == set(["foo", "ping"])

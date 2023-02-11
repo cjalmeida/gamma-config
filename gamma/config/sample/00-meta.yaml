@@ -6,9 +6,14 @@
 # file, so you're not able to use expressions that references other configs here.
 ####
 
-# Extra folders to load. By default we include a relative folder dynamically set
-# by the 'ENVIRONMENT' environment variable.
+# Extra folders to load. By default we include a relative folders dynamically set
+# by the 'ENVIRONMENT' environment variable. You can specify multiple folders
+# by separating them via space.
 include_folders: !expr env.get('ENVIRONMENT', '').strip().split()
 
 # Custom Jinja2 environment provider
 # j2_env: my_app.my_module:my_env_func
+
+# Accessing config entries via dot (.) is deprecated, but you can enable it
+# by setting the below to True.
+__enable_dot_access__: False

@@ -29,9 +29,9 @@ def test_ref_sibling():
     """
 
     cfg = RootConfig("dummy", src)
-    assert cfg.b.ref_a == "foo"
-    assert cfg.a == "foo"
-    assert cfg.b.sib == "foo"
+    assert cfg["b"]["ref_a"] == "foo"
+    assert cfg["a"] == "foo"
+    assert cfg["b"]["sib"] == "foo"
 
 
 def test_ref_to_dict():
@@ -101,7 +101,7 @@ def test_obj_tag():
         b: 2
     """
 
-    foo = RootConfig("dummy", src).foo
+    foo = RootConfig("dummy", src)["foo"]
     assert isinstance(foo, MyObj2)
     assert foo.a == 1
     assert foo.b == 2
@@ -116,7 +116,7 @@ def test_path_tag():
     foo: !path ..{test_path_fragment}
     """
 
-    foo = RootConfig("dummy", src).foo
+    foo = RootConfig("dummy", src)["foo"]
 
     assert str(foo).endswith(test_path_fragment)
     assert Path(foo).is_absolute()
