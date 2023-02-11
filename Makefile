@@ -10,8 +10,9 @@ build:
 	pdm build
 
 .PHONY: tag-push
-	VERSION=$$(python -c 'from gamma.config import __version__; print(__version__)') && \
-	git tag -a $$VERSION
+tag-push:
+	@VERSION=v$$(python -c 'from gamma.config import __version__; print(__version__)') && \
+	git tag -a $$VERSION -m "Bump to version $$VERSION" && \
 	git push --follow-tags
 
 

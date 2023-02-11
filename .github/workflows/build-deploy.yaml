@@ -90,6 +90,8 @@ jobs:
           pip install twine
 
       - name: Publish to GH and PyPI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           . .venv/bin/activate
           gh release create `git describe` --notes "New release" dist/*
