@@ -95,5 +95,5 @@ jobs:
         run: |
           . .venv/bin/activate
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.gamma.bcg.com/${GITHUB_REPOSITORY}.git
-          gh release create `git describe --tags` --notes "New release" dist/*
+          gh release create $GITHUB_REF_NAME --notes "New release $GITHUB_REF_NAME" dist/*
           twine upload --verbose -u __token__ -p "$$PYPY_TOKEN" dist/*
