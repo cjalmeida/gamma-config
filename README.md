@@ -35,7 +35,7 @@ libraries to provide configuration in a common way.
 -   Simplified key access via dot (`.`). Eg. for `config: {foo: {bar: 100}}`,
     this is True: `config.foo.bar == 100`
 
-[Click here to view the full documentation](https://github.gamma.bcg.com/pages/BCG/gamma-config/)
+[Click here to view the full documentation](https://cjalmeida.github.io/gamma-config/)
 
 ## Getting started
 
