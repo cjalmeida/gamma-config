@@ -55,6 +55,7 @@ dev = [
     "mkdocs-literate-nav>=0.6.0",
     "mkdocs-section-index>=0.3.5",
     "ghp-import>=2.1.0",
+    "twine>=4.0.2",
 ]
 
 [tool.pytest.ini_options]
