@@ -98,6 +98,17 @@ Most of the magic happen via tags. Look at the documentation for info on the [bu
 
 ## Changelog
 
+### Breaking in 0.7
+
+-   We've **DEPRECATED** our homegrown multiple dispatch system `gamma.dispatch` by
+    [`plum`][plum]. Unless you were using `gamma.dispatch` directly, or extending via
+    [custom tags][custom tags], no need to worry. The `gamma.dispatch` package will be
+    removed by release 1.0.
+
+### New in 0.7
+
+-   We have a new home in github.com/cjalmeida/gamma-config !
+
 ### Breaking in 0.6
 
 -   Strict support for [YAML 1.2 Core Schema](https://yaml.org/spec/1.2.1/#id2804923).
@@ -117,19 +128,17 @@ Most of the magic happen via tags. Look at the documentation for info on the [bu
 
 -   Support for [YAML Anchors and Aliases](https://www.educative.io/blog/advanced-yaml-syntax-cheatsheet#anchors)
 
-### New in 0.5
-
--   We're now in PyPI!
--   Options for installing extra dependencies (eg. `jinja2`, `pydantic`)
-
 ### Breaking changes in 0.5
 
 -   When using the dot (`.`) syntax, missing values raise `AttributeError` instead of returning
     a false-y object.
 -   Dropped support for Python 3.7
 
-## Copyright
+### New in 0.5
 
-Copyright 2021 Boston Consulting Group, all rights reserved.
+-   We're now in PyPI!
+-   Options for installing extra dependencies (eg. `jinja2`, `pydantic`)
 
-[structured]: https://github.gamma.bcg.com/pages/BCG/gamma-config/structured
+[structured]: https://cjalmeida.github.io/gamma-config/structured/
+[plum]: https://github.com/beartype/plum
+[custom tags]: https://cjalmeida.github.io/gamma-config/custom-tags/

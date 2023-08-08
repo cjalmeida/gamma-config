@@ -1,10 +1,10 @@
 # Multiple dispatch
 
-From the version `0.3.x` on, `gamma-config` was rewritten to use
-[multiple dispatch](https://en.wikipedia.org/wiki/Multiple_dispatch) as core paradigm
-instead of typical class based object orientation. All multiple dispatch code is
-under the `gamma.dispatch` namespace and I might create a dedicated library in the
-future.
+From the version `0.3.x` on, `gamma-config` was rewritten to use [multiple
+dispatch](https://en.wikipedia.org/wiki/Multiple_dispatch) as core paradigm instead of
+typical class based object orientation. We hade our own homegrown multiple dispatch
+infrastructure (`gamma.dispatch`) that was replaced in `0.7.x` by
+[plum][plum]
 
 ## Rationale
 
@@ -26,9 +26,8 @@ This is actually **a solved problem** for most languages, including Python, usin
 variety of techniques, where multiple dispatch is one of them (and probably the most
 elegant). But what sets Julia apart is that it's the only language where multiple
 dispatch is the core paradigm. This means that **idiomatic Julia code is easily amenable
-to extension** (and performant). In contrast in most languages you have be very explict
-about extensibility, adding unwarranted complexity, something frowned upon by the
-[You-Aint-Gonna-Need-It](https://martinfowler.com/bliki/Yagni.html) principle.
+to extension** (and performant). In contrast, in most languages you have be very explict
+about extensibility, adding unwarranted complexity.
 
 Interestingly, the impact of multiple dispatch on code reuse was an unplanned
 side-effect. I recommend watching the following presentation by one of Julia creators:
@@ -37,16 +36,14 @@ side-effect. I recommend watching the following presentation by one of Julia cre
 frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 allowfullscreen></iframe>
 
-For a number of reasons, I don't think we should go full Julia (yet). But what if
-idiomatic Python code had the same level of extensibility? Python is flexible enough
-that we could "bend the rules" and, with some tooling, make multiple-dispatch a first
-class citizen by convention. My (long shot) bet is that with a little
-coordination, we could greatly improve code reuse across cases.
+We believe idiomatic Python code can have the same level of extensibility. Python is
+flexible enough that we could "bend the rules" and, with some code, make
+multiple-dispatch a first class citizen by convention. 
 
 ## Dispatch rules
 
 Multiple dispatch works in a intuitive way for the large majority of the time. Since
-there's no canonical set of rules, I followed to Julia docs and behavior on
+there's no canonical set of rules, I (and [plum]) followed to Julia docs and behavior on
 [function](https://docs.julialang.org/en/v1/manual/functions)
 and [methods](https://docs.julialang.org/en/v1/manual/methods). We also share the same
 terminology of generic "functions" and associated "methods".
@@ -60,7 +57,7 @@ keyworkd-only arguments (those after `_`or`\*args`) are not considered for dispa
 Consider the example below:
 
 ```py
-from gamma.dispatch import dispatch
+from plum import dispatch
 
 
 @dispatch
@@ -128,90 +125,8 @@ assert foo(1, 2.0) == "second"
 assert foo(1) == "second"           # it has changed!
 ```
 
-To minimize confusion, this will log a "warning" telling you about the side-effect.
-If you do want to overwrite the method, you can pass `@dispatch(overwrite=True)`.
-
-### Namespaced dispatch
-
-In some applications, having to import all functions into the local scope in order to
-register a dispatch can be annoying. An alternative is to use a "configuration module"
-where you can register your own "namespaced" dispatch function.
-
-```py
-# in myapp/__init__.py
-from gamma.dispatch import dispatch as base_dispatch
-
-dispatch = base_dispatch(namespace="myapp")
-
-# load dependent modules
-import myapp.foo
-import myapp.bar
-```
-
-Then you can use the namespaced dispatch decorator to register dispatch methods without
-needing to import them
-
-```py
-# in myapp/foo.py
-
-from myapp import dispatch
-
-@dispatch
-def my_func(a: int):
-    ...
-
-```
-
-```py
-# in myapp/bar.py
-
-@dispatch          # <-- note that no import of `my_func` is needed!
-def my_func(a: str):
-    ...
-```
-
-### Ensure specialization
-
-We also added the `specialize` keyword to ensure a dispatch specializes a function.
-This is useful when writing modular applications to enforce some form of contract
-between components.
-
-```py
-# will break if no dispatched `my_func` exists in the local context / namespace.
-@dispatch(specialize=True)
-def my_func(a: str):
-    ...
-```
-
-This also works in conjunction with the "namespace" feature.
-
-```py
-# in myapp/__init__.py
-from gamma.dispatch import dispatch as base_dispatch
-
-dispatch = base_dispatch(namespace="myapp")
-specialize = base_dispatch(namespace="myapp", specialize=True)
-
-@dispatch  # base function
-def my_func(a):
-    ...
-
-@specialize  # specialization
-def my_func(a):
-    ...
-```
-
-The check is applied on function loading, so **import order matters**. So you should
-architect your application to ensure base modules are loaded before specialized modules.
-
-
-### Parametric dispatch
-
-_TODO_
-
-### Missing features
-
--   Type/length constraints for variadic arguments
+If you want to use multiple dispatch in your own codebase, I strongly recommend 
+reading [plum] docs.
 
 ### Other considerations
 
@@ -219,9 +134,8 @@ _TODO_
     dispatch. It's still pretty fast for most purposes, just avoid using it in "hot"
     loops.
 
--   Tie-breaking is done via the output of `type.mro()` (Method Resolution Order). We
-    still support dynamic subclass definition via `__subclasshook__`, but limited
-    tie-breaking since we can't determine the proper type hierarchy.
-
 -   Multiple inheritance may also introduce ambiguities or non-obvious behavior to
     dispatch tie-breaking.
+
+
+[plum]: https://github.com/beartype/plum
