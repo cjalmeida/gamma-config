@@ -10,7 +10,10 @@ on:
 jobs:
   Build:
     runs-on: ubuntu-latest
-
+    
+    permissions:
+      contents: write
+    
     steps:
       - run: echo "${HOME}/.local/bin" >> $GITHUB_PATH
       
