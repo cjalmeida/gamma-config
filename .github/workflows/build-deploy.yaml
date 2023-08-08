@@ -72,6 +72,9 @@ jobs:
 
     permissions:
       id-token: write
+      contents: write
+      discussions: write
+
     environment:
       name: pypi
       url: https://pypi.org/p/gamma-config
