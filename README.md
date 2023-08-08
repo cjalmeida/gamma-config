@@ -107,7 +107,7 @@ Most of the magic happen via tags. Look at the documentation for info on the [bu
 
 ### New in 0.7
 
--   We have a new home in github.com/cjalmeida/gamma-config !
+-   We have a new home in https://github.com/cjalmeida/gamma-config !
 
 ### Breaking in 0.6
 
