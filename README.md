@@ -100,10 +100,10 @@ Most of the magic happen via tags. Look at the documentation for info on the [bu
 
 ### Breaking in 0.7
 
--   We've **DEPRECATED** our homegrown multiple dispatch system `gamma.dispatch` by
-    [`plum`][plum]. Unless you were using `gamma.dispatch` directly, or extending via
-    [custom tags][custom tags], no need to worry. The `gamma.dispatch` package will be
-    removed by release 1.0.
+-   We've **DEPRECATED** our homegrown multiple dispatch system `gamma.dispatch`,
+    replacing it by [`plum`][plum]. Unless you were using `gamma.dispatch` directly, or
+    extending via [custom tags][custom tags], no need to worry. The `gamma.dispatch`
+    package will be removed by release 1.0.
 
 ### New in 0.7
 
