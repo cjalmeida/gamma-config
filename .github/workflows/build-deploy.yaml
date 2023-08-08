@@ -3,20 +3,19 @@ on:
   push:
     branches:
       - master
-      - feat/pdm
     tags:
       - v*
 
 jobs:
   Build:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: write
-    
+
     steps:
       - run: echo "${HOME}/.local/bin" >> $GITHUB_PATH
-      
+
       - uses: actions/checkout@master
         with:
           submodules: recursive
@@ -67,10 +66,16 @@ jobs:
           publish_dir: ./site
 
   Publish:
-    environment: pypi
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     needs: Build
+
+    permissions:
+      id-token: write
+    environment:
+      name: pypi
+      url: https://pypi.org/p/gamma-config
+
     steps:
       - uses: actions/checkout@master
 
@@ -79,25 +84,34 @@ jobs:
           name: dist
           path: dist
 
-      - name: Set up Python
-        uses: actions/setup-python@master
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          python-version: "3.8"
+          files: dist/*
 
-      - name: create venv and install deps
-        run: |
-          python -m venv .venv
-          . .venv/bin/activate
-          pip install twine
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
 
-      - name: Publish to GH and PyPI
-        env:
-          GH_HOST: github.gamma.bcg.com
-          GH_ENTERPRISE_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
-          PYPY_TOKEN: ${{ secrets.PYPY_TOKEN }}
-          GH_DEBUG: 1
-        run: |
-          . .venv/bin/activate
-          twine check dist/*
-          gh release create $GITHUB_REF_NAME --repo $GITHUB_REPOSITORY --notes "New release $GITHUB_REF_NAME" dist/*
-          twine upload --verbose -u __token__ -p "$PYPY_TOKEN" dist/*
+      # - name: Set up Python
+      #   uses: actions/setup-python@master
+      #   with:
+      #     python-version: "3.8"
+
+      # - name: create venv and install deps
+      #   run: |
+      #     python -m venv .venv
+      #     . .venv/bin/activate
+      #     pip install twine
+
+      # - name: Publish to GH and PyPI
+      #   env:
+      #     GH_HOST: github.gamma.bcg.com
+      #     GH_ENTERPRISE_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
+      #     PYPY_TOKEN: ${{ secrets.PYPY_TOKEN }}
+      #     GH_DEBUG: 1
+      #   run: |
+      #     . .venv/bin/activate
+      #     twine check dist/*
+      #     gh release create $GITHUB_REF_NAME --repo $GITHUB_REPOSITORY --notes "New release $GITHUB_REF_NAME" dist/*
+      #     twine upload --verbose -u __token__ -p "$PYPY_TOKEN" dist/*
