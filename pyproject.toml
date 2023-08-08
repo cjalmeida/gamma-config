@@ -63,4 +63,4 @@ dev = [
 
 [tool.pytest.ini_options]
 addopts = "--import-mode importlib --cov=gamma.config --cov-report term --cov-report xml:cov.xml"
-testpaths = "tests"
+testpaths = "tests/gamma/config"

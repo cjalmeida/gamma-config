@@ -1,6 +1,6 @@
 # Gamma Config
 
-![python](https://img.shields.io/badge/python-3.8%2B-blue) ![build](https://github.com/cjalmeida/gamma-config/actions/workflows/build-deploy.yaml/badge.svg) ![cov](https://img.shields.io/badge/coverage-91%25-green)
+![python](https://img.shields.io/badge/python-3.8%2B-blue) ![build](https://github.com/cjalmeida/gamma-config/actions/workflows/build-deploy.yaml/badge.svg) ![cov](https://img.shields.io/badge/coverage-96%25-green)
 
 An opinionated way of setting up configuration for data science projects.
 
