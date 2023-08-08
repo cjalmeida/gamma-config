@@ -4,9 +4,10 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional
 
-from gamma.config.load import load_node
-from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, Node, SequenceNode
+
+from gamma.config import dispatch
+from gamma.config.load import load_node
 
 from . import tags
 from .merge import merge_nodes
@@ -339,7 +340,7 @@ def create_last_entry_key(cfg: RootConfig) -> str:
 
 @dispatch
 @contextmanager
-def config_context(cfg: RootConfig, partial) -> None:
+def config_context(cfg: RootConfig, partial) -> Any:
     entry_key = create_last_entry_key(cfg)
     push_entry(cfg, entry_key, partial, _allow_unsafe=True)
     try:
@@ -350,7 +351,7 @@ def config_context(cfg: RootConfig, partial) -> None:
 
 @dispatch
 @contextmanager
-def config_context(partial) -> None:
+def config_context(partial) -> Any:
     from gamma.config.globalconfig import get_config
 
     cfg = get_config()

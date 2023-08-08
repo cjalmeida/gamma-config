@@ -1,6 +1,7 @@
 import time
 
 import pytest
+
 from gamma.config.confignode import (
     ConfigNode,
     RootConfig,
@@ -22,7 +23,6 @@ foo:
 
 
 def test_simple_config():
-
     node = load_node(SIMPLE)
     cfg = ConfigNode(node)
     assert isinstance(cfg["foo"], ConfigNode)
@@ -41,6 +41,21 @@ def test_attribute_dot_access():
 
     with pytest.raises(AttributeError):
         assert bool(cfg.foo.notexist) == False  # noqa
+
+
+def test_deprecated_dot_access():
+    cfg = RootConfig(
+        "dummy",
+        """
+        foo:
+            bar: 1
+        """,
+    )
+
+    assert cfg["foo"]["bar"] == 1
+
+    with pytest.raises(ValueError, match="deprecated"):
+        assert cfg.foo.bar == 1
 
 
 def test_guards():

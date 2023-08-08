@@ -1,4 +1,5 @@
 import pytest
+
 from gamma.dispatch.poset import PODict, POSet
 
 

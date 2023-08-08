@@ -1,5 +1,6 @@
-from gamma.config import RootConfig
 from pydantic import BaseModel
+
+from gamma.config import RootConfig
 
 
 class Dataset(BaseModel):

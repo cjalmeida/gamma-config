@@ -3,9 +3,10 @@
 import logging
 from typing import Any, Optional
 
-from gamma.config.confignode import ConfigNode, RootConfig  # noqa
-from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
+
+from gamma.config import dispatch
+from gamma.config.confignode import ConfigNode, RootConfig  # noqa
 
 from . import tags
 from .rawnodes import get_entries, get_values

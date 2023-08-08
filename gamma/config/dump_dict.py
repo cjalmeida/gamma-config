@@ -1,6 +1,7 @@
-from gamma.config.confignode import ConfigNode
-from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, SequenceNode
+
+from gamma.config import dispatch
+from gamma.config.confignode import ConfigNode
 
 from .render import render_node
 from .tags import Map, Seq

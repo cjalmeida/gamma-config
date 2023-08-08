@@ -1,8 +1,9 @@
 from typing import List
 
-from gamma.config.pydantic import ConfigStruct, URIConfigStruct
 from pydantic import BaseModel
 from ruamel.yaml import YAML
+
+from gamma.config.pydantic import ConfigStruct, URIConfigStruct
 
 CONFIG = """
 objects:

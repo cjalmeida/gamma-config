@@ -7,7 +7,7 @@ import colorama
 import pkg_resources
 from colorama import Fore, Style
 
-from gamma.dispatch import dispatch
+from gamma.config import dispatch
 
 ENTRYPOINT_GROUP = "gamma.config.scaffold"
 

@@ -37,9 +37,9 @@ def test_scaffold(test_cwd):
 
 
 def test_missing_meta_warning(test_cwd):
-    from gamma.config.scaffold import scaffold
     from gamma.config import get_config
     from gamma.config.findconfig import MissingMetaConfigFile
+    from gamma.config.scaffold import scaffold
 
     # test cwd
     scaffold(target=None, force=False)

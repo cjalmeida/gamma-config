@@ -49,7 +49,9 @@ level0:
   bar1: !j2 Custom = {{ custom_var }}
 ```
 
-The value of `foo1` is the string `Number = 100`. The value of `level0.bar1` is `Custom = myvalue` because we defined `_context` in a parent node. See the section on [extending the render context](tags?id=extending-the-render-context) to add your own variables.
+The value of `foo1` is the string `Number = 100`. The value of `level0.bar1` is `Custom
+= myvalue` because we defined `_context` in a parent node. See the section on [extending
+the render context](tags?id=extending-the-render-context) to add your own variables.
 
 We also provide `!j2_secret` to be used when dealing with sensitive data
 

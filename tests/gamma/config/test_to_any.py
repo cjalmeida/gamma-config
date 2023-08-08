@@ -1,10 +1,10 @@
 import io
 
-from gamma.config import RootConfig, to_dict, to_yaml
-from gamma.config.tags import Tag
-from gamma.dispatch import dispatch
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode
+
+from gamma.config import RootConfig, dispatch, to_dict, to_yaml
+from gamma.config.tags import Tag
 
 
 def test_to_dict_basic():
@@ -40,26 +40,23 @@ def test_to_dict_basic():
 
 def test_custom_dict_tag():
     src = """
-    foo: !customdict
+    foo: !test_any_customdict
         a: 1
     """
 
     from gamma.config.render import render_node
 
-    CustomTag = Tag["!customdict"]
-    try:
+    CustomTag = Tag["!test_any_customdict"]
 
-        @dispatch
-        def render_node(node: MappingNode, tag: CustomTag, **ctx):
-            # force render to dict even if tagged
-            return to_dict(node)
+    @dispatch
+    def render_node(node: MappingNode, tag: CustomTag, **ctx):
+        # force render to dict even if tagged
+        return to_dict(node)
 
-        cfg = RootConfig("dummy", src)
-        d = cfg["foo"]
-        assert type(d) == dict
-        assert d["a"] == 1
-    finally:
-        del render_node[MappingNode, CustomTag]
+    cfg = RootConfig("dummy", src)
+    d = cfg["foo"]
+    assert type(d) == dict
+    assert d["a"] == 1
 
 
 def test_to_yaml_basic():

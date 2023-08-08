@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import NamedTuple
 
+import pytest
+
 from gamma.config import RootConfig, ScalarNode, render_node, to_dict
 from gamma.config.builtin_tags import RefTag
 
@@ -91,6 +93,26 @@ def test_py_tag():
     assert cfg["hello"] == "world"
 
 
+def test_exceptions():
+    mod = __name__
+
+    with pytest.raises(Exception, match="invalid reference"):
+        cfg = RootConfig("dummy", f"hello: !py:{mod}.hello")
+        assert cfg["hello"] == "world"
+
+    with pytest.raises(Exception, match="missing"):
+        cfg = RootConfig("dummy", f"hello: !py {mod}.hello")
+        assert cfg["hello"] == "world"
+
+    with pytest.raises(Exception, match="not found"):
+        cfg = RootConfig("dummy", "hello: !py:wrong_module:hello")
+        assert cfg["hello"] == "world"
+
+    with pytest.raises(Exception, match="not found"):
+        cfg = RootConfig("dummy", f"hello: !py:{mod}:wrong_function")
+        assert cfg["hello"] == "world"
+
+
 def test_obj_tag():
     mod = __name__
     src = f"""
@@ -120,3 +142,46 @@ def test_path_tag():
 
     assert str(foo).endswith(test_path_fragment)
     assert Path(foo).is_absolute()
+
+
+def _custom_j2_env():
+    from jinja2 import Environment
+
+    return Environment()
+
+
+def test_j2_env():
+    from gamma.config.builtin_tags import j2_cache
+
+    src = """
+    j2_env: %(mod)s:_custom_j2_env
+    myval: !j2 "{{ 2 + 2 }} = 4"
+    """ % {
+        "mod": __name__
+    }
+
+    try:
+        # remove j2 env cache
+        if hasattr(j2_cache, "env"):
+            del j2_cache.env
+
+        cfg = RootConfig("dummy", src)
+        myval = cfg["myval"]
+        assert myval == "4 = 4"
+
+    finally:
+        if hasattr(j2_cache, "env"):
+            del j2_cache.env
+
+
+def test_j2_strict():
+    src = """
+    myok: !j2 "hello {{ 'world' }}"
+    myval: !j2 "{{ foo }} = foo"
+    """
+    cfg = RootConfig("dummy", src)
+
+    assert cfg["myok"] == "hello world"
+
+    with pytest.raises(ValueError, match="render"):
+        cfg["myval"]

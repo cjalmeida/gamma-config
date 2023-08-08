@@ -1,9 +1,10 @@
 import pytest
+from ruamel.yaml.nodes import Node
+
+from gamma.config import dispatch
 from gamma.config.load import load_node
 from gamma.config.render import RenderDispatchError, render_node
 from gamma.config.tags import Tag
-from gamma.dispatch import dispatch
-from ruamel.yaml.nodes import Node
 
 
 def test_scalar_str():
@@ -97,28 +98,26 @@ def test_render_uri():
     Bar = Tag["!bar"]
     BarC = Tag["!bar:c"]
 
-    try:
+    @dispatch
+    def render_node(node: Node, tag: Foo, **ctx):
+        return f"foo-{node.value}"
 
-        @dispatch
-        def render_node(node: Node, tag: Foo, **ctx):
-            return f"foo-{node.value}"
+    @dispatch
+    def render_node(node: Node, tag: Bar, **ctx):
+        assert ctx["path"]
+        return f"bar-{node.value}"
 
-        @dispatch
-        def render_node(node: Node, tag: Bar, **ctx):
-            assert ctx["path"]
-            return f"bar-{node.value}"
+    @dispatch
+    def render_node(node: Node, tag: BarC, **ctx):
+        assert ctx.get("path") is None
+        return f"bar-c-{node.value}"
 
-        @dispatch
-        def render_node(node: Node, tag: BarC, **ctx):
-            assert ctx.get("path") is None
-            return f"bar-c-{node.value}"
+    d = render_node(node)
+    assert d["a"] == "foo-1"
+    assert d["b"] == "bar-2"
+    assert d["c"] == "bar-c-3"
 
-        d = render_node(node)
-        assert d["a"] == "foo-1"
-        assert d["b"] == "bar-2"
-        assert d["c"] == "bar-c-3"
-
-    finally:
-        del render_node[Node, Foo]
-        del render_node[Node, Bar]
-        del render_node[Node, BarC]
+    # note: no neat way to delete methods yet on plum
+    # del render_node[Node, Foo]
+    # del render_node[Node, Bar]
+    # del render_node[Node, BarC]

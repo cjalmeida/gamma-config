@@ -1,8 +1,9 @@
 """Module implementing convenience methods for dealing with `ruamel.yaml` `Node`s"""
 from typing import Any, Hashable, Iterable, Optional, Tuple
 
-from gamma.dispatch import dispatch
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
+
+from gamma.config import dispatch
 
 from . import tags
 
@@ -17,7 +18,7 @@ def get_keys(node: MappingNode) -> Iterable[Node]:
 
 
 @dispatch
-def get_item(node: MappingNode, key, *, default=...) -> Node:
+def get_item(node: MappingNode, key, *, default=...) -> Optional[Node]:
     """Get a single child node item from `map` node"""
     for item_key, item_value in node.value:
         if is_equal(key, item_key):
@@ -74,11 +75,16 @@ def is_equal(a, b) -> bool:
 @dispatch
 def is_equal(a: SequenceNode, b: SequenceNode) -> bool:
     """Check if `a` is equal to `b`"""
-    a_values = get_values(a)
-    b_values = get_values(b)
-    for value in a_values:
-        if value not in b_values:
+    a_values = list(get_values(a))
+    b_values = list(get_values(b))
+
+    if len(a_values) != len(b_values):
+        return False
+
+    for i in range(len(a_values)):
+        if not is_equal(a_values[i], b_values[i]):
             return False
+
     return True
 
 

@@ -3,8 +3,10 @@ from io import IOBase, StringIO
 from pathlib import Path
 from typing import Dict
 
-from gamma.dispatch import dispatch, parametric
+from plum import parametric
 from ruamel.yaml.nodes import Node
+
+from gamma.config import dispatch
 
 
 @parametric

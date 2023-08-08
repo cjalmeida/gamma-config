@@ -1,4 +1,5 @@
 import pytest
+
 from gamma.dispatch import dispatch as base_dispatch
 from gamma.dispatch.dispatchsystem import DispatchError
 

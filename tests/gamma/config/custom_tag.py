@@ -1,8 +1,7 @@
 # let's load the gamma-config plugins module
 import os
 
-from gamma.config import ScalarNode, Tag, render_node
-from gamma.dispatch import dispatch
+from gamma.config import ScalarNode, Tag, dispatch
 
 # create a tag handler for !myenv
 MyEnvTag = Tag["!myenv"]

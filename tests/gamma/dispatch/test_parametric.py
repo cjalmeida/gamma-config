@@ -1,4 +1,5 @@
 import pytest
+
 from gamma.dispatch import ParametricMeta, Val, dispatch, parametric
 from gamma.dispatch.dispatchsystem import Sig, issubtype
 
@@ -119,8 +120,9 @@ def test_also_of():
 
 
 def test_union():
-    from gamma.dispatch import parametric, dispatch
     from typing import Union
+
+    from gamma.dispatch import dispatch, parametric
 
     @parametric
     class Tag:

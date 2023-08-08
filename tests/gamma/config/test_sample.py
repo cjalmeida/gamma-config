@@ -60,8 +60,9 @@ def test_env_default(monkeypatch):
 
 
 def test_sample_dump():
-    from gamma.config import get_config, to_yaml, to_dict
     from ruamel.yaml import YAML
+
+    from gamma.config import get_config, to_dict, to_yaml
 
     # load default config
     config = get_config()
@@ -104,8 +105,9 @@ def test_sample_dump():
 
 def test_expression(monkeypatch):
     monkeypatch.setenv("USER", "dummy")
-    from gamma.config import get_config
     import os
+
+    from gamma.config import get_config
 
     config = get_config()
 

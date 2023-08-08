@@ -74,6 +74,7 @@ def base_provider(**kwargs):
     - `c` -> the global RootConfig
     """
     import os
+
     from .globalconfig import get_config
 
     return [

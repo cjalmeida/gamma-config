@@ -5,11 +5,12 @@ import os
 import threading
 from typing import Any, Union
 
-from gamma.config.confignode import ConfigNode
-from gamma.config.dump_dict import to_dict
-from gamma.dispatch import dispatch
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
+
+from gamma.config import dispatch
+from gamma.config.confignode import ConfigNode
+from gamma.config.dump_dict import to_dict
 
 from .findconfig import get_config_root
 from .render import render_node
@@ -34,7 +35,7 @@ j2_cache = threading.local()
 
 
 @dispatch
-def render_node(node: Node, tag: EnvTag, **ctx) -> str:
+def render_node(node: Node, tag: EnvTag, **ctx):
     """[!env] Maps the value to an environment variable of the same name.
 
     You can provide a default using the ``|`` (pipe) character after the variable
@@ -57,7 +58,7 @@ def render_node(node: Node, tag: EnvTag, **ctx) -> str:
 
 # process: !env_secret
 @dispatch
-def render_node(node: Node, tag: EnvSecretTag, *, dump=False, **ctx) -> str:
+def render_node(node: Node, tag: EnvSecretTag, *, dump=False, **ctx):
     """[!env_secret] Similar to !env, but never returns the value when dumping."""
     if dump:
         return node
@@ -66,7 +67,7 @@ def render_node(node: Node, tag: EnvSecretTag, *, dump=False, **ctx) -> str:
 
 # process: !expr
 @dispatch
-def render_node(node: Node, tag: ExprTag, **ctx) -> Any:
+def render_node(node: Node, tag: ExprTag, **ctx):
     """[!expr] Uses ``eval()`` to render arbitrary Python expressions.
 
     By default, we add the root configuration as `c` variable.
@@ -81,7 +82,7 @@ def render_node(node: Node, tag: ExprTag, **ctx) -> Any:
 
 
 @dispatch
-def render_node(node: Node, tag: J2Tag, *, config=None, key=None, **ctx) -> Any:
+def render_node(node: Node, tag: J2Tag, *, config=None, key=None, **ctx):
     """[!j2] Treats the value a Jinj2 Template
 
     See ``gamma.config.render_context.context_providers`` documentation to add your
@@ -135,7 +136,7 @@ def render_node(node: Node, tag: J2Tag, *, config=None, key=None, **ctx) -> Any:
 
 # process: !j2_secret
 @dispatch
-def render_node(node: Node, tag: J2SecretTag, *, dump=False, **ctx) -> Any:
+def render_node(node: Node, tag: J2SecretTag, *, dump=False, **ctx):
     """[!j2_secret] Similar to !j2, but never returns the value when dumping."""
 
     if dump:
@@ -144,7 +145,7 @@ def render_node(node: Node, tag: J2SecretTag, *, dump=False, **ctx) -> Any:
 
 
 @dispatch
-def render_node(node: Node, tag: RefTag, *, config=None, recursive=False, **ctx) -> Any:
+def render_node(node: Node, tag: RefTag, *, config=None, recursive=False, **ctx):
     """[!ref] References other entries in the config object.
 
     Navigate the object using the dot notation. Complex named keys can be accessed
@@ -176,7 +177,7 @@ def render_node(node: Node, tag: RefTag, *, config=None, recursive=False, **ctx)
 
 # process: !py
 @dispatch
-def render_node(node: ScalarNode, tag: PyTag, *, path=None, **ctx) -> Any:
+def render_node(node: ScalarNode, tag: PyTag, *, path=None, **ctx):
     """[!py] Pass the node value to a Python callable.
 
     This tag should be used as a URI-style tag on the form `!py:<module>:<callable>`

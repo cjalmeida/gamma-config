@@ -1,9 +1,10 @@
 import copy
 from io import StringIO
 
-from gamma.dispatch import dispatch
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode, ScalarNode, SequenceNode
+
+from gamma.config import dispatch
 
 from .confignode import ConfigNode, RootConfig
 from .merge import merge_nodes

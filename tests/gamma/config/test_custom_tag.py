@@ -4,6 +4,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
+
 from gamma.config import get_config
 
 CONFIG_STR = """
@@ -60,10 +61,13 @@ def folder_fixture(monkeypatch):
 
 def test_custom_plugins(folder_fixture):
     import foo.custom_tag  # noqa
-    from gamma.config import render_node, ScalarNode, Tag
+    from plum import Signature
+
+    from gamma.config import ScalarNode, Tag, render_node
 
     # check dispatch correctly added the custom renderer
-    assert render_node[ScalarNode, Tag["!myenv"]] is not None
+    sig = Signature(ScalarNode, Tag["!myenv"])
+    assert render_node.methods.index(sig)
 
     # load config
     config = get_config()

@@ -1,6 +1,7 @@
 from typing import Any, Dict, Type, Union
 
 import pytest
+
 from gamma.dispatch import DispatchError, dispatch
 from gamma.dispatch.dispatchsystem import OverwriteWarning, Sig, methods_matching
 from gamma.dispatch.typesystem import Sig, SigSet, Vararg, signatures_from

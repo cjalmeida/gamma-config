@@ -14,9 +14,10 @@ def test_default_ctx():
 
 @pytest.fixture
 def custom_ctx():
-    from gamma.config import context_providers, ContextVar
-    from gamma.config.cache import cache
     import uuid
+
+    from gamma.config import ContextVar, context_providers
+    from gamma.config.cache import cache
 
     var_foo = ContextVar("foo", "bar")
     var_func = ContextVar("func", function=lambda: "zit")

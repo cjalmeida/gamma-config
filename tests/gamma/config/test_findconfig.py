@@ -19,8 +19,8 @@ def prepare_fixture():
 
 
 def test_find_jupyter(monkeypatch, prepare_fixture):
-    from gamma.config.findconfig import get_config_root, FindJupyter
     from gamma.config import findconfig as mod
+    from gamma.config.findconfig import FindJupyter, get_config_root
 
     expected_root = str(get_config_root())
     assert expected_root is not None

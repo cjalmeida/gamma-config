@@ -5,7 +5,9 @@ import os
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
-from gamma.dispatch import Val, dispatch
+from plum import Val
+
+from gamma.config import dispatch
 
 from .confignode import ConfigNode
 from .load import load_node

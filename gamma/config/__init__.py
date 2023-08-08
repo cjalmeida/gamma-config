@@ -1,5 +1,10 @@
 # flake8: noqa
+# isort: skip_file
+
 from gamma.config.__version__ import __version__
+
+# register a scoped dispatcher
+from plum import Dispatcher
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 from .builtin_tags import yaml
@@ -10,3 +15,5 @@ from .globalconfig import get_config
 from .render import render_node
 from .render_context import ContextVar, context_providers
 from .tags import Tag
+
+dispatch = Dispatcher()

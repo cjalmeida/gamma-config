@@ -2,8 +2,9 @@ import os
 
 
 def test_pickle(monkeypatch):
-    from gamma.config import get_config
     import pickle
+
+    from gamma.config import get_config
 
     c1 = get_config()
     data = pickle.dumps(c1)
@@ -25,6 +26,7 @@ def _sub(c, expected):
 
 def test_subprocess():
     import multiprocessing
+
     from gamma.config import get_config
 
     c = get_config()
