@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.8"
 
-      - name: create venv
+      - name: Create venv
         run: python -m venv .venv
 
       - name: install requirements
@@ -32,7 +32,7 @@ jobs:
           . .venv/bin/activate
           pdm install --dev
 
-      - name: build / run tests
+      - name: Build / run tests
         run: |
           . .venv/bin/activate
           export PYTHONPATH=$PWD
@@ -40,7 +40,7 @@ jobs:
           make lint
           make test
 
-      - name: archive whl
+      - name: Archive whl
         uses: actions/upload-artifact@master
         with:
           name: dist
@@ -51,16 +51,17 @@ jobs:
           . .venv/bin/activate
           twine check dist/*
 
-      - name: Publish docs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_AUTHOR_NAME: Github Actions
-          GIT_AUTHOR_EMAIL: noreply@github.gamma.bcg.com
+      - name: Build docs
         run: |
           . .venv/bin/activate
           export PYTHONPATH=$PWD
-          git remote set-url origin https://git:${GITHUB_TOKEN}@github.gamma.bcg.com/${GITHUB_REPOSITORY}.git
-          make publish-docs
+          make docs
+
+      - name: Publish docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
 
   Publish:
     environment: pypi
@@ -68,7 +69,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     needs: Build
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@master
 
       - uses: actions/download-artifact@master
         with:
