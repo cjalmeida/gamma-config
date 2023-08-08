@@ -693,20 +693,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../render_cli/" class="md-nav__link">
-        render_cli
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../render_context/" class="md-nav__link">
         render_context
       </a>
@@ -963,8 +949,7 @@
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/dump_yaml.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-82">82</a></span>
-<span class="normal"><a href="#__codelineno-0-83">83</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-83">83</a></span>
 <span class="normal"><a href="#__codelineno-0-84">84</a></span>
 <span class="normal"><a href="#__codelineno-0-85">85</a></span>
 <span class="normal"><a href="#__codelineno-0-86">86</a></span>
@@ -978,22 +963,23 @@
 <span class="normal"><a href="#__codelineno-0-94">94</a></span>
 <span class="normal"><a href="#__codelineno-0-95">95</a></span>
 <span class="normal"><a href="#__codelineno-0-96">96</a></span>
-<span class="normal"><a href="#__codelineno-0-97">97</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="k">def</span> <span class="nf">dump_node</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">MappingNode</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dump a `scalar` node as raw YAML node&quot;&quot;&quot;</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="c1"># render if sequence itself is tagged</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">tag</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;tag:yaml.org,2002:&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a>        <span class="n">tagobj</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">[</span><span class="n">tag</span><span class="p">]()</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>        <span class="n">val</span> <span class="o">=</span> <span class="n">render_node</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">tagobj</span><span class="p">,</span> <span class="n">dump</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a>        <span class="k">return</span> <span class="n">as_node</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="c1"># resolve recursively for each entry</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a>    <span class="n">newvalue</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">dump_node</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a>    <span class="n">node</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a>    <span class="n">node</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">newvalue</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a>    <span class="k">return</span> <span class="n">node</span>
+<span class="normal"><a href="#__codelineno-0-97">97</a></span>
+<span class="normal"><a href="#__codelineno-0-98">98</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="k">def</span> <span class="nf">dump_node</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">MappingNode</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dump a `scalar` node as raw YAML node&quot;&quot;&quot;</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="c1"># render if sequence itself is tagged</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">tag</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;tag:yaml.org,2002:&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a>        <span class="n">tagobj</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">[</span><span class="n">tag</span><span class="p">]()</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>        <span class="n">val</span> <span class="o">=</span> <span class="n">render_node</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">tagobj</span><span class="p">,</span> <span class="n">dump</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>        <span class="k">return</span> <span class="n">as_node</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>    <span class="c1"># resolve recursively for each entry</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a>    <span class="n">newvalue</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">dump_node</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a>    <span class="n">node</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>    <span class="n">node</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">newvalue</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a>    <span class="k">return</span> <span class="n">node</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1016,13 +1002,13 @@
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/dump_yaml.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-46">46</a></span>
-<span class="normal"><a href="#__codelineno-0-47">47</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-47">47</a></span>
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
-<span class="normal"><a href="#__codelineno-0-49">49</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">ConfigNode</span><span class="p">):</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Render a ConfigNode assuming default of `resolve_tags` = True&quot;&quot;&quot;</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="k">return</span> <span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-49">49</a></span>
+<span class="normal"><a href="#__codelineno-0-50">50</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">ConfigNode</span><span class="p">):</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Render a ConfigNode assuming default of `resolve_tags` = True&quot;&quot;&quot;</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a>    <span class="k">return</span> <span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>

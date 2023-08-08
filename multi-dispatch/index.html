@@ -402,34 +402,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#namespaced-dispatch" class="md-nav__link">
-    Namespaced dispatch
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ensure-specialization" class="md-nav__link">
-    Ensure specialization
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#parametric-dispatch" class="md-nav__link">
-    Parametric dispatch
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#missing-features" class="md-nav__link">
-    Missing features
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#other-considerations" class="md-nav__link">
     Other considerations
   </a>
@@ -725,20 +697,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/gamma/config/render_cli/" class="md-nav__link">
-        render_cli
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../api/gamma/config/render_context/" class="md-nav__link">
         render_context
       </a>
@@ -940,34 +898,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#namespaced-dispatch" class="md-nav__link">
-    Namespaced dispatch
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ensure-specialization" class="md-nav__link">
-    Ensure specialization
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#parametric-dispatch" class="md-nav__link">
-    Parametric dispatch
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#missing-features" class="md-nav__link">
-    Missing features
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#other-considerations" class="md-nav__link">
     Other considerations
   </a>
@@ -996,11 +926,11 @@
 
 
 <h1 id="multiple-dispatch">Multiple dispatch</h1>
-<p>From the version <code>0.3.x</code> on, <code>gamma-config</code> was rewritten to use
-<a href="https://en.wikipedia.org/wiki/Multiple_dispatch">multiple dispatch</a> as core paradigm
-instead of typical class based object orientation. All multiple dispatch code is
-under the <code>gamma.dispatch</code> namespace and I might create a dedicated library in the
-future.</p>
+<p>From the version <code>0.3.x</code> on, <code>gamma-config</code> was rewritten to use <a href="https://en.wikipedia.org/wiki/Multiple_dispatch">multiple
+dispatch</a> as core paradigm instead of
+typical class based object orientation. We hade our own homegrown multiple dispatch
+infrastructure (<code>gamma.dispatch</code>) that was replaced in <code>0.7.x</code> by
+<a href="https://github.com/beartype/plum">plum</a></p>
 <h2 id="rationale">Rationale</h2>
 <p>The main reason was for me to learn more about the feasability of using multiple
 dispatch in Python in a non-trivial project. I was inspired in how multiple dispatch
@@ -1019,23 +949,20 @@ programming language design: how can you structure your application so that you 
 variety of techniques, where multiple dispatch is one of them (and probably the most
 elegant). But what sets Julia apart is that it's the only language where multiple
 dispatch is the core paradigm. This means that <strong>idiomatic Julia code is easily amenable
-to extension</strong> (and performant). In contrast in most languages you have be very explict
-about extensibility, adding unwarranted complexity, something frowned upon by the
-<a href="https://martinfowler.com/bliki/Yagni.html">You-Aint-Gonna-Need-It</a> principle.</p>
+to extension</strong> (and performant). In contrast, in most languages you have be very explict
+about extensibility, adding unwarranted complexity.</p>
 <p>Interestingly, the impact of multiple dispatch on code reuse was an unplanned
 side-effect. I recommend watching the following presentation by one of Julia creators:</p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/kc9HwsxE1OY"
 frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 allowfullscreen></iframe>
 
-<p>For a number of reasons, I don't think we should go full Julia (yet). But what if
-idiomatic Python code had the same level of extensibility? Python is flexible enough
-that we could "bend the rules" and, with some tooling, make multiple-dispatch a first
-class citizen by convention. My (long shot) bet is that with a little
-coordination, we could greatly improve code reuse across cases.</p>
+<p>We believe idiomatic Python code can have the same level of extensibility. Python is
+flexible enough that we could "bend the rules" and, with some code, make
+multiple-dispatch a first class citizen by convention. </p>
 <h2 id="dispatch-rules">Dispatch rules</h2>
 <p>Multiple dispatch works in a intuitive way for the large majority of the time. Since
-there's no canonical set of rules, I followed to Julia docs and behavior on
+there's no canonical set of rules, I (and <a href="https://github.com/beartype/plum">plum</a>) followed to Julia docs and behavior on
 <a href="https://docs.julialang.org/en/v1/manual/functions">function</a>
 and <a href="https://docs.julialang.org/en/v1/manual/methods">methods</a>. We also share the same
 terminology of generic "functions" and associated "methods".</p>
@@ -1045,7 +972,7 @@ considered "one single function with two methods. All <strong>POSITIONAL</strong
 arguments are used for dispatching. Variadic positional arguments (eg. <code>_args</code>) and
 keyworkd-only arguments (those after <code>_</code>or<code>\*args</code>) are not considered for dispatching.</p>
 <p>Consider the example below:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">gamma.dispatch</span> <span class="kn">import</span> <span class="n">dispatch</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">plum</span> <span class="kn">import</span> <span class="n">dispatch</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nd">@dispatch</span>
@@ -1102,80 +1029,14 @@ common "gotcha" is to accidentally ovewrite the second method with a new signatu
 <a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="k">assert</span> <span class="n">foo</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;second&quot;</span>
 <a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="k">assert</span> <span class="n">foo</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;second&quot;</span>           <span class="c1"># it has changed!</span>
 </code></pre></div>
-<p>To minimize confusion, this will log a "warning" telling you about the side-effect.
-If you do want to overwrite the method, you can pass <code>@dispatch(overwrite=True)</code>.</p>
-<h3 id="namespaced-dispatch">Namespaced dispatch</h3>
-<p>In some applications, having to import all functions into the local scope in order to
-register a dispatch can be annoying. An alternative is to use a "configuration module"
-where you can register your own "namespaced" dispatch function.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># in myapp/__init__.py</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span> <span class="nn">gamma.dispatch</span> <span class="kn">import</span> <span class="n">dispatch</span> <span class="k">as</span> <span class="n">base_dispatch</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">dispatch</span> <span class="o">=</span> <span class="n">base_dispatch</span><span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;myapp&quot;</span><span class="p">)</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1"># load dependent modules</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="kn">import</span> <span class="nn">myapp.foo</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="kn">import</span> <span class="nn">myapp.bar</span>
-</code></pre></div>
-<p>Then you can use the namespaced dispatch decorator to register dispatch methods without
-needing to import them</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># in myapp/foo.py</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">from</span> <span class="nn">myapp</span> <span class="kn">import</span> <span class="n">dispatch</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="o">...</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># in myapp/bar.py</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nd">@dispatch</span>          <span class="c1"># &lt;-- note that no import of `my_func` is needed!</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="o">...</span>
-</code></pre></div>
-<h3 id="ensure-specialization">Ensure specialization</h3>
-<p>We also added the <code>specialize</code> keyword to ensure a dispatch specializes a function.
-This is useful when writing modular applications to enforce some form of contract
-between components.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># will break if no dispatched `my_func` exists in the local context / namespace.</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nd">@dispatch</span><span class="p">(</span><span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="o">...</span>
-</code></pre></div>
-<p>This also works in conjunction with the "namespace" feature.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># in myapp/__init__.py</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">from</span> <span class="nn">gamma.dispatch</span> <span class="kn">import</span> <span class="n">dispatch</span> <span class="k">as</span> <span class="n">base_dispatch</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">dispatch</span> <span class="o">=</span> <span class="n">base_dispatch</span><span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;myapp&quot;</span><span class="p">)</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">specialize</span> <span class="o">=</span> <span class="n">base_dispatch</span><span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;myapp&quot;</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="nd">@dispatch</span>  <span class="c1"># base function</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="o">...</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="nd">@specialize</span>  <span class="c1"># specialization</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>    <span class="o">...</span>
-</code></pre></div>
-<p>The check is applied on function loading, so <strong>import order matters</strong>. So you should
-architect your application to ensure base modules are loaded before specialized modules.</p>
-<h3 id="parametric-dispatch">Parametric dispatch</h3>
-<p><em>TODO</em></p>
-<h3 id="missing-features">Missing features</h3>
-<ul>
-<li>Type/length constraints for variadic arguments</li>
-</ul>
+<p>If you want to use multiple dispatch in your own codebase, I strongly recommend 
+reading <a href="https://github.com/beartype/plum">plum</a> docs.</p>
 <h3 id="other-considerations">Other considerations</h3>
 <ul>
 <li>
 <p>Multiple dispatch is slower compared to simple function or wrapped <code>__call__</code>
     dispatch. It's still pretty fast for most purposes, just avoid using it in "hot"
     loops.</p>
-</li>
-<li>
-<p>Tie-breaking is done via the output of <code>type.mro()</code> (Method Resolution Order). We
-    still support dynamic subclass definition via <code>__subclasshook__</code>, but limited
-    tie-breaking since we can't determine the proper type hierarchy.</p>
 </li>
 <li>
 <p>Multiple inheritance may also introduce ambiguities or non-obvious behavior to

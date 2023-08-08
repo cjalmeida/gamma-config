@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../render_cli/">
+        <link rel="prev" href="../render/">
       
       
         <link rel="next" href="../scaffold/">
@@ -630,20 +630,6 @@
     <li class="md-nav__item">
       <a href="../render/" class="md-nav__link">
         render
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../render_cli/" class="md-nav__link">
-        render_cli
       </a>
     </li>
   
@@ -1277,19 +1263,21 @@ value.</p>
 <span class="normal"><a href="#__codelineno-0-79">79</a></span>
 <span class="normal"><a href="#__codelineno-0-80">80</a></span>
 <span class="normal"><a href="#__codelineno-0-81">81</a></span>
-<span class="normal"><a href="#__codelineno-0-82">82</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="k">def</span> <span class="nf">base_provider</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-82">82</a></span>
+<span class="normal"><a href="#__codelineno-0-83">83</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="k">def</span> <span class="nf">base_provider</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Defaults to context</span>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    - `env` -&gt; os.environ</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    - `c` -&gt; the global RootConfig</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="kn">import</span> <span class="nn">os</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="kn">from</span> <span class="nn">.globalconfig</span> <span class="kn">import</span> <span class="n">get_config</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>        <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">),</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a>        <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">get_config</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a>    <span class="p">]</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a>    <span class="kn">from</span> <span class="nn">.globalconfig</span> <span class="kn">import</span> <span class="n">get_config</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a>        <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">),</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a>        <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">get_config</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="p">]</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1405,8 +1393,7 @@ value.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/render_context.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-85">85</a></span>
-<span class="normal"><a href="#__codelineno-0-86">86</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-86">86</a></span>
 <span class="normal"><a href="#__codelineno-0-87">87</a></span>
 <span class="normal"><a href="#__codelineno-0-88">88</a></span>
 <span class="normal"><a href="#__codelineno-0-89">89</a></span>
@@ -1418,20 +1405,21 @@ value.</p>
 <span class="normal"><a href="#__codelineno-0-95">95</a></span>
 <span class="normal"><a href="#__codelineno-0-96">96</a></span>
 <span class="normal"><a href="#__codelineno-0-97">97</a></span>
-<span class="normal"><a href="#__codelineno-0-98">98</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="k">def</span> <span class="nf">underscore_context_provider</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">ConfigNode</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Look in parent config nodes and add all entries under the `_context` key&quot;&quot;&quot;</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="nb">vars</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>        <span class="k">return</span> <span class="nb">vars</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a>    <span class="k">while</span> <span class="n">config</span><span class="o">.</span><span class="n">_parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>        <span class="n">config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">_parent</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a>        <span class="n">ctx</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_context&quot;</span><span class="p">,</span> <span class="p">{})</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ctx</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a>            <span class="nb">vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ContextVar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a>    <span class="k">return</span> <span class="nb">vars</span>
+<span class="normal"><a href="#__codelineno-0-98">98</a></span>
+<span class="normal"><a href="#__codelineno-0-99">99</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="k">def</span> <span class="nf">underscore_context_provider</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">ConfigNode</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Look in parent config nodes and add all entries under the `_context` key&quot;&quot;&quot;</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a>    <span class="nb">vars</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>        <span class="k">return</span> <span class="nb">vars</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="k">while</span> <span class="n">config</span><span class="o">.</span><span class="n">_parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>        <span class="n">config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">_parent</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="n">ctx</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_context&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ctx</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>            <span class="nb">vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ContextVar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a>    <span class="k">return</span> <span class="nb">vars</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
