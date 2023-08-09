@@ -1078,7 +1078,7 @@
 
   <div class="doc doc-contents ">
       <p class="doc doc-class-bases">
-        Bases: <code><span title="typing.NamedTuple">NamedTuple</span></code></p>
+        Bases: <code><span title="beartype.typing.NamedTuple">NamedTuple</span></code></p>
 
   
       <p>A specification for a context variable used for rendering dynamic values.</p>
@@ -1088,8 +1088,7 @@ value.</p>
 
         <details class="quote">
           <summary>Source code in <code>gamma/config/render_context.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-10">10</a></span>
-<span class="normal"><a href="#__codelineno-0-11">11</a></span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-11">11</a></span>
 <span class="normal"><a href="#__codelineno-0-12">12</a></span>
 <span class="normal"><a href="#__codelineno-0-13">13</a></span>
 <span class="normal"><a href="#__codelineno-0-14">14</a></span>
@@ -1105,24 +1104,25 @@ value.</p>
 <span class="normal"><a href="#__codelineno-0-24">24</a></span>
 <span class="normal"><a href="#__codelineno-0-25">25</a></span>
 <span class="normal"><a href="#__codelineno-0-26">26</a></span>
-<span class="normal"><a href="#__codelineno-0-27">27</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="k">class</span> <span class="nc">ContextVar</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A specification for a context variable used for rendering dynamic values.</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12"></a>
-<a id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="sd">    Either if ``function`` is specified, we&#39;ll call the function to get the actual</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="sd">    value.</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16"></a>
-<a id="__codelineno-0-17" name="__codelineno-0-17"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;The name of the variable&quot;&quot;&quot;</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19"></a>
-<a id="__codelineno-0-20" name="__codelineno-0-20"></a>    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;The value of the variable&quot;&quot;&quot;</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22"></a>
-<a id="__codelineno-0-23" name="__codelineno-0-23"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to call to resolve the variable&quot;&quot;&quot;</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="n">cacheable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;If True, will cache the function result, otherwise will call on each render.&quot;&quot;&quot;</span>
+<span class="normal"><a href="#__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="k">class</span> <span class="nc">ContextVar</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A specification for a context variable used for rendering dynamic values.</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="sd">    Either if ``function`` is specified, we&#39;ll call the function to get the actual</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="sd">    value.</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17"></a>
+<a id="__codelineno-0-18" name="__codelineno-0-18"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;The name of the variable&quot;&quot;&quot;</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20"></a>
+<a id="__codelineno-0-21" name="__codelineno-0-21"></a>    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;The value of the variable&quot;&quot;&quot;</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23"></a>
+<a id="__codelineno-0-24" name="__codelineno-0-24"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to call to resolve the variable&quot;&quot;&quot;</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26"></a>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a>    <span class="n">cacheable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;If True, will cache the function result, otherwise will call on each render.&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
         </details>
 
@@ -1251,8 +1251,7 @@ value.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/render_context.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-70">70</a></span>
-<span class="normal"><a href="#__codelineno-0-71">71</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-71">71</a></span>
 <span class="normal"><a href="#__codelineno-0-72">72</a></span>
 <span class="normal"><a href="#__codelineno-0-73">73</a></span>
 <span class="normal"><a href="#__codelineno-0-74">74</a></span>
@@ -1264,20 +1263,21 @@ value.</p>
 <span class="normal"><a href="#__codelineno-0-80">80</a></span>
 <span class="normal"><a href="#__codelineno-0-81">81</a></span>
 <span class="normal"><a href="#__codelineno-0-82">82</a></span>
-<span class="normal"><a href="#__codelineno-0-83">83</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="k">def</span> <span class="nf">base_provider</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Defaults to context</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    - `env` -&gt; os.environ</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    - `c` -&gt; the global RootConfig</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="kn">import</span> <span class="nn">os</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a>    <span class="kn">from</span> <span class="nn">.globalconfig</span> <span class="kn">import</span> <span class="n">get_config</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a>        <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">),</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a>        <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">get_config</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-83">83</a></span>
+<span class="normal"><a href="#__codelineno-0-84">84</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="k">def</span> <span class="nf">base_provider</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Defaults to context</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    - `env` -&gt; os.environ</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    - `c` -&gt; the global RootConfig</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="kn">import</span> <span class="nn">os</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="kn">from</span> <span class="nn">.globalconfig</span> <span class="kn">import</span> <span class="n">get_config</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a>    <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a>        <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">),</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>        <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">get_config</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="p">]</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1306,8 +1306,7 @@ value.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/render_context.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-30">30</a></span>
-<span class="normal"><a href="#__codelineno-0-31">31</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-31">31</a></span>
 <span class="normal"><a href="#__codelineno-0-32">32</a></span>
 <span class="normal"><a href="#__codelineno-0-33">33</a></span>
 <span class="normal"><a href="#__codelineno-0-34">34</a></span>
@@ -1338,39 +1337,40 @@ value.</p>
 <span class="normal"><a href="#__codelineno-0-59">59</a></span>
 <span class="normal"><a href="#__codelineno-0-60">60</a></span>
 <span class="normal"><a href="#__codelineno-0-61">61</a></span>
-<span class="normal"><a href="#__codelineno-0-62">62</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="k">def</span> <span class="nf">get_render_context</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the render context by calling each function in ``context_provider``.</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="sd">    A context provider must be a function with the signature:</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="sd">        `(**kwargs) -&gt; List[ContextVar]`</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">    or simply a list of `ContextVar` objects</span>
-<a id="__codelineno-0-36" name="__codelineno-0-36"></a>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    The provided `**kwargs` are the same available in the `render_node` function</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="k">for</span> <span class="n">provider</span> <span class="ow">in</span> <span class="n">context_providers</span><span class="p">:</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a>        <span class="n">var</span><span class="p">:</span> <span class="n">ContextVar</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a>        <span class="nb">vars</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ContextVar</span><span class="p">]</span> <span class="o">=</span> <span class="n">provider</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">provider</span><span class="p">)</span> <span class="k">else</span> <span class="n">provider</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a>        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">:</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a>            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">cacheable</span><span class="p">:</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a>                <span class="n">cache_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;render_context/</span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>                <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a>                    <span class="n">out</span><span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a>                    <span class="k">continue</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a>                    <span class="k">pass</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a>            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">function</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>                <span class="n">val</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">function</span><span class="p">()</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a>                <span class="n">val</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">value</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">cacheable</span><span class="p">:</span>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a>                <span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a>            <span class="n">out</span><span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>    <span class="k">return</span> <span class="n">out</span>
+<span class="normal"><a href="#__codelineno-0-62">62</a></span>
+<span class="normal"><a href="#__codelineno-0-63">63</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="k">def</span> <span class="nf">get_render_context</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the render context by calling each function in ``context_provider``.</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="sd">    A context provider must be a function with the signature:</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        `(**kwargs) -&gt; List[ContextVar]`</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">    or simply a list of `ContextVar` objects</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">    The provided `**kwargs` are the same available in the `render_node` function</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a>    <span class="k">for</span> <span class="n">provider</span> <span class="ow">in</span> <span class="n">context_providers</span><span class="p">:</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a>        <span class="n">var</span><span class="p">:</span> <span class="n">ContextVar</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a>        <span class="nb">vars</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ContextVar</span><span class="p">]</span> <span class="o">=</span> <span class="n">provider</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">provider</span><span class="p">)</span> <span class="k">else</span> <span class="n">provider</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a>        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">:</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a>            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">cacheable</span><span class="p">:</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a>                <span class="n">cache_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;render_context/</span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a>                <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a>                    <span class="n">out</span><span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a>                    <span class="k">continue</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a>                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a>                    <span class="k">pass</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a>            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">function</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a>                <span class="n">val</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">function</span><span class="p">()</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>                <span class="n">val</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">value</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a>            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">cacheable</span><span class="p">:</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a>                <span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a>            <span class="n">out</span><span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a>    <span class="k">return</span> <span class="n">out</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1393,33 +1393,33 @@ value.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/render_context.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-86">86</a></span>
-<span class="normal"><a href="#__codelineno-0-87">87</a></span>
-<span class="normal"><a href="#__codelineno-0-88">88</a></span>
-<span class="normal"><a href="#__codelineno-0-89">89</a></span>
-<span class="normal"><a href="#__codelineno-0-90">90</a></span>
-<span class="normal"><a href="#__codelineno-0-91">91</a></span>
-<span class="normal"><a href="#__codelineno-0-92">92</a></span>
-<span class="normal"><a href="#__codelineno-0-93">93</a></span>
-<span class="normal"><a href="#__codelineno-0-94">94</a></span>
-<span class="normal"><a href="#__codelineno-0-95">95</a></span>
-<span class="normal"><a href="#__codelineno-0-96">96</a></span>
-<span class="normal"><a href="#__codelineno-0-97">97</a></span>
-<span class="normal"><a href="#__codelineno-0-98">98</a></span>
-<span class="normal"><a href="#__codelineno-0-99">99</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="k">def</span> <span class="nf">underscore_context_provider</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">ConfigNode</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Look in parent config nodes and add all entries under the `_context` key&quot;&quot;&quot;</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a>    <span class="nb">vars</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a>        <span class="k">return</span> <span class="nb">vars</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="k">while</span> <span class="n">config</span><span class="o">.</span><span class="n">_parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a>        <span class="n">config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">_parent</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="n">ctx</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_context&quot;</span><span class="p">,</span> <span class="p">{})</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ctx</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a>            <span class="nb">vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ContextVar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a>    <span class="k">return</span> <span class="nb">vars</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
+<span class="normal"><a href="#__codelineno-0-88"> 88</a></span>
+<span class="normal"><a href="#__codelineno-0-89"> 89</a></span>
+<span class="normal"><a href="#__codelineno-0-90"> 90</a></span>
+<span class="normal"><a href="#__codelineno-0-91"> 91</a></span>
+<span class="normal"><a href="#__codelineno-0-92"> 92</a></span>
+<span class="normal"><a href="#__codelineno-0-93"> 93</a></span>
+<span class="normal"><a href="#__codelineno-0-94"> 94</a></span>
+<span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
+<span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
+<span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
+<span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
+<span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
+<span class="normal"><a href="#__codelineno-0-100">100</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="k">def</span> <span class="nf">underscore_context_provider</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">ConfigNode</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Look in parent config nodes and add all entries under the `_context` key&quot;&quot;&quot;</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a>    <span class="nb">vars</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>        <span class="k">return</span> <span class="nb">vars</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>    <span class="k">while</span> <span class="n">config</span><span class="o">.</span><span class="n">_parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="n">config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">_parent</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a>        <span class="n">ctx</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_context&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ctx</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a>            <span class="nb">vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ContextVar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a>    <span class="k">return</span> <span class="nb">vars</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
