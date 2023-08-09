@@ -1,5 +1,4 @@
-from typing import Mapping, Optional, Tuple
-
+from beartype.typing import Mapping, Optional, Tuple
 from pydantic import BaseModel
 
 NO_DISCRIMINATOR = object()

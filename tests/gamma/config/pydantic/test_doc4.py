@@ -1,4 +1,4 @@
-from typing import List
+from beartype.typing import List
 
 from gamma.config import RootConfig
 from gamma.config.pydantic import ConfigStruct

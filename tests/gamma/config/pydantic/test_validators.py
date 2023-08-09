@@ -1,5 +1,4 @@
-from typing import List
-
+from beartype.typing import List
 from pydantic import BaseModel
 from ruamel.yaml import YAML
 

@@ -1,6 +1,5 @@
-from typing import Any, Dict, Type, Union
-
 import pytest
+from beartype.typing import Any, Dict, Type, Union
 
 from gamma.dispatch import DispatchError, dispatch
 from gamma.dispatch.dispatchsystem import OverwriteWarning, Sig, methods_matching

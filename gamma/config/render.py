@@ -1,8 +1,8 @@
 """Base render_node methods"""
 
 import logging
-from typing import Any, Optional
 
+from beartype.typing import Any, Optional
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 from gamma.config import dispatch

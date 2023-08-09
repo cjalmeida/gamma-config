@@ -3,8 +3,8 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
 
+from beartype.typing import Any, List, Optional, Tuple
 from plum import Val
 
 from gamma.config import dispatch

@@ -6,7 +6,17 @@ https://github.com/JeffBezanson/phdthesis/blob/master/main.pdf
 import inspect
 import itertools
 import typing
-from typing import Any, Callable, Iterable, Optional, Tuple, Type, TypeVar, Union
+
+from beartype.typing import (
+    Any,
+    Callable,
+    Iterable,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from .poset import VT, PODict, POSet
 

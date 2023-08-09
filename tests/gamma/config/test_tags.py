@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
-from typing import NamedTuple
 
 import pytest
+from beartype.typing import NamedTuple
 
 from gamma.config import RootConfig, ScalarNode, render_node, to_dict
 from gamma.config.builtin_tags import RefTag

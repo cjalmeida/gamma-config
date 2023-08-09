@@ -1,6 +1,7 @@
 from collections.abc import MutableMapping, MutableSet
 from operator import __eq__, __lt__
-from typing import Generic, Iterable, List, Tuple, TypeVar
+
+from beartype.typing import Generic, Iterable, List, Tuple, TypeVar
 
 KT = TypeVar("KT")
 VT = TypeVar("VT")

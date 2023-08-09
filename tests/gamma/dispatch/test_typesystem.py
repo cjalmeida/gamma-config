@@ -1,5 +1,6 @@
 import typing
-from typing import Any, Tuple, Type, Union
+
+from beartype.typing import Any, Tuple, Type, Union
 
 from gamma.dispatch.typesystem import Sig, SigSet, Vararg, is_more_specific, issubtype
 

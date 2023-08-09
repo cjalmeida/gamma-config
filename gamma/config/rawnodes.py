@@ -1,6 +1,5 @@
 """Module implementing convenience methods for dealing with `ruamel.yaml` `Node`s"""
-from typing import Any, Hashable, Iterable, Optional, Tuple
-
+from beartype.typing import Any, Hashable, Iterable, Optional, Tuple
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 from gamma.config import dispatch

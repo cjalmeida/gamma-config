@@ -43,7 +43,7 @@ def test_parametric_create():
 
 
 def test_parametric_deco():
-    from typing import NamedTuple
+    from beartype.typing import NamedTuple
 
     @parametric
     class Tag:
@@ -120,7 +120,7 @@ def test_also_of():
 
 
 def test_union():
-    from typing import Union
+    from beartype.typing import Union
 
     from gamma.dispatch import dispatch, parametric
 

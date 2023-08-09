@@ -2,8 +2,8 @@
 import re
 from copy import deepcopy
 from functools import reduce
-from typing import List, Tuple, Union
 
+from beartype.typing import List, Tuple, Union
 from ruamel.yaml.nodes import MappingNode, Node, SequenceNode
 
 from gamma.config import dispatch

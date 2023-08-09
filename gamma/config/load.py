@@ -1,8 +1,8 @@
 """Module for loading content as `ruamel.yaml` `Node` instances"""
 from io import IOBase, StringIO
 from pathlib import Path
-from typing import Dict
 
+from beartype.typing import Dict
 from plum import parametric
 from ruamel.yaml.nodes import Node
 

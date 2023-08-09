@@ -1,6 +1,6 @@
 """Module declaring a cache utility for gamma.config"""
 
-from typing import Any, Mapping
+from beartype.typing import Any, Mapping
 
 
 class Cache(Mapping):

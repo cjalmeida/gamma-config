@@ -1,6 +1,7 @@
 """Module handling rendering context variables (eg. for !expr and !j2)"""
 from functools import partial
-from typing import Any, Callable, Dict, List, NamedTuple, Optional, Union
+
+from beartype.typing import Any, Callable, Dict, List, NamedTuple, Optional, Union
 
 from gamma.config.confignode import ConfigNode
 

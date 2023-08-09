@@ -3,7 +3,8 @@ import inspect
 import typing
 import warnings
 from collections import defaultdict
-from typing import Callable, Dict, Iterable, List, Set, Tuple
+
+from beartype.typing import Callable, Dict, Iterable, List, Set, Tuple
 
 from .typesystem import Sig, SigDict, is_more_specific, issubtype, signatures_from
 

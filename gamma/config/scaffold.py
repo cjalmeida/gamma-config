@@ -1,10 +1,10 @@
 """Module to 'scaffold' append bootstrap config for gamma-io"""
 import shutil
 from pathlib import Path
-from typing import NamedTuple
 
 import colorama
 import pkg_resources
+from beartype.typing import NamedTuple
 from colorama import Fore, Style
 
 from gamma.config import dispatch

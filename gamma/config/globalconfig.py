@@ -2,7 +2,8 @@
 
 import multiprocessing
 import threading
-from typing import Optional, Tuple
+
+from beartype.typing import Optional, Tuple
 
 from .cache import cache
 from .confignode import RootConfig, push_entry

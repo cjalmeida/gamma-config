@@ -3,8 +3,8 @@
 import importlib
 import os
 import threading
-from typing import Any, Union
 
+from beartype.typing import Any, Union
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 

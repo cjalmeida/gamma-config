@@ -1,6 +1,7 @@
 import inspect
 import types
-from typing import Any, Generic, Tuple, TypeVar
+
+from beartype.typing import Any, Generic, Tuple, TypeVar
 
 T = TypeVar("T")
 
