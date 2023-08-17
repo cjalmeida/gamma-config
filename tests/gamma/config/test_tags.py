@@ -121,12 +121,18 @@ def test_obj_tag():
     foo: !obj:MyObj2
         a: 1
         b: 2
+
+    bar: !obj:{mod}:hello
+    zee: !obj:{mod}:make_list 1
     """
 
-    foo = RootConfig("dummy", src)["foo"]
+    cfg = RootConfig("dummy", src)
+    foo = cfg["foo"]
     assert isinstance(foo, MyObj2)
     assert foo.a == 1
     assert foo.b == 2
+    assert cfg["bar"] == "world"
+    assert cfg["zee"] == [1]
 
 
 def test_path_tag():

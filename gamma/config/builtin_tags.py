@@ -299,6 +299,30 @@ def render_node(
     return func(**val)
 
 
+@dispatch
+def render_node(node: ScalarNode, tag: ObjTag, *, path=None, config=None, **ctx) -> Any:
+    """Handle scalar nodes by passing the value as the single argument.
+
+    Examples:
+    ```yaml
+    foo: !obj:myapp.mymodule:MyClass 100
+    bar: !obj:myapp.mymodule:MyClass
+    ```
+
+    `foo` will try to call `myapp.mymodule.MyClass(100)` and `bar` will try to call
+    `myapp.mymodule.MyClass(100)`
+    """
+
+    root = config and config._root
+    default_module = (root and root.get("obj_default_module")) or None
+    func = _py_tag_get_func("obj", path, default_module=default_module)
+    val = yaml.load(node.value)
+
+    if val is None:
+        return func()
+    return func(val)
+
+
 # process: !path
 @dispatch
 def render_node(node: Node, tag: PathTag, **ctx) -> str:
