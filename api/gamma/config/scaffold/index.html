@@ -1038,8 +1038,8 @@ and <code>get_source</code> functions.</p>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="c1"># load plugins from ENTRYPOINT_GROUP</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a>    <span class="n">modules</span> <span class="o">=</span> <span class="p">[</span><span class="n">GammaConfigScaffold</span><span class="p">()]</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a>    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_entry_points</span><span class="p">(</span><span class="n">ENTRYPOINT_GROUP</span><span class="p">):</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>        <span class="n">plugin</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a>    <span class="k">for</span> <span class="n">ep</span> <span class="ow">in</span> <span class="n">entry_points</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ENTRYPOINT_GROUP</span><span class="p">,</span> <span class="p">[]):</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a>        <span class="n">plugin</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a>        <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plugin</span><span class="p">())</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a>    <span class="c1"># find source under sample folder</span>
