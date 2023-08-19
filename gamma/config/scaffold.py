@@ -1,9 +1,9 @@
 """Module to 'scaffold' append bootstrap config for gamma-io"""
 import shutil
+from importlib.metadata import entry_points
 from pathlib import Path
 
 import colorama
-import pkg_resources
 from beartype.typing import NamedTuple
 from colorama import Fore, Style
 
@@ -58,8 +58,8 @@ def scaffold(target, force):
 
     # load plugins from ENTRYPOINT_GROUP
     modules = [GammaConfigScaffold()]
-    for entry in pkg_resources.iter_entry_points(ENTRYPOINT_GROUP):
-        plugin = entry.load()
+    for ep in entry_points().get(ENTRYPOINT_GROUP, []):
+        plugin = ep.load()
         modules.append(plugin())
 
     # find source under sample folder
