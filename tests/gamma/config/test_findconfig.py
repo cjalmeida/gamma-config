@@ -20,7 +20,7 @@ def prepare_fixture():
 
 def test_find_jupyter(monkeypatch, prepare_fixture):
     from gamma.config import findconfig as mod
-    from gamma.config.findconfig import FindJupyter, get_config_root
+    from gamma.config.findconfig import get_config_root
 
     expected_root = str(get_config_root())
     assert expected_root is not None
@@ -32,7 +32,7 @@ def test_find_jupyter(monkeypatch, prepare_fixture):
 
     # use findJupyter specialization
     monkeypatch.setattr(mod, "_isnotebook", lambda: True)
-    jupyter_root = str(get_config_root(FindJupyter()))
+    jupyter_root = str(get_config_root("JUPYTER"))
     assert expected_root == jupyter_root
 
     os.chdir("..")

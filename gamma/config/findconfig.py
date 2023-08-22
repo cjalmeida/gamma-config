@@ -3,9 +3,9 @@
 import logging
 import os
 from pathlib import Path
+from typing import Literal
 
 from beartype.typing import Any, List, Optional, Tuple
-from plum import Val
 
 from gamma.config import dispatch
 
@@ -14,11 +14,7 @@ from .load import load_node
 
 logger = logging.getLogger(__name__)
 
-FindEnv = Val["env"]
-FindLocal = Val["local"]
-FindJupyter = Val["jupyter"]
-
-CONFIG_FIND_ORDER = [FindEnv, FindLocal, FindJupyter]
+CONFIG_FIND_ORDER = ["ENV", "LOCAL", "JUPYTER"]
 CONFIG_ROOT_ENV = "GAMMA_CONFIG_ROOT"
 
 
@@ -72,8 +68,8 @@ def get_config_root() -> Path:
     module variable.
     """
 
-    for mech in CONFIG_FIND_ORDER:
-        root = get_config_root(mech())
+    for mechanism in CONFIG_FIND_ORDER:
+        root = get_config_root(mechanism)
         if root is not None:
             return root
 
@@ -89,7 +85,7 @@ def get_config_root() -> Path:
 
 
 @dispatch
-def get_config_root(_: FindEnv) -> Optional[Path]:
+def get_config_root(_: Literal["ENV"]) -> Optional[Path]:
     f"""Try the path set by {CONFIG_ROOT_ENV} as a root config folder"""
     if CONFIG_ROOT_ENV not in os.environ:
         return None
@@ -105,7 +101,7 @@ def get_config_root(_: FindEnv) -> Optional[Path]:
 
 
 @dispatch
-def get_config_root(_: FindLocal) -> Optional[Path]:
+def get_config_root(_: Literal["LOCAL"]) -> Optional[Path]:
     """Try the path `$PWD/config` as root config folder"""
     root = Path("config").absolute()
     if _has_meta(root):
@@ -114,7 +110,7 @@ def get_config_root(_: FindLocal) -> Optional[Path]:
 
 
 @dispatch
-def get_config_root(_: FindJupyter) -> Optional[Path]:
+def get_config_root(_: Literal["JUPYTER"]) -> Optional[Path]:
     """Try `<parent>/config` folders iteratively if we're in a Jupyter (IPython)
     environment"""
 
