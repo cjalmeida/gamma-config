@@ -52,6 +52,8 @@ def render_node(node: Node, tag: EnvTag, **ctx):
         raise TagException(
             f"Env variable '{name}' not found when resolving node and no default set"
         )
+    elif env_val is not None:
+        env_val = yaml.load(env_val)
 
     return env_val
 
