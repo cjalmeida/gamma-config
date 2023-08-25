@@ -191,3 +191,27 @@ def test_j2_strict():
 
     with pytest.raises(ValueError, match="render"):
         cfg["myval"]
+
+
+def test_env(monkeypatch):
+    monkeypatch.setenv("E1", "True")
+    monkeypatch.setenv("E2", "true")
+    monkeypatch.setenv("E3", "1")
+
+    src = """
+    e1: !env E1
+    e2: !env E2
+    e3: !env E3
+    e4: !env E1|False
+    e5: !env E5|False
+    e6: !env E6|foo
+    """
+
+    cfg = RootConfig("dummy", src)
+
+    assert cfg["e1"] is True
+    assert cfg["e2"] is True
+    assert cfg["e3"] == 1
+    assert cfg["e4"] is True
+    assert cfg["e5"] is False
+    assert cfg["e6"] == "foo"

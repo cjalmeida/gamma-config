@@ -356,5 +356,4 @@ def _split_default(value):
     parsed = value
     if "|" in value:
         parsed, default = value.rsplit("|", 1)
-        default = yaml.load(default)
     return parsed, default
