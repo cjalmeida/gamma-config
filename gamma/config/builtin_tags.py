@@ -26,7 +26,7 @@ yaml = YAML(typ="safe")
 
 
 RefTag = Tag["!ref"]
-EnvTag = Tag["!env"] | Tag["!env_secret"]
+EnvTag = Union[Tag["!env"], Tag["!env_secret"]]
 ExprTag = Tag["!expr"]
 J2Tag = Tag["!j2"]
 J2SecretTag = Tag["!j2_secret"]

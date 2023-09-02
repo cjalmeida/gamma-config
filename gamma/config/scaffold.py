@@ -1,10 +1,10 @@
 """Module to 'scaffold' append bootstrap config for gamma-io"""
 import shutil
-from importlib.metadata import entry_points
+from importlib.metadata import EntryPoint, entry_points
 from pathlib import Path
 
 import colorama
-from beartype.typing import NamedTuple
+from beartype.typing import List, NamedTuple
 from colorama import Fore, Style
 
 from gamma.config import dispatch
@@ -24,6 +24,16 @@ def get_source(module: GammaConfigScaffold):
 @dispatch
 def get_files(module, src):
     return sorted(src.glob("**/*"))
+
+
+def _get_entrypoints() -> List[EntryPoint]:
+    import sys
+
+    v = sys.version_info
+    if (v.major, v.minor) >= (3, 10):
+        return entry_points().select(group=ENTRYPOINT_GROUP)
+    else:
+        return entry_points().get(ENTRYPOINT_GROUP, [])
 
 
 def scaffold(target, force):
@@ -58,7 +68,7 @@ def scaffold(target, force):
 
     # load plugins from ENTRYPOINT_GROUP
     modules = [GammaConfigScaffold()]
-    for ep in entry_points(group=ENTRYPOINT_GROUP):
+    for ep in _get_entrypoints():
         plugin = ep.load()
         modules.append(plugin())
 
