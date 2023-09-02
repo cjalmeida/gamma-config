@@ -290,15 +290,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#env_secret" class="md-nav__link">
-    !env_secret
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#j2-or-j2_secret" class="md-nav__link">
-    !j2 or !j2_secret
+  <a href="#j2" class="md-nav__link">
+    !j2
   </a>
   
 </li>
@@ -318,48 +311,29 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#py" class="md-nav__link">
-    !py
+  <a href="#call" class="md-nav__link">
+    !call
   </a>
-  
-    <nav class="md-nav" aria-label="!py">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#usage-pymodulecallable" class="md-nav__link">
-    Usage: !py:[module]:[callable]
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#obj" class="md-nav__link">
-    !obj
-  </a>
-  
-    <nav class="md-nav" aria-label="!obj">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#usage-objmodulecallable-or-objcallable" class="md-nav__link">
-    Usage: !obj:[module]:[callable] or !obj:[callable]
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#path" class="md-nav__link">
     !path
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#py" class="md-nav__link">
+    !py
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#obj" class="md-nav__link">
+    !obj
   </a>
   
 </li>
@@ -966,15 +940,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#env_secret" class="md-nav__link">
-    !env_secret
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#j2-or-j2_secret" class="md-nav__link">
-    !j2 or !j2_secret
+  <a href="#j2" class="md-nav__link">
+    !j2
   </a>
   
 </li>
@@ -994,48 +961,29 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#py" class="md-nav__link">
-    !py
+  <a href="#call" class="md-nav__link">
+    !call
   </a>
-  
-    <nav class="md-nav" aria-label="!py">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#usage-pymodulecallable" class="md-nav__link">
-    Usage: !py:[module]:[callable]
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#obj" class="md-nav__link">
-    !obj
-  </a>
-  
-    <nav class="md-nav" aria-label="!obj">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#usage-objmodulecallable-or-objcallable" class="md-nav__link">
-    Usage: !obj:[module]:[callable] or !obj:[callable]
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#path" class="md-nav__link">
     !path
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#py" class="md-nav__link">
+    !py
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#obj" class="md-nav__link">
+    !obj
   </a>
   
 </li>
@@ -1062,43 +1010,46 @@
 
 
 <h1 id="built-in-tags">Built-in tags</h1>
-<p>In <code>gamma-config</code>, YAML tags provide dynamic behavior to the configuration allowing the resulting config object to centralize all application parameters. While we provide a good set of built-in tags, you're encouraged to write custom tags to fit your
+<p>In <code>gamma-config</code>, YAML tags provide dynamic behavior to the configuration allowing the
+resulting config object to centralize all application parameters. While we provide a
+good set of built-in tags, you're encouraged to write custom tags to fit your
 application needs.</p>
 <h2 id="built-in-tags-reference">Built-in tags reference</h2>
 <h3 id="env">!env</h3>
-<p>References a system environment variable. <strong>Do not use this tag to load secrets</strong> as
-the contents are dumped by default on the <code>to_yaml()</code> call. You can use the <code>|</code>
-(pipe) character to provide a default if a value is missing.</p>
+<div class="admonition note">
+<p class="admonition-title">Changed in v0.8</p>
+<p>The <code>!env</code> tag defaults to not dumping the contents when calling <code>to_yaml</code>. 
+<code>!env_secret</code> is still supported but it's use is discouraged.</p>
+</div>
+<p>References a system environment variable. You can use the <code>|</code> (pipe) character to
+provide a default if a value is missing. By default <code>!env</code> won't dump the content
+when calling <code>to_yaml</code>, if you want to force this behavior, use <code>!env:dump</code></p>
 <p>Example:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">sample_key</span><span class="p">:</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">my_var</span><span class="p">:</span><span class="w"> </span><span class="kt">!env</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VAR|my_default</span>
 </code></pre></div>
-<h3 id="env_secret">!env_secret</h3>
-<p>Similar to <code>!env</code> but won't dump the variable contents.</p>
-<p>Example:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">sample_key</span><span class="p">:</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nt">my_var</span><span class="p">:</span><span class="w"> </span><span class="kt">!env_secret</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SECRET|my_secret</span>
-</code></pre></div>
-<h3 id="j2-or-j2_secret">!j2 or !j2_secret</h3>
+<h3 id="j2">!j2</h3>
 <p>Allow the use of Jinja2 templates. The default variables available are:</p>
 <ul>
 <li><code>env</code>: a dict of the system environment variables</li>
 <li><code>c</code>: a reference to the root config object</li>
-<li>Anything under a <code>_context</code> map in a parent node</li>
+<li>Anything under a <code>_context</code> map in a parent node. The <code>_context</code> map is searched
+    and merged recursively until the root node.</li>
 </ul>
 <p>In practice, in the snippet bellow:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">myvar</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">foo1</span><span class="p">:</span><span class="w"> </span><span class="kt">!j2</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Number = {{ c.myvar }}</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">level0</span><span class="p">:</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">_context</span><span class="p">:</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nt">custom_var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myvalue</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">bar1</span><span class="p">:</span><span class="w"> </span><span class="kt">!j2</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Custom = {{ custom_var }}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">myvar</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">foo1</span><span class="p">:</span><span class="w"> </span><span class="kt">!j2</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Number = {{ c.myvar }}</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nt">level0</span><span class="p">:</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nt">_context</span><span class="p">:</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="nt">custom_var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myvalue</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="nt">bar1</span><span class="p">:</span><span class="w"> </span><span class="kt">!j2</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Custom = {{ custom_var }}</span>
 </code></pre></div>
-<p>The value of <code>foo1</code> is the string <code>Number = 100</code>. The value of <code>level0.bar1</code> is <code>Custom
-= myvalue</code> because we defined <code>_context</code> in a parent node. See the section on <a href="tags?id=extending-the-render-context">extending
+<p>The value of <code>foo1</code> is the string <code>Number = 100</code>. The value of <code>level0.bar1</code> is <code>Custom = myvalue</code> 
+because we defined <code>_context</code> in a parent node. See the section on <a href="tags?id=extending-the-render-context">extending
 the render context</a> to add your own variables.</p>
-<p>We also provide <code>!j2_secret</code> to be used when dealing with sensitive data</p>
+<p>By default, <code>!j2</code> <strong>will dump it's contents</strong> when calling <code>to_yaml</code>. To avoid leaking 
+sensitive data please use <code>!j2:secret</code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Jinja2 <strong>is not installed by default</strong>, you should install yourself by
@@ -1110,16 +1061,16 @@ dependency.</p>
 overriden by an environment specific entry. If you key has a <code>.</code> (dot) or other
 special characters, you can wrap the key in single-quotes <code>'</code>.</p>
 <p>Example:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">key_a</span><span class="p">:</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="nt">sub_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nt">key_b</span><span class="p">:</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="s">&quot;my</span><span class="nv"> </span><span class="s">sub&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># use dot notation to access nested entries</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1"># will be the same as key_a -&gt; subkey == 100</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="nt">ref_a</span><span class="p">:</span><span class="w"> </span><span class="kt">!ref</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">key_a.sub_key</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nt">ref_b</span><span class="p">:</span><span class="w"> </span><span class="kt">!ref</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">key_b.&#39;my sub&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">key_a</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="nt">sub_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nt">key_b</span><span class="p">:</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="s">&quot;my</span><span class="nv"> </span><span class="s">sub&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># use dot notation to access nested entries</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1"># will be the same as key_a -&gt; subkey == 100</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="nt">ref_a</span><span class="p">:</span><span class="w"> </span><span class="kt">!ref</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">key_a.sub_key</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="nt">ref_b</span><span class="p">:</span><span class="w"> </span><span class="kt">!ref</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">key_b.&#39;my sub&#39;</span>
 </code></pre></div>
 <h3 id="expr">!expr</h3>
 <p>Allows you to evalute arbitrary Python expressions, using the <code>eval()</code> built-in. The default variables available are:</p>
@@ -1129,69 +1080,102 @@ special characters, you can wrap the key in single-quotes <code>'</code>.</p>
 <li>Anything under a <code>_context</code> map in a parent node</li>
 </ul>
 <p>Example usage:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">sample_key</span><span class="p">:</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="c1"># we may need to enclose the whole expression in quotes to keep it valid YAML</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">my_var</span><span class="p">:</span><span class="w"> </span><span class="kt">!expr</span><span class="w"> </span><span class="s">&#39;&quot;This</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">env</span><span class="nv"> </span><span class="s">variable&quot;</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">env[&quot;USER&quot;]&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">sample_key</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="c1"># we may need to enclose the whole expression in quotes to keep it valid YAML</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">my_var</span><span class="p">:</span><span class="w"> </span><span class="kt">!expr</span><span class="w"> </span><span class="s">&#39;&quot;This</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">env</span><span class="nv"> </span><span class="s">variable&quot;</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">env[&quot;USER&quot;]&#39;</span>
 </code></pre></div>
 <p>See the section on <a href="tags?id=extending-the-render-context">extending the render context</a> to add your own variables.</p>
+<p>By default <code>!expr</code> won't dump the content when calling <code>to_yaml</code>, if you want to force
+this behavior, use <code>!expr:dump</code></p>
+<h3 id="call">!call</h3>
+<p>Allows you to call Python functions, including class constructors from the
+configuration.</p>
+<p>By default, the <code>!call</code> tag <strong>will not</strong> call the function when "dumping" the
+configuration. If you want this behavior, you can force it by using <code>!call:dump</code></p>
+<hr />
+<p><strong>usage:</strong> <code>!call &lt;module&gt;:&lt;callable&gt;(&lt;args&gt;)</code></p>
+<p>Similar to <code>!expr</code>, it will <code>eval()</code> the code replacing <code>&lt;module&gt;:&lt;callable&gt;</code> with the
+right function reference.</p>
+<p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">my_value</span><span class="p">:</span><span class="w"> </span><span class="kt">!call</span><span class="w"> </span><span class="s">&#39;mypackage.subpackage:get_value(&quot;my-scope&quot;,</span><span class="nv"> </span><span class="s">&quot;my-key&quot;)&#39;</span>
+</code></pre></div>
+<p>The value of <code>my_value</code> key is the result of calling <code>get_value("my-key", "custom-name")</code>
+in the <code>mypackage.subpackage</code> module.</p>
+<hr />
+<p><strong>usage:</strong> <code>!call {func: &lt;module&gt;:&lt;callable&gt;, **&lt;kwargs&gt;}</code></p>
+<p>You can pass a mapping/dict to <code>!call</code>. It must contain either <code>_func</code> or <code>func</code> key
+pointing the the callable, the rest of entries are passed as keyword arguments to
+the callable.</p>
+<p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">my_value</span><span class="p">:</span><span class="w"> </span><span class="kt">!call</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nt">func</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mypackage.subpackage:get_value</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">scope</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-scope</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-key</span>
+</code></pre></div>
+<p>The value of <code>my_value</code> key is the result of calling <code>get_value(scope="my-key", key="custom-name")</code>
+in the <code>mypackage.subpackage</code> module.</p>
+<h3 id="path">!path</h3>
+<p>Return an absolute path string, relative to the <strong>parent of the config root folder</strong>.</p>
+<p>For example, consider you have a <code>data</code> folder located as a sibling to
+<code>config</code> and want to reference a file in it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">my_var</span><span class="p">:</span><span class="w"> </span><span class="kt">!path</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/hello_world.csv</span>
+</code></pre></div>
 <h3 id="py">!py</h3>
-<h5 id="usage-pymodulecallable">Usage: <code>!py:[module]:[callable]</code></h5>
+<div class="admonition warning">
+<p class="admonition-title">Deprecation warning</p>
+<p>The <code>!py</code> tag is scheduled for deprecation on release <code>1.0</code>, please use the cleaner
+<code>!call</code> tag.</p>
+</div>
+<p><strong>usage:</strong> <code>!py:[module]:[callable]</code></p>
 <p>Wraps the rendered node by calling a Python callable (class, function, etc.)</p>
 <blockquote>
 <p>[!TIP]
 This tag is an example of a <a href="tags?id=uri-style-tags">URI style tags</a>.</p>
 </blockquote>
 <p>Example usage:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># in module myapp.foo</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">def</span> <span class="nf">split_dict</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="k">return</span> <span class="n">val</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">],</span> <span class="n">val</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># in module myapp.foo</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">def</span> <span class="nf">split_dict</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="k">return</span> <span class="n">val</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">],</span> <span class="n">val</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span>
 </code></pre></div>
 <p>and config:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># here we&#39;re looking for callable `split_dict` in module `myapp.foo`</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">foo</span><span class="p">:</span><span class="w"> </span><span class="kt">!py:myapp.foo:split_dict</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nt">b</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># here we&#39;re looking for callable `split_dict` in module `myapp.foo`</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">foo</span><span class="p">:</span><span class="w"> </span><span class="kt">!py:myapp.foo:split_dict</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nt">a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nt">b</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 </code></pre></div>
 <p>The following holds:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="k">assert</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">2</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="k">assert</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">2</span>
 </code></pre></div>
 <h3 id="obj">!obj</h3>
-<h5 id="usage-objmodulecallable-or-objcallable">Usage: <code>!obj:[module]:[callable]</code> or <code>!obj:[callable]</code></h5>
+<div class="admonition warning">
+<p class="admonition-title">Deprecation warning</p>
+<p>The <code>!obj</code> tag is scheduled for deprecation on release <code>1.0</code>, please use the cleaner
+<code>!call</code> tag.</p>
+</div>
+<p><strong>usage:</strong> <code>!obj:[module]:[callable]</code> or <code>!obj:[callable]</code></p>
 <p>Specialized version of the <code>!py</code> tag above, designed to pass dictionaries as expanded <code>**kwargs</code> of the callable. It also allows you to define a default module by adding
 a <code>obj_default_module</code> entry in the root of the config file.</p>
 <p>Unlike the <code>!py</code> tag, it only support mapping nodes.</p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>This tag is particularly useful when integrating with validation libraries.
-<a href="https://pydantic-docs.helpmanual.io/">Pydantic</a> in particular supports parsing
-nested <code>dict</code>s into an object tree. See <a href="/structured">structured configuration</a>.</p>
-</div>
 <p>Example usage:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># in module myapp.config</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nd">@dataclass</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">class</span> <span class="nc">Section</span><span class="p">:</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">a</span><span class="p">:</span> <span class="nb">int</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="n">b</span><span class="p">:</span> <span class="nb">int</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># in module myapp.config</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nd">@dataclass</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">class</span> <span class="nc">Section</span><span class="p">:</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">a</span><span class="p">:</span> <span class="nb">int</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">b</span><span class="p">:</span> <span class="nb">int</span>
 </code></pre></div>
 <p>and config</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">obj_default_module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myapp.config</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nt">foo</span><span class="p">:</span><span class="w"> </span><span class="kt">!obj:Section</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="nt">a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="nt">b</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">obj_default_module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myapp.config</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nt">foo</span><span class="p">:</span><span class="w"> </span><span class="kt">!obj:Section</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="nt">a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="nt">b</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 </code></pre></div>
 <p>The following holds:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">section</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="k">assert</span> <span class="n">section</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">section</span><span class="o">.</span><span class="n">b</span> <span class="o">==</span> <span class="mi">2</span>
-</code></pre></div>
-<h3 id="path">!path</h3>
-<p>Return an absolute path string, relative to the <strong>parent of the config root folder</strong>.</p>
-<p>For example, consider you have a <code>data</code> folder located as a sibling to
-<code>config</code> and want to reference a file in it:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">my_var</span><span class="p">:</span><span class="w"> </span><span class="kt">!path</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/hello_world.csv</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="n">section</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="k">assert</span> <span class="n">section</span><span class="o">.</span><span class="n">a</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">section</span><span class="o">.</span><span class="n">b</span> <span class="o">==</span> <span class="mi">2</span>
 </code></pre></div>
 
 

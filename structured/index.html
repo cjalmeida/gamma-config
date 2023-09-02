@@ -914,6 +914,12 @@
 
 
 <h1 id="structured-configuration-pydantic">Structured configuration (Pydantic)</h1>
+<div class="admonition warning">
+<p class="admonition-title">Deprecated</p>
+<p>Structured configuration support is deprecated and scheduled for removal in <code>v1.0</code>.
+We recommend directly using <a href="https://docs.pydantic.dev/latest/usage/types/unions/#discriminated-unions-aka-tagged-unions">Pydantic's V2 discriminated unions</a> 
+as an alternative.</p>
+</div>
 <p>While you can read configuration entries as dictionary entries, <code>gamma-config</code> has 
 direct support for <strong>structured configuration</strong> using <a href="https://pydantic-docs.helpmanual.io/">Pydantic</a>. Structured
 configuration simply means using types to describe and validate your configuration

@@ -566,6 +566,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#gamma.config.confignode.as_node" class="md-nav__link">
+    as_node()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#gamma.config.confignode.config_getitem" class="md-nav__link">
     config_getitem()
   </a>
@@ -975,6 +982,13 @@
         <li class="md-nav__item">
   <a href="#gamma.config.confignode.RootConfig" class="md-nav__link">
     RootConfig
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gamma.config.confignode.as_node" class="md-nav__link">
+    as_node()
   </a>
   
 </li>
@@ -1490,6 +1504,35 @@ sort order and this affects merge results.</p>
 
 </div>
 
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="gamma.config.confignode.as_node" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">as_node</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Return the underlying mapping node.</p>
+
+      <details class="quote">
+        <summary>Source code in <code>gamma/config/confignode.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="k">def</span> <span class="nf">as_node</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="s2">&quot;ConfigNode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the underlying mapping node.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">_node</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 

@@ -223,6 +223,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#breaking-in-08" class="md-nav__link">
+    Breaking in 0.8
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#breaking-in-07" class="md-nav__link">
     Breaking in 0.7
   </a>
@@ -971,6 +978,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#breaking-in-08" class="md-nav__link">
+    Breaking in 0.8
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#breaking-in-07" class="md-nav__link">
     Breaking in 0.7
   </a>
@@ -1034,7 +1048,7 @@
 
 
 <h1 id="gamma-config">Gamma Config</h1>
-<p><img alt="python" src="https://img.shields.io/badge/python-3.8%2B-blue" /> <img alt="build" src="https://github.com/cjalmeida/gamma-config/actions/workflows/build-deploy.yaml/badge.svg" /> <img alt="cov" src="https://img.shields.io/badge/coverage-96%25-green" /></p>
+<p><img alt="python" src="https://img.shields.io/badge/python-3.8%2B-blue" /> <img alt="build" src="https://github.com/cjalmeida/gamma-config/actions/workflows/build-deploy.yaml/badge.svg" /> <img alt="cov" src="https://img.shields.io/badge/coverage-95%25-green" /></p>
 <p>An opinionated way of setting up configuration for data science projects.</p>
 <h2 id="overview">Overview</h2>
 <p>Gamma config provides a standard and flexible way of implementing application
@@ -1105,6 +1119,27 @@ with the contents:</p>
 </code></pre></div>
 <p>Most of the magic happen via tags. Look at the documentation for info on the <a href="tags">built-in tags</a> available.</p>
 <h2 id="changelog">Changelog</h2>
+<h3 id="breaking-in-08">Breaking in 0.8</h3>
+<ul>
+<li>
+<p>We <strong>DEPRECATED</strong> <code>!py</code> and <code>!obj</code> tags, replacing them by the cleaner/simpler
+    <a href="built-in-tags/#call"><code>!call</code> tag</a>. Those are schedule to be removed by release 1.0.</p>
+</li>
+<li>
+<p>We <strong>DEPRECATED</strong> "Structured configuration" support, We recommend directly using 
+    <a href="https://docs.pydantic.dev/latest/usage/types/unions/#discriminated-unions-aka-tagged-unions">Pydantic's V2 discriminated unions</a> 
+    as an alternative.</p>
+</li>
+<li>
+<p>By default, <code>!env</code>, <code>!expr</code> and <code>!call</code> will not dump the contents on a <code>to_yaml</code>
+    call. We provide <code>!env:dump</code>, <code>!expr:dump</code>, <code>!call:dump</code> to force dumping. Tag 
+    <code>!env_secret</code> is still supported but use is discouraged.</p>
+</li>
+<li>
+<p>We have <code>!j2:secret</code> in addition to <code>!j2_secret</code> for consistency. Use of
+    <code>!j2_secret</code> is discouraged.</p>
+</li>
+</ul>
 <h3 id="breaking-in-07">Breaking in 0.7</h3>
 <ul>
 <li>We've <strong>DEPRECATED</strong> our homegrown multiple dispatch system <code>gamma.dispatch</code>,
