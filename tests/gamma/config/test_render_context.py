@@ -56,3 +56,43 @@ def test_custom_ctx(custom_ctx):
     assert new_rnd != old_rnd
 
     assert ctx["foo2"] == "bar"
+
+
+def test_undescore_context():
+    from gamma.config import RootConfig
+
+    src = """
+
+_context:
+  va: 1
+
+na: !expr va
+
+level0:
+  _context:
+    va: 10
+    vb: 20
+
+  na: !expr va
+  nb: !expr vb
+
+  level1:
+    _context:
+      va: 100
+      vc: 300
+
+    na: !expr va
+    nb: !expr vb
+    nc: !expr vc
+    """
+
+    cfg = RootConfig("dummy", src)
+
+    assert cfg["na"] == 1
+    assert cfg["level0"]["na"] == 10
+    assert cfg["level0"]["level1"]["na"] == 100
+
+    assert cfg["level0"]["nb"] == 20
+    assert cfg["level0"]["level1"]["nb"] == 20
+
+    assert cfg["level0"]["level1"]["nc"] == 300

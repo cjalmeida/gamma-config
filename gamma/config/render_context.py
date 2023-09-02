@@ -87,17 +87,39 @@ def base_provider(**kwargs):
 def underscore_context_provider(*, config: ConfigNode = None, **kwargs):
     """Look in parent config nodes and add all entries under the `_context` key"""
 
-    vars = []
+    from .dump_dict import to_dict
+    from .merge import merge_nodes
+    from .rawnodes import as_node
+
     if not config:
-        return vars
+        return []
 
-    while config._parent is not None:
-        config = config._parent
-        ctx: dict = config.get("_context", {})
-        for key, value in ctx.items():
-            vars.append(ContextVar(key, value))
+    stack = []
 
-    return vars
+    cur = config
+
+    while cur:
+        _context = as_node(cur.get("_context", {}))
+        stack.append(_context)
+
+        cur = cur._parent
+        if cur is None:
+            break
+
+    # merge context stack and render
+    stack = list(reversed(stack))
+    _, merged_node = merge_nodes(stack)
+    new_args = kwargs.copy()
+    new_args.pop("node", None)
+    new_args.pop("tag", None)
+    merged = to_dict(merged_node, config=config, **new_args)
+
+    # wrap in context vars
+    out = []
+    for key, value in merged.items():
+        out.append(ContextVar(key, value))
+
+    return out
 
 
 context_providers: List[Union[Callable, List[ContextVar]]] = [

@@ -10,8 +10,12 @@ from .tags import Map, Seq
 def _prepare_ctx(**ctx):
     from gamma.config import get_config
 
-    ctx.setdefault("recursive", True)
-    ctx.setdefault("config", get_config())
+    if "recursive" not in ctx:
+        ctx["recursive"] = True
+
+    if "config" not in ctx:
+        ctx["config"] = get_config()
+
     return ctx
 
 

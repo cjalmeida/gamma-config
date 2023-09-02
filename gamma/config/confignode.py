@@ -357,3 +357,9 @@ def config_context(partial) -> Any:
     cfg = get_config()
     with config_context(cfg, partial):
         yield
+
+
+@dispatch
+def as_node(a: "ConfigNode") -> Node:
+    """Return the underlying mapping node."""
+    return a._node
