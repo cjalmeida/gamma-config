@@ -98,6 +98,22 @@ Most of the magic happen via tags. Look at the documentation for info on the [bu
 
 ## Changelog
 
+### Breaking in 0.8
+
+-   We **DEPRECATED** `!py` and `!obj` tags, replacing them by the cleaner/simpler
+    [`!call` tag](built-in-tags/#call). Those are schedule to removel by release 1.0.
+
+-   We **DEPRECATED** "Structured configuration" support, We recommend directly using 
+    [Pydantic's V2 discriminated unions](https://docs.pydantic.dev/latest/usage/types/unions/#discriminated-unions-aka-tagged-unions) 
+    as an alternative.
+
+-   By default, `!env`, `!expr` and `!call` will not dump the contents on a `to_yaml`
+    call. We provide `!env:dump`, `!expr:dump`, `!call:dump` to force dumping. Tag 
+    `!env_secret` is still supported but use is discouraged.
+
+-   We have `!j2:secret` in addition to `!j2_secret` for consistency. Use of
+    `!j2_secret` is discouraged.
+
 ### Breaking in 0.7
 
 -   We've **DEPRECATED** our homegrown multiple dispatch system `gamma.dispatch`,
