@@ -1,7 +1,7 @@
 """Module implementing convenience methods for dealing with `ruamel.yaml` `Node`s"""
 from collections.abc import Hashable
 
-from beartype.typing import Any, Iterable, Optional, Tuple
+from beartype.typing import Any, Iterable, Mapping, Optional, Tuple
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
 from gamma.config import dispatch
@@ -148,6 +148,13 @@ def as_node(a) -> Node:
 @dispatch
 def as_node(a: str) -> Node:
     return ScalarNode("tag:yaml.org,2002:str", value=a)
+
+
+@dispatch
+def as_node(a: Mapping) -> Node:
+    return MappingNode(
+        "tag:yaml.org,2002:map", value=[(as_node(k), as_node(v)) for k, v in a.items()]
+    )
 
 
 @dispatch
