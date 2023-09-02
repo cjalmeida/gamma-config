@@ -4,6 +4,7 @@ import importlib
 import os
 import re
 import threading
+import warnings
 
 from beartype.typing import Any, List, Union
 from ruamel.yaml import YAML
@@ -325,6 +326,13 @@ def render_node(node: ScalarNode, tag: PyTag, *, path=None, **ctx):
     - no argument passed
     """
 
+    warnings.warn(
+        "`!py` is deprecated. Use `!call`, see  "
+        "https://cjalmeida.github.io/gamma-config/#breaking-in-08",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     func = _py_tag_get_func("py", path)
     val = yaml.load(node.value)
     if val:
@@ -345,6 +353,13 @@ def render_node(
     The `map` or `seq` node value is first converted to a Python `dict`/`list`
     recursively using the `to_dict` method.
     """
+
+    warnings.warn(
+        "`!py` is deprecated. Use `!call`, see  "
+        "https://cjalmeida.github.io/gamma-config/#breaking-in-08",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     func = _py_tag_get_func("py", path)
     val = to_dict(node, **ctx)
@@ -418,6 +433,13 @@ def render_node(
     ```
     """
 
+    warnings.warn(
+        "`!obj` is deprecated. Use `!call`, see  "
+        "https://cjalmeida.github.io/gamma-config/#breaking-in-08",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     root = config and config._root
     default_module = (root and root.get("obj_default_module")) or None
     func = _py_tag_get_func("obj", path, default_module=default_module)
@@ -438,6 +460,13 @@ def render_node(node: ScalarNode, tag: ObjTag, *, path=None, config=None, **ctx)
     `foo` will try to call `myapp.mymodule.MyClass(100)` and `bar` will try to call
     `myapp.mymodule.MyClass(100)`
     """
+
+    warnings.warn(
+        "`!obj` is deprecated. Use `!call`, see  "
+        "https://cjalmeida.github.io/gamma-config/#breaking-in-08",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     root = config and config._root
     default_module = (root and root.get("obj_default_module")) or None

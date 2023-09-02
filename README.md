@@ -101,7 +101,7 @@ Most of the magic happen via tags. Look at the documentation for info on the [bu
 ### Breaking in 0.8
 
 -   We **DEPRECATED** `!py` and `!obj` tags, replacing them by the cleaner/simpler
-    [`!call` tag](built-in-tags/#call). Those are schedule to removel by release 1.0.
+    [`!call` tag](built-in-tags/#call). Those are schedule to be removed by release 1.0.
 
 -   We **DEPRECATED** "Structured configuration" support, We recommend directly using 
     [Pydantic's V2 discriminated unions](https://docs.pydantic.dev/latest/usage/types/unions/#discriminated-unions-aka-tagged-unions) 
