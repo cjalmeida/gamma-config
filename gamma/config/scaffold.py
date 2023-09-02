@@ -58,7 +58,7 @@ def scaffold(target, force):
 
     # load plugins from ENTRYPOINT_GROUP
     modules = [GammaConfigScaffold()]
-    for ep in entry_points().get(ENTRYPOINT_GROUP, []):
+    for ep in entry_points(group=ENTRYPOINT_GROUP):
         plugin = ep.load()
         modules.append(plugin())
 

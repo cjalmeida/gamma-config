@@ -2,9 +2,10 @@
 
 import importlib
 import os
+import re
 import threading
 
-from beartype.typing import Any, Union
+from beartype.typing import Any, List, Union
 from ruamel.yaml import YAML
 from ruamel.yaml.nodes import MappingNode, Node, ScalarNode, SequenceNode
 
@@ -18,15 +19,17 @@ from .render_context import get_render_context
 from .tags import Tag, TagException
 
 UNDEFINED = "~~UNDEFINED~~"
+VALID_MODIFIERS = ("dump", "secret")
+
 yaml = YAML(typ="safe")
 
 
 RefTag = Tag["!ref"]
-EnvTag = Tag["!env"]
-EnvSecretTag = Tag["!env_secret"]
+EnvTag = Tag["!env"] | Tag["!env_secret"]
 ExprTag = Tag["!expr"]
 J2Tag = Tag["!j2"]
 J2SecretTag = Tag["!j2_secret"]
+CallTag = Tag["!call"]
 PyTag = Tag["!py"]
 ObjTag = Tag["!obj"]
 PathTag = Tag["!path"]
@@ -34,17 +37,40 @@ PathTag = Tag["!path"]
 j2_cache = threading.local()
 
 
+def get_modifiers(path) -> List[str]:
+    if not path:
+        return []
+    mods = path.split(":")
+    assert all(mod in VALID_MODIFIERS for mod in mods), f"Invalid tag: {path}"
+    return mods
+
+
+def mod_force_dump(modifiers) -> bool:
+    return "dump" in modifiers
+
+
+def mod_secret(modifiers) -> bool:
+    return "secret" in modifiers
+
+
 @dispatch
-def render_node(node: Node, tag: EnvTag, **ctx):
+def render_node(node: Node, tag: EnvTag, *, dump=False, path=None, **ctx):
     """[!env] Maps the value to an environment variable of the same name.
 
     You can provide a default using the ``|`` (pipe) character after the variable
     name.
 
+    Accepts `dump` modifier.
+
     Examples:
 
         my_var: !env MYVAR|my_default
     """
+
+    modifiers = get_modifiers(path)
+    if dump and not mod_force_dump(modifiers):
+        return node
+
     name = node.value
     name, default = _split_default(name)
     env_val = os.getenv(name, default)
@@ -58,19 +84,12 @@ def render_node(node: Node, tag: EnvTag, **ctx):
     return env_val
 
 
-# process: !env_secret
-@dispatch
-def render_node(node: Node, tag: EnvSecretTag, *, dump=False, **ctx):
-    """[!env_secret] Similar to !env, but never returns the value when dumping."""
-    if dump:
-        return node
-    return render_node(node, EnvTag(), dump=dump, **ctx)
-
-
 # process: !expr
 @dispatch
-def render_node(node: Node, tag: ExprTag, **ctx):
+def render_node(node: Node, tag: ExprTag, *, path=None, dump=False, **ctx):
     """[!expr] Uses ``eval()`` to render arbitrary Python expressions.
+
+    Accepts `dump` modifier.
 
     By default, we add the root configuration as `c` variable.
 
@@ -78,14 +97,22 @@ def render_node(node: Node, tag: ExprTag, **ctx):
     own variables to the context.
     """
 
+    modifiers = get_modifiers(path)
+    if dump and not mod_force_dump(modifiers):
+        return node
+
     _locals = {}
     _globals = get_render_context(node=node, tag=tag, **ctx)
     return eval(node.value, _globals, _locals)
 
 
 @dispatch
-def render_node(node: Node, tag: J2Tag, *, config=None, key=None, **ctx):
+def render_node(
+    node: Node, tag: J2Tag, *, path=None, dump=False, config=None, key=None, **ctx
+):
     """[!j2] Treats the value a Jinj2 Template
+
+    Accepts `secret` modifier
 
     See ``gamma.config.render_context.context_providers`` documentation to add your
     own variables to the context.
@@ -103,7 +130,13 @@ def render_node(node: Node, tag: J2Tag, *, config=None, key=None, **ctx):
 
     Notes:
         * Jinja2 is not installed by default, you should install it manually.
+        * By default, it will dump values, including transitive references.
     """
+
+    modifiers = get_modifiers(path)
+    if dump and mod_secret(modifiers):
+        return node
+
     try:
         import jinja2
         import jinja2.exceptions
@@ -146,6 +179,7 @@ def render_node(node: Node, tag: J2SecretTag, *, dump=False, **ctx):
     return render_node(node, J2Tag(), dump=dump, **ctx)
 
 
+# process !ref
 @dispatch
 def render_node(node: Node, tag: RefTag, *, config=None, recursive=False, **ctx):
     """[!ref] References other entries in the config object.
@@ -175,6 +209,96 @@ def render_node(node: Node, tag: RefTag, *, config=None, recursive=False, **ctx)
             val = render_node(val, config=config, recursive=recursive, **ctx)
 
     return val
+
+
+CALL_FUNC_REGEX = re.compile(r"([a-zA-Z_][\w:\.]*?)\(.*?\)")
+
+
+def _resolve_callable(fq_name: str):
+    if ":" not in fq_name:
+        msg = "Expected function format <module>:<name>(<args>)"
+        raise ValueError(msg)
+
+    # Load the module and get the function
+    modname, fname = fq_name.split(":", 1)
+    mod = importlib.import_module(modname)
+    func = getattr(mod, fname, None)
+    if func is None:
+        msg = f"Function '{fname}' not in module '{modname}'"
+        raise ValueError(msg)
+
+    return func
+
+
+# process: !call <scalar>
+@dispatch
+def render_node(node: ScalarNode, tag: CallTag, *, dump=False, path=None, **ctx):
+    """[!call <scalar>] Call `eval()` on the arguments.
+
+    Accepts `dump` modifier.
+
+    It detects and load qualified function calls."""
+
+    modifiers = get_modifiers(path)
+    if dump and not mod_force_dump(modifiers):
+        return node
+
+    func_map = {}
+    code = node.value
+
+    # use regex to parse node value
+    pos = 0
+    while match := CALL_FUNC_REGEX.match(code, pos=pos):
+        # Get the fully qualified function name
+        fq_name = match.group(1)
+
+        try:
+            func = _resolve_callable(fq_name)
+        except ValueError as ex:
+            msg = ex.args[0]
+            raise ValueError(f"Error in '!call {code}': {msg}")
+
+        # Replace the fq name with a valid Python identifier and add to fmap
+        new_name = fq_name.replace(":", "__")
+        func_map[new_name] = func
+        code = code.replace(fq_name, new_name)
+        pos = match.endpos
+
+    # eval the updated code with the correct function references
+    _locals = {}
+    _globals = get_render_context(node=node, tag=tag, **ctx)
+    _globals.update(func_map)
+    return eval(code, _globals, _locals)
+
+
+# process: !call <mapping>
+@dispatch
+def render_node(node: MappingNode, tag: CallTag, *, dump=False, path=None, **ctx):
+    """[!call <mapping>] Call `eval()` on the arguments.
+
+    Accepts `dump` modifier.
+
+    Requires `_func` or `func` keys in the mapping"""
+
+    modifiers = get_modifiers(path)
+    if dump and not mod_force_dump(modifiers):
+        return node
+
+    args: dict = to_dict(node)
+
+    fq_name = args.pop("_func", None) or args.pop("func", None)
+
+    if fq_name is None:
+        msg = f"No '_func' or 'func' key found in mapping {args}"
+        raise ValueError(f"Error in '!call <mapping>': {msg}")
+
+    try:
+        func = _resolve_callable(fq_name)
+    except ValueError as ex:
+        msg = ex.args[0]
+        raise ValueError(f"Error in '!call <mapping>': {msg}")
+
+    return func(**args)
 
 
 # process: !py

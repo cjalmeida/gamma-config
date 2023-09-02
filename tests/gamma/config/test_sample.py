@@ -77,7 +77,7 @@ def test_sample_dump():
     assert loaded["sample_scalar_1"] == "hello world"
 
     # test env
-    assert loaded["sample_env"]["user"] == os.environ["USER"]
+    assert not isinstance(loaded["sample_env"]["user"], str)
 
     # assert secret env was not dumped
     assert not isinstance(loaded["sample_env"]["secret_user"], str)
@@ -95,12 +95,12 @@ def test_sample_dump():
     dump = to_yaml(config["sample_env"], True)
     yaml = YAML(typ="rt")
     loaded = yaml.load(dump)
-    assert loaded["user"] == os.environ["USER"]
+    assert not (loaded["user"] == os.environ["USER"])
 
     # dump to dict
     new_dict = to_dict(config)
-    assert type(new_dict) == dict
-    assert type(new_dict["sample_env"]) == dict
+    assert isinstance(new_dict, dict)
+    assert isinstance(new_dict["sample_env"], dict)
 
 
 def test_expression(monkeypatch):

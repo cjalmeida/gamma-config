@@ -111,11 +111,10 @@ configuration. If you want this behavior, you can force it by using `!call:dump`
 
 ---
 
-**usage:** `!call <string>`
+**usage:** `!call <module>:<callable>(<args>)`
 
-Similar to `!expr`, it will `eval()` the code but as syntatic sugar it will locate all
-instances of `<module>:<callable>(<args>)` and load the Python module `<module>` as
-needed.
+Similar to `!expr`, it will `eval()` the code replacing `<module>:<callable>` with the
+right function reference.
 
 Example usage:
 

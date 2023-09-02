@@ -6,7 +6,7 @@ groups = ["default", "pydantic", "jinja2", "dev"]
 cross_platform = true
 static_urls = false
 lock_version = "4.3"
-content_hash = "sha256:4eb7a2093bd613a26e6b212dbf038c41d6f22be8180c6181a60122ca5ae7cb26"
+content_hash = "sha256:ac2735cb64984963bf962d82f65aecab8b9c6aa0f6aee187ce15e15b300df0b4"
 
 [[package]]
 name = "anyio"
@@ -473,6 +473,19 @@ summary = "Get the currently executing AST node of a frame, and other informatio
 files = [
     {file = "executing-1.2.0-py2.py3-none-any.whl", hash = "sha256:0314a69e37426e3608aada02473b4161d4caf5a4b244d1d0c48072b8fee7bacc"},
     {file = "executing-1.2.0.tar.gz", hash = "sha256:19da64c18d2d851112f09c287f8d3dbbdf725ab0e569077efb6cdcbd3497c107"},
+]
+
+[[package]]
+name = "fancycompleter"
+version = "0.9.1"
+summary = "colorful TAB completion for Python prompt"
+dependencies = [
+    "pyreadline; platform_system == \"Windows\"",
+    "pyrepl>=0.8.2",
+]
+files = [
+    {file = "fancycompleter-0.9.1-py3-none-any.whl", hash = "sha256:dd076bca7d9d524cc7f25ec8f35ef95388ffef9ef46def4d3d25e9b044ad7080"},
+    {file = "fancycompleter-0.9.1.tar.gz", hash = "sha256:09e0feb8ae242abdfd7ef2ba55069a46f011814a80fe5476be48f51b00247272"},
 ]
 
 [[package]]
@@ -1077,6 +1090,20 @@ files = [
 ]
 
 [[package]]
+name = "pdbpp"
+version = "0.10.3"
+summary = "pdb++, a drop-in replacement for pdb"
+dependencies = [
+    "fancycompleter>=0.8",
+    "pygments",
+    "wmctrl",
+]
+files = [
+    {file = "pdbpp-0.10.3-py2.py3-none-any.whl", hash = "sha256:79580568e33eb3d6f6b462b1187f53e10cd8e4538f7d31495c9181e2cf9665d1"},
+    {file = "pdbpp-0.10.3.tar.gz", hash = "sha256:d9e43f4fda388eeb365f2887f4e7b66ac09dce9b6236b76f63616530e2f669f5"},
+]
+
+[[package]]
 name = "pexpect"
 version = "4.8.0"
 summary = "Pexpect allows easy control of interactive console applications."
@@ -1280,6 +1307,22 @@ dependencies = [
 files = [
     {file = "pymdown_extensions-9.9.2-py3-none-any.whl", hash = "sha256:c3d804eb4a42b85bafb5f36436342a5ad38df03878bb24db8855a4aa8b08b765"},
     {file = "pymdown_extensions-9.9.2.tar.gz", hash = "sha256:ebb33069bafcb64d5f5988043331d4ea4929325dc678a6bcf247ddfcf96499f8"},
+]
+
+[[package]]
+name = "pyreadline"
+version = "2.1"
+summary = "A python implmementation of GNU readline."
+files = [
+    {file = "pyreadline-2.1.zip", hash = "sha256:4530592fc2e85b25b1a9f79664433da09237c1a270e4d78ea5aa3a2c7229e2d1"},
+]
+
+[[package]]
+name = "pyrepl"
+version = "0.9.0"
+summary = "A library for building flexible command line interfaces"
+files = [
+    {file = "pyrepl-0.9.0.tar.gz", hash = "sha256:292570f34b5502e871bbb966d639474f2b57fbfcd3373c2d6a2f3d56e681a775"},
 ]
 
 [[package]]
@@ -1777,6 +1820,14 @@ summary = "Character encoding aliases for legacy web content"
 files = [
     {file = "webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78"},
     {file = "webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"},
+]
+
+[[package]]
+name = "wmctrl"
+version = "0.4"
+summary = "A tool to programmatically control windows inside X"
+files = [
+    {file = "wmctrl-0.4.tar.gz", hash = "sha256:66cbff72b0ca06a22ec3883ac3a4d7c41078bdae4fb7310f52951769b10e14e0"},
 ]
 
 [[package]]
