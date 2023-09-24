@@ -99,12 +99,17 @@ def underscore_context_provider(*, config: ConfigNode = None, **kwargs):
     cur = config
 
     while cur:
-        _context = as_node(cur.get("_context", {}))
-        stack.append(_context)
+        _context = cur.get("_context", {})
+
+        if _context:
+            stack.append(as_node(_context))
 
         cur = cur._parent
         if cur is None:
             break
+
+    if not stack:
+        return []
 
     # merge context stack and render
     stack = list(reversed(stack))
