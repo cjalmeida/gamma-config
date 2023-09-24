@@ -1,32 +1,59 @@
-from pydantic import BaseModel
+from typing import Literal
 
-from gamma.config import RootConfig
+from beartype.typing import List, Optional, Union
+from pydantic import BaseModel, Field, parse_obj_as
+from typing_extensions import Annotated
+
+from gamma.config import RootConfig, to_dict
 
 
-class Dataset(BaseModel):
+class BaseDataset(BaseModel):
+    format: str
     path: str
+
+
+class ParquetDataset(BaseDataset):
+    format: Literal["parquet"]
     compression: str
+    columns: Optional[List[str]]
 
 
-def test_obj():
-    from tests.gamma.config.pydantic.test_doc2 import Dataset
+class CsvDataset(BaseDataset):
+    format: Literal["csv"]
+    compression: str
+    separator: str
 
+
+Dataset = Annotated[Union[ParquetDataset, CsvDataset], Field(discriminator="format")]
+
+
+def test_manual():
     src = """
-obj_default_module: tests.gamma.config.pydantic.test_doc2
-
 datasets:
-  foo: !obj:Dataset
+  foo:
+    format: csv
     path: data/foo.csv.gz
     compression: gzip
-  bar: !obj:Dataset
+    separator: ";"
+
+  bar:
+    format: parquet
     path: data/bar.parquet
     compression: snappy
+    columns: [col_x, col_y]
     """
 
     config = RootConfig("dummy", src)
     get_config = lambda: config  # noqa
 
-    foo = get_config()["datasets"]["foo"]
-    bar = get_config()["datasets"]["bar"]
-    assert isinstance(foo, Dataset)
-    assert isinstance(bar, Dataset)
+    def get_dataset(name):
+        entry = get_config()["datasets"][name]
+        obj = parse_obj_as(Dataset, to_dict(entry))
+        return obj
+
+    foo = get_dataset("foo")
+    bar = get_dataset("bar")
+    assert isinstance(foo, CsvDataset)
+    assert not hasattr(foo, "columns")
+    assert isinstance(bar, ParquetDataset)
+    assert not hasattr(bar, "separator")

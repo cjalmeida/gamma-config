@@ -86,7 +86,7 @@ The `ctx` kwargs dict allows you to access contextual information when rendering
 ### URI-style tags
 
 The default tag dispatch mechanism is to dispatch on the resolved tag value using a
-parameterized `Tag` subtype. For instance, `foo: !mytag 1` will only dipatch on `(node:
+parameterized `Tag` subtype. For instance, `foo: !mytag 1` will only dispatch on `(node:
 ScalarNode, tag: Tag["!mytag"])`.
 
 However, if the tag contains a `:` (colon), we're assuming the tag is an _URI-style tag_
@@ -100,12 +100,14 @@ An example:
 foo: !mytag:mypath 1
 ```
 
-will dispatch first on `(node: ScalarNode, tag: Tag["!mytag:mypath"])` and, failing to find such method, will also try `(node: ScalarNode, tag: Tag["!mytag"])` with `path = "mypath"` as extra keyword argument.
+will dispatch first on `(node: ScalarNode, tag: Tag["!mytag:mypath"])` and, failing to
+find such method, will also try `(node: ScalarNode, tag: Tag["!mytag"])` with `path =
+"mypath"` as extra keyword argument.
 
 ## Extending the render context
 
 Some tags like `!j2` and `!expr` allow you to refer to variables in the _render context_.
-By default, we provide `env` and `c`, refering to a dict of environment variables, and
+By default, we provide `env` and `c`, referring to a dict of environment variables, and
 to the root config itself.
 
 We also allow you to add a `_context` mapping entry to any parent node to extend the

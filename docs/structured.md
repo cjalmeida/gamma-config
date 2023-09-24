@@ -1,196 +1,123 @@
-# Structured configuration (Pydantic)
+# Structured configuration
 
-!!! warning "Deprecated"
-    
-    Structured configuration support is deprecated and scheduled for removal in `v1.0`.
-    We recommend directly using [Pydantic's V2 discriminated unions](https://docs.pydantic.dev/latest/usage/types/unions/#discriminated-unions-aka-tagged-unions) 
-    as an alternative.
+!!! warning "`gamma.config.pydantic` deprecated"
 
-While you can read configuration entries as dictionary entries, `gamma-config` has 
-direct support for **structured configuration** using [Pydantic][pydantic]. Structured
-configuration simply means using types to describe and validate your configuration
-to catch potential issues ahead of time.
+    Prior to `v0.8` we had direct support for structured configuration. This was removed
+    and replace with the recommended approach below.
 
+For more complex applications, it's recommended to use an a approach called "Structured
+Configuration" where you validate the provided configuration entries against a schema.
+Python [provides _many_ ways](https://github.com/mahmoudimus/awesome-validation-python)
+to validate a data structure against a schema. Here we'll [Pydantic][pydantic] as it's
+very popular, easy to use and provide a number of useful features.
 
-## Manually loading entries
-
-```yaml
-datasets:
-  foo:
-    path: data/foo.csv.gz
-    compression: gzip
-  bar:
-    path: data/bar.parquet
-    compression: snappy
-```
-
-You can use the following code to declare a structure that validate against our 
-expected entries, and a helper function to read/validate this entry.
-
-```python
-from pydantic import BaseModel
-from gamma.config import get_config, to_dict
-
-
-class Dataset(BaseModel):
-    path: str
-    compression: str
-
-def get_dataset(name):
-    entry = get_config()["datasets"][name]
-    obj = Dataset(**to_dict(entry))
-    return obj
-
-assert isinstance(get_dataset("foo"), Dataset)
-assert isinstance(get_dataset("bar"), Dataset)
-```
-
-This approach is simple and flexible enough to work in most simple scenarios. 
-
-## Using the `!obj` tag
-
-A cleaner alternative that does not require a helper function is to use the [`!obj` tag](/tags/#obj)
-
-
-```yaml
-obj_default_module: mypackage.types
-
-datasets:
-  foo: !obj:Dataset
-    path: data/foo.csv.gz
-    compression: gzip
-  bar: !obj:Dataset
-    path: data/bar.parquet
-    compression: snappy
-```
-
-And a similar code, but getting a `Dataset` instance directly
-
-```python
-from pydantic import BaseModel
-from gamma.config import get_config, to_dict
-
-class Dataset(BaseModel):
-    path: str
-    compression: str
-
-foo = get_config()["datasets"]["foo"]
-bar = get_config()["datasets"]["bar"]
-assert isinstance(foo, Dataset)
-assert isinstance(bar, Dataset)
-```
-
-
-## Automatically discriminating entries
-Let's augment our example by having different expected parameters for each format 
-(eg. `separator` for CSV, `columns` for Parquet).
-
+First let's start with an example where you declare "datasets" entries, and we have
+different expected parameters for each format (eg. mandatory `separator` for CSV,
+optional `columns` for Parquet).
 
 ```yaml
 datasets:
   foo:
-    kind: csv
+    format: csv
     path: data/foo.csv.gz
     compression: gzip
     separator: ";"
 
   bar:
-    kind: parquet
+    format: parquet
     path: data/bar.parquet
     compression: snappy
     columns: [col_x, col_y]
 ```
 
-Here our simple approach might work, we just need to add code to `get_dataset` to
-use the `kind` key to discriminate between the correct type. Because this is so 
-common we provide the class `gamma.config.pydantic.ConfigStruct` to simplify the 
-process.
+A first version of our code may create the following Pydantic model to handle this:
 
 ```python
-from typing import List
+
 from pydantic import BaseModel
-from gamma.config import get_config, to_dict
-from gamma.config.pydantic import ConfigStruct
 
-class Dataset(ConfigStruct):
-    """Base class with common properties."""
-
+class Dataset(BaseModel):                         # (1)
+    format: str
     path: str
     compression: str
+    separator: Optional[str]
+    columns: Optional[List[str]]
 
-class CsvDataset(Dataset):
-    kind = "csv"
+
+def get_dataset(name: str) -> Dataset:            # (2)
+    entry = get_config()["datasets"][name]        # (3)
+    obj = Dataset.parse_obj(to_dict(entry))       # (4)
+    return obj
+```
+
+Here we create in `(1)` a Pydantic model, and an accessor function in `(2)`. In the
+function implementation, we get the config entry `(3)`, convert to a plain dict using
+`to_dict` and call `.parse_obj` to build the object from the dictionary.
+
+The `to_dict` helper will recursively convert the nested config data structure to a
+nested dictionary object, rendering dynamic values as needed. So, be aware of infinite
+recursion for dynamic entries. Pydantic's `BaseModel.parse_obj` knows how to handle
+recursive dicts converting to the correct datatypes.
+
+The fact we need to model mandatory format-specific attributes (eg. `separator` for CSV)
+as `Optional` fields is not very clean though. Pydantic has [discriminated unions] that
+allow us to split the specification into separate format-specific types.
+
+```python
+from typing import Literal, List, Optional, Union
+from typing_extensions import Annotated
+
+from pydantic import BaseModel, Field, parse_obj_as
+
+from gamma.config import to_dict
+
+
+class BaseDataset(BaseModel):
+    format: str
+    path: str
+
+
+class ParquetDataset(BaseDataset):
+    format: Literal["parquet"]
+    compression: str
+    columns: Optional[List[str]]
+
+
+class CsvDataset(BaseDataset):
+    format: Literal["csv"]
+    compression: str
     separator: str
 
-class ParquetDataset(Dataset):
-    kind = "parquet"
-    columns: List[str]
 
-def get_dataset(name):
+Dataset = Annotated[Union[ParquetDataset, CsvDataset], Field(discriminator="format")]
+
+def get_dataset(name: str) -> Dataset:
     entry = get_config()["datasets"][name]
-    obj = Dataset.parse_obj(to_dict(entry))
+    obj = parse_obj_as(Dataset, to_dict(entry))
     return obj
 
 foo = get_dataset("foo")
+bar = get_dataset("bar")
+
 assert isinstance(foo, CsvDataset)
-assert foo.separator == ";"
-assert isinstance(get_dataset("bar"), ParquetDataset)
+assert isinstance(bar, ParquetDataset)
 ```
 
-Note that we used `Dataset.parse_obj(<dict>)` function to instantiate and validate 
-the correct Pydantic model. If we want to use the `!obj` tag in this situation, we can
-create a `Datasets` wrapper function that will accept the value of the `datasets` key. 
-Here's the modified YAML
+In the modified full script example above:
 
-```yaml
-obj_default_module: mypackage.types
+-   We import the types from stdlib `typing`, including `Literal`, and `Annotated` from
+    `typing_extensions` or `typing` depending if you're on Python 3.9+. From pydantic,
+    we import `Field` and `parse_obj_as` in addition to `BaseModel`.
 
-datasets: !obj:Datasets
-  foo:
-    kind: csv
-    path: data/foo.csv.gz
-    compression: gzip
-    separator: ";"
+-   We create our Pydantic class structure mimicking our expected model. Note that while
+    we use class inheritance here, this is not required.
 
-  bar:
-    kind: parquet
-    path: data/bar.parquet
-    compression: snappy
-    columns: [col_x, col_y]
-```
+-   We declare our `Dataset` as being an "annotated" union of our target classes. We
+    annotated it with a `Field` entry that provides the discriminator field. The
+    `Annotated` type was specified PEP 593 and [here's the full documentation](https://docs.python.org/3/library/typing.html#typing.Annotated)
 
-And the modified Python file:
-
-
-```python
-from typing import List
-from pydantic import BaseModel
-from gamma.config import get_config, to_dict
-from gamma.config.pydantic import ConfigStruct
-
-class Dataset(ConfigStruct):
-    """Base class with common properties."""
-
-    path: str
-    compression: str
-
-class CsvDataset(Dataset):
-    kind = "csv"
-    separator: str
-
-class ParquetDataset(Dataset):
-    kind = "parquet"
-    columns: List[str]
-
-# note we're using a function, not a class
-def Datasets(**entries):
-    return {key: Dataset.parse_obj(obj) for key, obj in entries.items() }
-    
-foo = get_config()["datasets"]["foo"]
-bar = get_config()["datasets"]["bar"]
-assert isinstance(foo, Dataset)
-assert isinstance(bar, Dataset)
-```
-
+-   In the `get_dataset` accessor, we modify it to use the `parse_obj_as` function
+    instead of the `parse_obj` method.
 
 [pydantic]: https://pydantic-docs.helpmanual.io/
+[discriminated unions]: https://docs.pydantic.dev/dev-v1/usage/types/#discriminated-unions-aka-tagged-unions

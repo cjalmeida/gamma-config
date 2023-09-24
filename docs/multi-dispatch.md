@@ -8,11 +8,11 @@ infrastructure (`gamma.dispatch`) that was replaced in `0.7.x` by
 
 ## Rationale
 
-The main reason was for me to learn more about the feasability of using multiple
+The main reason was for me to learn more about the feasibility of using multiple
 dispatch in Python in a non-trivial project. I was inspired in how multiple dispatch
 enabled a rich ecosystem of reusable components Julia language, in a very short time.
 
-For the theorically inclined, multiple dispatch solves the
+For the theoretically inclined, multiple dispatch solves the
 [expression problem](https://eli.thegreenplace.net/2016/the-expression-problem-and-its-solutions/)
 in a very elegant way. In summary, the expression problem is a fundamental issue in
 programming language design: how can you structure your application so that you can:
@@ -26,7 +26,7 @@ This is actually **a solved problem** for most languages, including Python, usin
 variety of techniques, where multiple dispatch is one of them (and probably the most
 elegant). But what sets Julia apart is that it's the only language where multiple
 dispatch is the core paradigm. This means that **idiomatic Julia code is easily amenable
-to extension** (and performant). In contrast, in most languages you have be very explict
+to extension** (and performant). In contrast, in most languages you have be very explicit
 about extensibility, adding unwarranted complexity.
 
 Interestingly, the impact of multiple dispatch on code reuse was an unplanned
@@ -52,7 +52,7 @@ We mark a function as part of a multiple-dispatch group by annotation with `@dis
 Two `@dispatch` annotated functions with the same name, in the same scope are
 considered "one single function with two methods. All **POSITIONAL** and **POSITIONAL_OR_KEYWORD**
 arguments are used for dispatching. Variadic positional arguments (eg. `_args`) and
-keyworkd-only arguments (those after `_`or`\*args`) are not considered for dispatching.
+keyword-only arguments (those after `_`or`\*args`) are not considered for dispatching.
 
 Consider the example below:
 
@@ -106,7 +106,7 @@ assert foo(1) == "first"
 ```
 
 In the example above, it created `foo(:int, :int)` and `foo(:int)` methods. A
-common "gotcha" is to accidentally ovewrite the second method with a new signature.
+common "gotcha" is to accidentally overwrite the second method with a new signature.
 
 ```py
 @dispatch

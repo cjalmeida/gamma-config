@@ -22,7 +22,7 @@ Example:
 
 ```yaml
 sample_key:
-    my_var: !env VAR|my_default
+  my_var: !env VAR|my_default
 ```
 
 ### !j2
@@ -40,10 +40,10 @@ In practice, in the snippet bellow:
 myvar: 100
 foo1: !j2 Number = {{ c.myvar }}
 level0:
-    _context:
-        custom_var: myvalue
+  _context:
+    custom_var: myvalue
 
-    bar1: !j2 Custom = {{ custom_var }}
+  bar1: !j2 Custom = {{ custom_var }}
 ```
 
 The value of `foo1` is the string `Number = 100`. The value of `level0.bar1` is `Custom = myvalue` 
@@ -56,13 +56,13 @@ sensitive data please use `!j2:secret`.
 !!! note
 
     Jinja2 **is not installed by default**, you should install yourself by
-    running `pip install jinja2` or, more generally adding the `jinja2` extra package
+    running `pip install jinja2` or, more generally, adding the `jinja2` extra package
     dependency.
 
 ### !ref
 
 References another entry in the config object, even if it's in another file or
-overriden by an environment specific entry. If you key has a `.` (dot) or other
+overridden by an environment specific entry. If you key has a `.` (dot) or other
 special characters, you can wrap the key in single-quotes `'`.
 
 Example:
@@ -82,7 +82,8 @@ ref_b: !ref key_b.'my sub'
 
 ### !expr
 
-Allows you to evalute arbitrary Python expressions, using the `eval()` built-in. The default variables available are:
+Allows you to evaluate arbitrary Python expressions, using the `eval()` built-in. The
+default variables available are:
 
 -   `env`: a dict of the system environment variables
 -   `c`: a reference to the root config object

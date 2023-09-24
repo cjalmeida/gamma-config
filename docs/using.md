@@ -7,43 +7,15 @@ whenever you need to get a dict-like `config` object, like in the example below:
 from gamma.config import get_config
 
 def do_something():
-
     config = get_config()
-    assert config["foo"] == 1
-    assert config.foo == 1
+    assert config["foo"] == 1  # from 'foo: 1'
 ```
 
 In the section below we'll discuss some patterns and caveats.
 
-## Safe navigation using attribute (dot) access
-
-If you try to access a non-existing value from the returned config object using the
-dictionary style `config['missing']` or dot (`.`) access style `config.missing` 
-it will throw a `KeyError` as expected.
-
-!!! note
-    Behavior changed from 0.4 where `config.missing` would return a false-y object.
-
-```python
-config = get_config()
-
-try:
-    val = config["missing"] == 1          # this will throw KeyError
-except KeyError:
-    pass
-
-try:
-    val = config.missing                   # this will also throw KeyError
-except KeyError:
-    pass
-```
-
-This behavior allows you to conveniently navigate deep across nodes, but can be
-backfire. Stick to the dictionary style if you want to be safe.
-
 ## Config object to "real" `dict`
 
-Despite behaving like one, sometimes you need a "real" dict. The way to convert a
+Despite behaving like one, sometimes you need a "real" `dict`. The way to convert a
 config node into one is to use the `to_dict` function.
 
 ```py
@@ -56,7 +28,7 @@ def do_something():
     assert type(val_dict) == dict
 ```
 
-## Dump to YAML or Pickle
+## Dump to YAML
 
 `gamma-config` supports dumping the config object to YAML in a safe way, protecting
 secrets. This is very useful, for instance, to capture the config state at a given
@@ -66,9 +38,6 @@ By default, the [`to_yaml`](api?id=to_yaml) method will serialized the config ob
 **with all tags rendered**, except for those marked as sensitive. Eg. it will
 store a `!env USER` node with the actual value of the `USER`. On the other hand,
 `!env_secret MY_KEY` will be serialized as is.
-
-The config object should be pickable by default. But note that when you pickle,
-it **does not render** the tags, as expected.
 
 ```py
 from gamma.config import get_config, to_yaml
@@ -82,6 +51,18 @@ def do_something():
     assert type(val_dict) == str  # YAML content
 ```
 
+!!! warning "Configs are pickable, but Pickle is almost always the wrong answer."
+
+    The config object should be pickable by default. When you pickle, it **does not
+    render** the tags, as expected.
+
+    However we discourage pickling the config object as a) the pickle format is not
+    suitable for long-term storage; b) pickled data from 3rd parties cannot be trusted
+    and; c) because the dynamic, un-rendered configuration values can be different when
+    accessed across process or cluster nodes.
+
+    It's generally better to use static values and stables format (eg. JSON and YAML)
+    for passing configuration data around.
 
 ## Ways call `get_config` inside a function
 
@@ -90,8 +71,7 @@ when using `gamma-config`.
 
 The first time you call `get_config`, the loading mechanism will load the config files
 and cache the result. This may result in hard to debug behavior since you lose the
-ability to extend `gamma-config`. For instance, reading custom tags before they're
-loaded, not loading non-static config coming from a database, etc.
+ability to extend `gamma-config`.
 
 Example of bad behavior:
 
@@ -110,16 +90,21 @@ def do_something():
     my_value = get_config()["my_value"]
 ```
 
+In this example, the `my_value` config entry is fixed at import. While this may be what
+you want, more generally you lose the ability to "bootstrap" the value from another
+source such as a database entry, secrets manager, or from CLI, as we'll discuss further
+in the documentation. 
+
 ## Config objects are immutable
 
 Config objects (`RootConfig` and `ConfigNode` classes) are read-only and effectively
 immutable. They're also fully pickable and you can pass them to child processes and
 thread following the usual rules and they'll keep their dynamic behavior.
 
-!!! note 
-    In distributed processing, you're still required to be able to provide
-    `gamma-config` lib and dependencies as usual. In that case, rendering the (sub)config
-    to plain dict using `to_dict` is recommended.
+!!! note
+In distributed processing, you're still required to be able to provide
+`gamma-config` lib and dependencies as usual. In that case, rendering the (sub)config
+to plain dict using `to_dict` is recommended.
 
 The only way to mutate a config object is by using the `push_entry`. For the global
 config returned from `get_config()`, you **must** modify it from the main thread;
@@ -171,5 +156,5 @@ def do_something():
 
 We don't force any specific validation method. But you're encouraged to validate and/or
 enforce a schema in your configuration. And we try to play nice with most popular
-validation libraries. In particular we have support for [Pydantic](https://pydantic-docs.helpmanual.io/), 
+validation libraries. In particular we have support for [Pydantic](https://pydantic-docs.helpmanual.io/),
 see our [structured configuration](/structured) guide.
