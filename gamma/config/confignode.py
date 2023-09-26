@@ -320,13 +320,13 @@ def get_keys(cfg: RootConfig) -> Iterable[Node]:
 
 
 @dispatch
-def config_len(cfg: ConfigNode) -> int:
+def config_len(cfg: ConfigNode):
     """Number of keys in a config node"""
     return len(cfg._node.value)
 
 
 @dispatch
-def config_len(cfg: RootConfig) -> int:
+def config_len(cfg: RootConfig):
     """Number of *distinct* keys in a config node"""
     return len(list(get_keys(cfg)))
 

@@ -96,3 +96,27 @@ level0:
     assert cfg["level0"]["level1"]["nb"] == 20
 
     assert cfg["level0"]["level1"]["nc"] == 300
+
+
+def test_undescore_nested(monkeypatch):
+    from gamma.config import RootConfig
+
+    src = """
+
+_context:
+  foo: !call os:getenv("FOO")
+
+sub:
+  _context:
+    bar: !call os:getenv("BAR")
+
+  n1: !j2 "foo is {{ foo }}"
+  n2: !j2 "bar is {{ bar }}"
+"""
+
+    monkeypatch.setenv("FOO", "foo")
+    monkeypatch.setenv("BAR", "bar")
+
+    cfg = RootConfig("dummy", src)
+    assert cfg["sub"]["n1"] == "foo is foo"
+    assert cfg["sub"]["n2"] == "bar is bar"

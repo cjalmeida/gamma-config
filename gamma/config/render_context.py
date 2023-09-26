@@ -1,7 +1,7 @@
 """Module handling rendering context variables (eg. for !expr and !j2)"""
 from functools import partial
 
-from beartype.typing import Any, Callable, Dict, List, NamedTuple, Optional, Union
+from beartype.typing import Any, Callable, List, NamedTuple, Optional, Union
 
 from gamma.config.confignode import ConfigNode
 
@@ -28,7 +28,7 @@ class ContextVar(NamedTuple):
     """If True, will cache the function result, otherwise will call on each render."""
 
 
-def get_render_context(**kwargs) -> Dict[str, Any]:
+def get_render_context(**kwargs):
     """Return the render context by calling each function in ``context_provider``.
 
     A context provider must be a function with the signature:
@@ -87,42 +87,33 @@ def base_provider(**kwargs):
 def underscore_context_provider(*, config: ConfigNode = None, **kwargs):
     """Look in parent config nodes and add all entries under the `_context` key"""
 
-    from .dump_dict import to_dict
-    from .merge import merge_nodes
-    from .rawnodes import as_node
+    from .confignode import get_keys
+    from .render import render_node
 
-    if not config:
+    if config is None:
         return []
 
-    stack = []
+    out = []
+    parents = set([config._node])
 
     cur = config
 
-    while cur:
-        _context = cur.get("_context", {})
+    while True:
+        _context = cur.get("_context", None)
 
-        if _context:
-            stack.append(as_node(_context))
+        if _context is not None and _context._node not in parents:
+            for key in get_keys(_context):
+                var = ContextVar(
+                    render_node(key),
+                    function=partial(_context.__getitem__, key),
+                )
+                out.append(var)
 
         cur = cur._parent
         if cur is None:
             break
 
-    if not stack:
-        return []
-
-    # merge context stack and render
-    stack = list(reversed(stack))
-    _, merged_node = merge_nodes(stack)
-    new_args = kwargs.copy()
-    new_args.pop("node", None)
-    new_args.pop("tag", None)
-    merged = to_dict(merged_node, config=config, **new_args)
-
-    # wrap in context vars
-    out = []
-    for key, value in merged.items():
-        out.append(ContextVar(key, value))
+        parents.add(cur._node)
 
     return out
 
