@@ -168,7 +168,32 @@ def set_config_roots(modules: List[ModuleType]):
 
     paths = [m.__path__ for m in modules]
     paths = list(chain(*paths))
+    paths = list(set(paths))
     set_config_roots(paths)
+
+
+@dispatch
+def append_config_root(root: str):
+    """Append a root the the set of existing roots.
+
+    This function resets the global config if any root was added.
+    """
+
+    from .globalconfig import reset_config
+
+    global CONFIG_ROOT_SET
+
+    CONFIG_ROOT_SET = CONFIG_ROOT_SET or []
+    if root not in CONFIG_ROOT_SET:
+        CONFIG_ROOT_SET.append(root)
+
+    reset_config()
+
+
+@dispatch
+def append_config_root(module: ModuleType):
+    for path in set(module.__path__):
+        append_config_root(path)
 
 
 def is_config_roots_set() -> bool:
