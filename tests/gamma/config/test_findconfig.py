@@ -94,7 +94,7 @@ include_folders: None
 
 
 def test_multi_root(multi_root):
-    from gamma.config import get_config, set_config_roots
+    from gamma.config import append_config_root, get_config, set_config_roots
 
     t1, t2 = multi_root
 
@@ -110,6 +110,19 @@ def test_multi_root(multi_root):
     assert cfg.get("foo") is None
 
     set_config_roots([t1, t2])
+    cfg = get_config()
+    assert cfg["foo"] == 1
+    assert cfg["bar"] == 20
+    assert cfg["zzz"] == 30
+
+    set_config_roots(None)
+
+    append_config_root(t1)
+    cfg = get_config()
+    assert cfg["foo"] == 1
+    assert cfg["bar"] == 2
+
+    append_config_root(t2)
     cfg = get_config()
     assert cfg["foo"] == 1
     assert cfg["bar"] == 20
