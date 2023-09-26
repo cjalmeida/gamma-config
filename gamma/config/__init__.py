@@ -19,4 +19,4 @@ from .globalconfig import get_config
 from .render import render_node
 from .render_context import ContextVar, context_providers
 from .tags import Tag
-from .findconfig import set_config_roots
+from .findconfig import set_config_roots, is_config_roots_set

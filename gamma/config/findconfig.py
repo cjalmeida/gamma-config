@@ -3,9 +3,9 @@
 import logging
 import os
 from pathlib import Path
+from types import ModuleType
 from typing import Literal
 
-from beartype import beartype
 from beartype.typing import Any, List, Optional, Tuple
 
 from gamma.config import dispatch
@@ -140,7 +140,7 @@ def get_config_roots(_: Literal["SET"]) -> Optional[List[Path]]:
     return roots
 
 
-@beartype
+@dispatch
 def set_config_roots(roots: Optional[List[str]]):
     """Manually set the config roots.
 
@@ -152,6 +152,27 @@ def set_config_roots(roots: Optional[List[str]]):
     CONFIG_ROOT_SET = roots
 
     reset_config()
+
+
+@dispatch
+def set_config_roots(modules: List[ModuleType]):
+    """Manually set the config roots living inside packages.
+
+    This function resets the global config.
+
+    Args:
+        modules: List of modules to search for configs.
+    """
+
+    from itertools import chain
+
+    paths = [m.__path__ for m in modules]
+    paths = list(chain(*paths))
+    set_config_roots(paths)
+
+
+def is_config_roots_set() -> bool:
+    return CONFIG_ROOT_SET is not None
 
 
 @dispatch
