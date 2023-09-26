@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from typing import Literal
 
+from beartype import beartype
 from beartype.typing import Any, List, Optional, Tuple
 
 from gamma.config import dispatch
@@ -14,8 +15,9 @@ from .load import load_node
 
 logger = logging.getLogger(__name__)
 
-CONFIG_FIND_ORDER = ["ENV", "LOCAL", "JUPYTER"]
+CONFIG_FIND_ORDER = ["SET", "ENV", "LOCAL", "JUPYTER"]
 CONFIG_ROOT_ENV = "GAMMA_CONFIG_ROOT"
+CONFIG_ROOT_SET: Optional[List[str]] = None
 
 
 class MissingMetaConfigFile(Exception):
@@ -24,10 +26,13 @@ class MissingMetaConfigFile(Exception):
 
 @dispatch
 def get_entries() -> List[Tuple[str, Any]]:
-    """Discover the config root folder and get all entries"""
-    config_root = get_config_root()
-    load_dotenv(config_root)
-    return get_entries(config_root)
+    """Discover the config root folders and get all entries"""
+    roots = get_config_roots()
+    entries = []
+    for root in roots:
+        load_dotenv(root)
+        entries += get_entries(root) or []
+    return entries
 
 
 @dispatch
@@ -35,7 +40,7 @@ def get_entries(folder: Path, *, meta_include_folders=True) -> List[Tuple[str, A
     """Get all entries in a given folder.
 
     Args:
-        meta_include_folder: If `True`, try to load the `00-meta.yaml` file in the
+        meta_include_folder: If `True`, try to load the `XX-meta.yaml` file in the
             folder and follow `include_folder` entries.
     """
     paths = list(folder.glob("*.yaml")) + list(folder.glob("*.yml"))
@@ -54,14 +59,16 @@ def get_entries(folder: Path, *, meta_include_folders=True) -> List[Tuple[str, A
 
 @dispatch
 def load_meta(config_root: Path) -> ConfigNode:
-    """Load the `00-meta.yaml` file in a given folder"""
-    meta_path = config_root / "00-meta.yaml"
-    with meta_path.open("r") as fo:
+    """Load the `XX-meta.yaml` file in a given folder"""
+    meta_path = list(config_root.glob("*-meta.yaml"))
+    if len(meta_path) > 1:
+        raise ValueError(f"More than one '*-meta.yaml' in folder: {config_root}")
+    with meta_path[0].open("r") as fo:
         return ConfigNode(load_node(fo))
 
 
 @dispatch
-def get_config_root() -> Path:
+def get_config_roots() -> List[Path]:
     """Return the location for config root path.
 
     The mechanisms used to find the config root are set in the ``CONFIG_LOAD_ORDER``
@@ -69,15 +76,15 @@ def get_config_root() -> Path:
     """
 
     for mechanism in CONFIG_FIND_ORDER:
-        root = get_config_root(mechanism)
-        if root is not None:
-            return root
+        roots = get_config_roots(mechanism)
+        if roots is not None:
+            return roots
 
     config_folder = Path("config").absolute()
     if config_folder.exists():
         raise MissingMetaConfigFile(
             f"We found a config folder at '{config_folder}' "
-            f"but no '00-meta.yaml' file. You must have a '00-meta.yaml' file at the "
+            f"but no 'XX-meta.yaml' file. You must have a 'XX-meta.yaml' file at the "
             f"config folder location even if it's empty."
         )
 
@@ -85,32 +92,70 @@ def get_config_root() -> Path:
 
 
 @dispatch
-def get_config_root(_: Literal["ENV"]) -> Optional[Path]:
-    f"""Try the path set by {CONFIG_ROOT_ENV} as a root config folder"""
+def get_config_roots(_: Literal["ENV"]) -> Optional[List[Path]]:
+    f"""Try the path set by {CONFIG_ROOT_ENV} as root config folders.
+
+    Multiple folders can be separated by the `PATH` separator (`os.pathsep`, usually `:`
+    in *NIX systems).
+    """
     if CONFIG_ROOT_ENV not in os.environ:
         return None
 
-    root = Path(os.getenv(CONFIG_ROOT_ENV)).absolute()
-    if not _has_meta(root):
-        raise ValueError(
-            f"Could not find {root}/00-meta.yaml file as pointed by "
-            f"{CONFIG_ROOT_ENV} environment variable"
-        )
+    roots = os.getenv(CONFIG_ROOT_ENV).split(os.pathsep)
+    roots = [Path(r).absolute() for r in roots]
+    for root in roots:
+        if not _has_meta(root):
+            raise ValueError(
+                f"Could not find {root}/XX-meta.yaml file as pointed by "
+                f"{CONFIG_ROOT_ENV} environment variable"
+            )
 
-    return root
+    return roots
 
 
 @dispatch
-def get_config_root(_: Literal["LOCAL"]) -> Optional[Path]:
+def get_config_roots(_: Literal["LOCAL"]) -> Optional[List[Path]]:
     """Try the path `$PWD/config` as root config folder"""
     root = Path("config").absolute()
     if _has_meta(root):
-        return root
+        return [root]
     return None
 
 
 @dispatch
-def get_config_root(_: Literal["JUPYTER"]) -> Optional[Path]:
+def get_config_roots(_: Literal["SET"]) -> Optional[List[Path]]:
+    """Try the path `$PWD/config` as root config folder"""
+
+    if CONFIG_ROOT_SET is None:
+        return None
+
+    roots = [Path(r).absolute() for r in CONFIG_ROOT_SET]
+    for root in roots:
+        if not _has_meta(root):
+            raise ValueError(
+                f"Could not find {root}/XX-meta.yaml file in roots defined via "
+                "`set_config_roots`."
+            )
+
+    return roots
+
+
+@beartype
+def set_config_roots(roots: Optional[List[str]]):
+    """Manually set the config roots.
+
+    This function resets the global config.
+    """
+    from .globalconfig import reset_config
+
+    global CONFIG_ROOT_SET
+    CONFIG_ROOT_SET = roots
+
+    reset_config()
+
+
+@dispatch
+def get_config_roots(_: Literal["JUPYTER"]) -> Optional[List[Path]]:
     """Try `<parent>/config` folders iteratively if we're in a Jupyter (IPython)
     environment"""
 
@@ -121,14 +166,14 @@ def get_config_root(_: Literal["JUPYTER"]) -> Optional[Path]:
     while path != path.parent:
         candidate = path / "config"
         if _has_meta(candidate):
-            return candidate
+            return [candidate]
         path = path.parent
 
     return None
 
 
 def _has_meta(root: Path):
-    return (root / "00-meta.yaml").exists()
+    return len(list(root.glob("*-meta.yaml"))) > 0
 
 
 def _isnotebook():  # pragma: no cover

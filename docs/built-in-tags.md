@@ -11,7 +11,7 @@ application needs.
 
 !!! note "Changed in v0.8"
 
-    The `!env` tag defaults to not dumping the contents when calling `to_yaml`. 
+    The `!env` tag defaults to not dumping the contents when calling `to_yaml`.
     `!env_secret` is still supported but it's use is discouraged.
 
 References a system environment variable. You can use the `|` (pipe) character to
@@ -29,10 +29,10 @@ sample_key:
 
 Allow the use of Jinja2 templates. The default variables available are:
 
--   `env`: a dict of the system environment variables
--   `c`: a reference to the root config object
--   Anything under a `_context` map in a parent node. The `_context` map is searched
-    and merged recursively until the root node.
+- `env`: a dict of the system environment variables
+- `c`: a reference to the root config object
+- Anything under a `_context` map in a parent node. The `_context` map is searched
+  and merged recursively until the root node.
 
 In practice, in the snippet bellow:
 
@@ -46,11 +46,11 @@ level0:
   bar1: !j2 Custom = {{ custom_var }}
 ```
 
-The value of `foo1` is the string `Number = 100`. The value of `level0.bar1` is `Custom = myvalue` 
+The value of `foo1` is the string `Number = 100`. The value of `level0.bar1` is `Custom = myvalue`
 because we defined `_context` in a parent node. See the section on [extending
 the render context](tags?id=extending-the-render-context) to add your own variables.
 
-By default, `!j2` **will dump it's contents** when calling `to_yaml`. To avoid leaking 
+By default, `!j2` **will dump it's contents** when calling `to_yaml`. To avoid leaking
 sensitive data please use `!j2:secret`.
 
 !!! note
@@ -69,10 +69,10 @@ Example:
 
 ```yaml
 key_a:
-    sub_key: 100
+  sub_key: 100
 
 key_b:
-    "my sub": bar
+  "my sub": bar
 
 # use dot notation to access nested entries
 # will be the same as key_a -> subkey == 100
@@ -85,16 +85,16 @@ ref_b: !ref key_b.'my sub'
 Allows you to evaluate arbitrary Python expressions, using the `eval()` built-in. The
 default variables available are:
 
--   `env`: a dict of the system environment variables
--   `c`: a reference to the root config object
--   Anything under a `_context` map in a parent node
+- `env`: a dict of the system environment variables
+- `c`: a reference to the root config object
+- Anything under a `_context` map in a parent node
 
 Example usage:
 
 ```yaml
 sample_key:
-    # we may need to enclose the whole expression in quotes to keep it valid YAML
-    my_var: !expr '"This is an env variable" + env["USER"]'
+  # we may need to enclose the whole expression in quotes to keep it valid YAML
+  my_var: !expr '"This is an env variable" + env["USER"]'
 ```
 
 See the section on [extending the render context](tags?id=extending-the-render-context) to add your own variables.
@@ -138,18 +138,18 @@ Example usage:
 
 ```yaml
 my_value: !call
-    func: mypackage.subpackage:get_value
-    scope: my-scope
-    key: my-key
+  func: mypackage.subpackage:get_value
+  scope: my-scope
+  key: my-key
 ```
 
 The value of `my_value` key is the result of calling `get_value(scope="my-key", key="custom-name")`
 in the `mypackage.subpackage` module.
 
-
 ### !path
 
 Return an absolute path string, relative to the **parent of the config root folder**.
+This tag only works if you have only a single root folder defined.
 
 For example, consider you have a `data` folder located as a sibling to
 `config` and want to reference a file in it:
@@ -157,7 +157,6 @@ For example, consider you have a `data` folder located as a sibling to
 ```yaml
 my_var: !path data/hello_world.csv
 ```
-
 
 ### !py
 
@@ -186,8 +185,8 @@ and config:
 ```yaml
 # here we're looking for callable `split_dict` in module `myapp.foo`
 foo: !py:myapp.foo:split_dict
-    a: 1
-    b: 2
+  a: 1
+  b: 2
 ```
 
 The following holds:
@@ -228,8 +227,8 @@ and config
 obj_default_module: myapp.config
 
 foo: !obj:Section
-    a: 1
-    b: 2
+  a: 1
+  b: 2
 ```
 
 The following holds:

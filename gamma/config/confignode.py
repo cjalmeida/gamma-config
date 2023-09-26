@@ -101,7 +101,7 @@ def _except_dot_access():
     raise ValueError(
         "Accessing config entries via dot (.) is deprecated. "
         "If you need the old behavior for compatibility, set "
-        "'__enable_dot_access__: true' in 'config/00-meta.yaml'"
+        "'__enable_dot_access__: true' in 'config/XX-meta.yaml'"
     )
 
 
@@ -158,7 +158,7 @@ def _allow_dot_access(root: RootConfig):
 def push_folder(root: RootConfig, folder: Path) -> None:
     """Push all entries in a given folder.
 
-    Note this will ignore any `00-meta.yaml` entries.
+    Note this will ignore any `XX-meta.yaml` entries.
     """
     from .findconfig import get_entries
 
@@ -208,7 +208,7 @@ def push_entry(
     s = collections.OrderedDict(sorted(d.items(), key=lambda x: x[0]))
     root._root_nodes = s
 
-    if entry_key == "00-meta.yaml":
+    if entry_key.endswith("-meta.yaml"):
         _update_meta_features(root)
 
 

@@ -14,7 +14,7 @@ from gamma.config import dispatch
 from gamma.config.confignode import ConfigNode
 from gamma.config.dump_dict import to_dict
 
-from .findconfig import get_config_root
+from .findconfig import get_config_roots
 from .render import render_node
 from .render_context import get_render_context
 from .tags import Tag, TagException
@@ -125,7 +125,7 @@ def render_node(
         foo2: !j2 This is a number = {c.myvar}
 
     You can customize the Jinja2 environment by providing a reference to a Python
-    function in the `j2_env` key in `00-meta.yaml`. Example
+    function in the `j2_env` key in `XX-meta.yaml`. Example
 
         j2_env: my_app.my_module:my_func
 
@@ -489,7 +489,10 @@ def render_node(node: Node, tag: PathTag, **ctx) -> str:
         my_var: !path data/hello_world.csv
     """
     path_fragment = node.value
-    base = get_config_root().parent
+    roots = get_config_roots()
+    if len(roots) > 1:
+        raise ValueError("More than one root defined, cannot use !path")
+    base = get_config_roots()[0].parent
     return str(base.joinpath(path_fragment).absolute())
 
 
