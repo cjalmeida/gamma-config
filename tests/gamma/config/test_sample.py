@@ -9,13 +9,14 @@ def test_load_sample(caplog, monkeypatch):
     caplog.set_level(logging.DEBUG)
 
     from gamma.config import get_config
+    from gamma.config.findconfig import load_meta
     from gamma.config.globalconfig import reset_config
+
+    meta = load_meta()
+    assert "include_folders" in meta
 
     # load default config
     config = get_config()
-
-    # assert meta was loaded
-    config["include_folders"]  # should not fail
 
     # assert default was loaded
     assert config["sample_scalar_1"] == "hello world"

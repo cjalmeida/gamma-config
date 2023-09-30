@@ -93,7 +93,7 @@ def underscore_context_provider(*, config: ConfigNode = None, **kwargs):
     if config is None:
         return []
 
-    out = []
+    out = {}
     parents = set([config._node])
 
     cur = config
@@ -103,11 +103,13 @@ def underscore_context_provider(*, config: ConfigNode = None, **kwargs):
 
         if _context is not None and _context._node not in parents:
             for key in get_keys(_context):
-                var = ContextVar(
-                    render_node(key),
-                    function=partial(_context.__getitem__, key),
+                name = render_node(key)
+                if name in out:
+                    continue
+
+                out[name] = ContextVar(
+                    name, function=partial(_context.__getitem__, key)
                 )
-                out.append(var)
 
         cur = cur._parent
         if cur is None:
@@ -115,7 +117,7 @@ def underscore_context_provider(*, config: ConfigNode = None, **kwargs):
 
         parents.add(cur._node)
 
-    return out
+    return list(out.values())
 
 
 context_providers: List[Union[Callable, List[ContextVar]]] = [

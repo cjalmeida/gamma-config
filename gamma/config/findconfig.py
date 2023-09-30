@@ -2,6 +2,7 @@
 
 import logging
 import os
+import re
 from pathlib import Path
 from types import ModuleType
 from typing import Literal
@@ -18,6 +19,12 @@ logger = logging.getLogger(__name__)
 CONFIG_FIND_ORDER = ["SET", "ENV", "LOCAL", "JUPYTER"]
 CONFIG_ROOT_ENV = "GAMMA_CONFIG_ROOT"
 CONFIG_ROOT_SET: Optional[List[str]] = None
+
+DEFAULT_META = """
+include_folders: !expr env.get('ENVIRONMENT', '').strip().split()
+__enable_dot_access__: False
+"""
+META_PATTERN = r"\d\d-meta\.yaml"
 
 
 class MissingMetaConfigFile(Exception):
@@ -36,35 +43,55 @@ def get_entries() -> List[Tuple[str, Any]]:
 
 
 @dispatch
-def get_entries(folder: Path, *, meta_include_folders=True) -> List[Tuple[str, Any]]:
-    """Get all entries in a given folder.
-
-    Args:
-        meta_include_folder: If `True`, try to load the `XX-meta.yaml` file in the
-            folder and follow `include_folder` entries.
-    """
+def get_entries(folder: Path) -> List[Tuple[str, Any]]:
+    """Get all entries in a given folder."""
     paths = list(folder.glob("*.yaml")) + list(folder.glob("*.yml"))
-    entries = [(p.name, p) for p in paths]
-    if meta_include_folders:
-        meta = load_meta(folder)
-        for subfolder in meta["include_folders"]:
-            if subfolder is None:
-                continue
-            subpath = folder / subfolder
-            for k, e in get_entries(subpath, meta_include_folders=False):
+    entries = [(p.name, p) for p in paths if not _is_meta(p)]
+
+    meta = load_meta()
+    for subfolder in meta["include_folders"]:
+        if subfolder is None:
+            continue
+        subpath: Path = folder / subfolder
+        if subpath.is_dir():
+            for k, e in get_entries(subpath):
                 entries.append((k, e))
 
     return entries
 
 
+def _is_meta(path: Path) -> bool:
+    return re.match(META_PATTERN, path.name) is not None
+
+
 @dispatch
-def load_meta(config_root: Path) -> ConfigNode:
-    """Load the `XX-meta.yaml` file in a given folder"""
-    meta_path = list(config_root.glob("*-meta.yaml"))
-    if len(meta_path) > 1:
-        raise ValueError(f"More than one '*-meta.yaml' in folder: {config_root}")
-    with meta_path[0].open("r") as fo:
-        return ConfigNode(load_node(fo))
+def load_meta() -> dict:
+    return load_meta(get_config_roots())
+
+
+@dispatch
+def load_meta(config_roots: List[Path]) -> dict:
+    """Load the `XX-meta.yaml` file in a given folder."""
+
+    from . import to_dict
+    from .merge import merge_nodes
+
+    meta_paths = []
+    for root in config_roots:
+        for p in root.glob("*-meta.yaml"):
+            if re.match(META_PATTERN, p.name):
+                meta_paths.append(p)
+
+    if len(meta_paths) == 0:
+        return to_dict(ConfigNode(load_node(DEFAULT_META)))
+
+    elif len(meta_paths) == 1:
+        return to_dict(ConfigNode(load_node(meta_paths[0])))
+
+    else:
+        meta = [ConfigNode(load_node(p))._node for p in meta_paths]
+        _, meta = merge_nodes(meta)
+        return to_dict(meta, config=None)
 
 
 @dispatch
@@ -104,10 +131,11 @@ def get_config_roots(_: Literal["ENV"]) -> Optional[List[Path]]:
     roots = os.getenv(CONFIG_ROOT_ENV).split(os.pathsep)
     roots = [Path(r).absolute() for r in roots]
     for root in roots:
-        if not _has_meta(root):
+        if not root.is_dir():
             raise ValueError(
-                f"Could not find {root}/XX-meta.yaml file as pointed by "
-                f"{CONFIG_ROOT_ENV} environment variable"
+                f"Root candidate '{root}' does not exists or is not a directory. Check "
+                f"{CONFIG_ROOT_ENV} environment variable or calls to `set_config_roots`"
+                f" and `append_config_root`"
             )
 
     return roots
@@ -117,7 +145,7 @@ def get_config_roots(_: Literal["ENV"]) -> Optional[List[Path]]:
 def get_config_roots(_: Literal["LOCAL"]) -> Optional[List[Path]]:
     """Try the path `$PWD/config` as root config folder"""
     root = Path("config").absolute()
-    if _has_meta(root):
+    if root.is_dir():
         return [root]
     return None
 
@@ -131,13 +159,18 @@ def get_config_roots(_: Literal["SET"]) -> Optional[List[Path]]:
 
     roots = [Path(r).absolute() for r in CONFIG_ROOT_SET]
     for root in roots:
-        if not _has_meta(root):
+        if not root.is_dir():
             raise ValueError(
-                f"Could not find {root}/XX-meta.yaml file in roots defined via "
-                "`set_config_roots`."
+                f"Entry '{root}' is not a directory in roots defined via "
+                "`set_config_roots` or `append_config_root`."
             )
 
     return roots
+
+
+@dispatch
+def set_config_roots(*roots):
+    set_config_roots(roots)
 
 
 @dispatch
@@ -211,15 +244,11 @@ def get_config_roots(_: Literal["JUPYTER"]) -> Optional[List[Path]]:
     path = Path(".").absolute()
     while path != path.parent:
         candidate = path / "config"
-        if _has_meta(candidate):
+        if candidate.is_dir():
             return [candidate]
         path = path.parent
 
     return None
-
-
-def _has_meta(root: Path):
-    return len(list(root.glob("*-meta.yaml"))) > 0
 
 
 def _isnotebook():  # pragma: no cover

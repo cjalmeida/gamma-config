@@ -101,7 +101,7 @@ def _except_dot_access():
     raise ValueError(
         "Accessing config entries via dot (.) is deprecated. "
         "If you need the old behavior for compatibility, set "
-        "'__enable_dot_access__: true' in 'config/XX-meta.yaml'"
+        "'__enable_dot_access__: true' in a custom '00-meta.yaml' file."
     )
 
 
@@ -122,9 +122,12 @@ class RootConfig(ConfigNode):
     If `entry_key` is `None`, a dynamically generated entry key will be created.
     """
 
-    def __init__(self, entry_key: Optional[str] = None, entry=None) -> None:
+    def __init__(
+        self, entry_key: Optional[str] = None, entry=None, *, meta=None
+    ) -> None:
+        meta = meta or {}
         self._root_nodes: Dict[str, MappingNode] = collections.OrderedDict()
-        self._dot_access = False
+        self._dot_access = meta.get("__enable_dot_access__", False)
         super().__init__(node=None, root=self, parent=None)
 
         if bool(entry_key) or bool(entry):
@@ -156,13 +159,10 @@ def _allow_dot_access(root: RootConfig):
 
 @dispatch
 def push_folder(root: RootConfig, folder: Path) -> None:
-    """Push all entries in a given folder.
-
-    Note this will ignore any `XX-meta.yaml` entries.
-    """
+    """Push all entries in a given folder."""
     from .findconfig import get_entries
 
-    for key, entry in get_entries(folder, meta_include_folders=False):
+    for key, entry in get_entries(folder):
         push_entry(root, key, entry)
 
 
@@ -207,18 +207,6 @@ def push_entry(
     # sort by entry_key
     s = collections.OrderedDict(sorted(d.items(), key=lambda x: x[0]))
     root._root_nodes = s
-
-    if entry_key.endswith("-meta.yaml"):
-        _update_meta_features(root)
-
-
-def _update_meta_features(root: RootConfig):
-    try:
-        root._dot_access = config_getitem(
-            root, "__enable_dot_access__", config=root, dump=False
-        )
-    except KeyError:
-        pass
 
 
 @dispatch

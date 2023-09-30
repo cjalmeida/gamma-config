@@ -1,40 +1,48 @@
 # Writing configuration files
 
-_Static_ configuration should be written as one or many YAML files.
-`gamma-config` by will, by default, look for a `<current-working-dir>/config/00-meta.yaml` file
-and treat the folder as the _configuration root_. All YAML files in the base folder
-of this configuration root are loaded and merged into a single data structure.
+_Static_ configuration should be written as one or many YAML files. `gamma-config` by
+will, by default, look for a `<current-working-dir>/config` folder, treating it as
+_configuration root_. All YAML files in the base folder of this configuration root are
+loaded and merged into a single data structure.
 
 !!! note
-Sub-folders of the config root **are not** loaded by default.
+
+    Sub-folders of the config roots **are not** loaded by default.
 
 By convention, configurations are prefixed with two digits to ensure they're loaded
 and merged in the correct order. Below is an example of a config folder structure:
 
 ```
 <current-working-dir>/config
-├── 00-meta.yaml
 ├── 10-sample.yaml
 └── 11-sample-override.yaml
 ```
 
 ## Custom config root folder
 
-If for any reason you need to set the config root folder to something else other than
+If you need to set the config root folder to something else other than
 `<current-working-dir>/config`, you can set the `GAMMA_CONFIG_ROOT` environment
-variable.
+variable to add one or more config folders. Folder paths must be separated by the system
+path separator, (eg. `:` in Linux/MACOS, `;` in Windows).
+
+You can also use the API functions `gamma.config.append_config_root` and
+`gamma.config.set_config_roots` to add a folder or replace the set of root folders
+respectively.
 
 A common use-case is to place the configuration inside application package so it can be
 included inside a `whl` as an alternative to Docker deployments. In this case, an
-approach is to add the following snippet in your `myapp/__init__.py` file or your
-preferred application entry-point:
+approach is to add the following snippet in your `<myapp>/__init__.py` file or your
+preferred application entry-point, assuming you want to set `<myapp>/config` as your 
+root folder:
 
 ```python
 import os
 from pathlib import Path
+from gamma.config import set_config_roots
+from . import config as config_root
 
-# set correct configuration location
-os.environ["GAMMA_CONFIG_ROOT"] = str(Path(__file__).parent.absolute())
+# set correct configuration location, accepts either path strings or modules
+set_config_roots([config_root])
 ```
 
 ## Merging behavior

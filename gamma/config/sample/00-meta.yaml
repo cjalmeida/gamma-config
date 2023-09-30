@@ -1,9 +1,10 @@
 ####
-# Meta parameters for configuring the gamma-config tool itself. This file must be
-# named '00-meta.yaml'.
+# Optional meta parameters for configuring the gamma-config tool itself. This file must
+# be named 'XX-meta.yaml'.
 #
-# The configuration here is loaded *and evaluated* before any other configuration
-# file, so you're not able to use expressions that references other configs here.
+# The configuration here is loaded *and evaluated* in isolation from other configuration
+# files, so you're not able to use expressions that references other configs here or
+# access those values in the config object.
 ####
 
 # Extra folders to load. By default we include a relative folders dynamically set

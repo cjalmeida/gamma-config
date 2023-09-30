@@ -8,7 +8,6 @@ def test_default_ctx():
     get_config()  # requires initialization
     ctx = get_render_context()
 
-    assert "include_folders" in ctx["c"]  # from 00-meta.yaml
     assert ctx["env"]["USER"]
 
 
@@ -58,7 +57,7 @@ def test_custom_ctx(custom_ctx):
     assert ctx["foo2"] == "bar"
 
 
-def test_undescore_context():
+def test_underscore_context():
     from gamma.config import RootConfig
 
     src = """
@@ -98,7 +97,7 @@ level0:
     assert cfg["level0"]["level1"]["nc"] == 300
 
 
-def test_undescore_nested(monkeypatch):
+def test_underscore_nested(monkeypatch):
     from gamma.config import RootConfig
 
     src = """

@@ -33,8 +33,8 @@ def test_simple_config():
 
 
 def test_attribute_dot_access():
-    META = SIMPLE + "\n__enable_dot_access__: True"
-    cfg = RootConfig("00-meta.yaml", META)
+    meta = {"__enable_dot_access__": True}
+    cfg = RootConfig("00-foo.yaml", SIMPLE, meta=meta)
     assert cfg.foo.bar == 1
     assert cfg.foo.zoo == [1, 2, 3]
     assert cfg.foo.sub.bar == 10

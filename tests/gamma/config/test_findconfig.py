@@ -70,20 +70,13 @@ except:
 def multi_root():
     from gamma.config import set_config_roots
 
-    META = """
-include_folders: None
-"""
     c1 = "{foo: 1, bar: 2}"
     t1 = tempfile.TemporaryDirectory()
-    m1 = Path(t1.name) / "00-meta.yaml"
-    m1.write_text(META)
     f1 = Path(t1.name) / "10-data.yaml"
     f1.write_text(c1)
 
     c2 = "{bar: 20, zzz: 30}"
     t2 = tempfile.TemporaryDirectory()
-    m2 = Path(t2.name) / "01-meta.yaml"
-    m2.write_text(META)
     f2 = Path(t2.name) / "20-data.yaml"
     f2.write_text(c2)
 
