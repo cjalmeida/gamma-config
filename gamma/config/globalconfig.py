@@ -7,7 +7,7 @@ from beartype.typing import Optional, Tuple
 
 from .cache import cache
 from .confignode import RootConfig, push_entry
-from .findconfig import get_entries
+from .findconfig import get_entries, load_meta
 from .load import load_node
 
 
@@ -90,8 +90,9 @@ def get_config(initialize: bool = True) -> Optional[RootConfig]:
     if _global_store.empty() and not initialize:
         return None
     elif _global_store.empty() and initialize:
+        meta = load_meta()
         entries = sorted(get_entries())
-        root = RootConfig()
+        root = RootConfig(meta=meta)
         for entry_key, entry in entries:
             node = load_node(entry)
             if node:
