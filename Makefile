@@ -10,10 +10,11 @@ build:
 	pdm build
 
 .PHONY: tag-push
+tag-push: ACTION=patch
 tag-push:
-	@VERSION=v$$(python -c 'from gamma.config import __version__; print(__version__)') && \
-	git tag -a $$VERSION -m "Bump to version $$VERSION" && \
-	git push --follow-tags
+	bumpversion $(ACTION)
+	git push origin --all && git push origin --tags
+	$(MAKE) deploy
 
 
 .PHONY: publish

@@ -5,7 +5,7 @@
 groups = ["default", "pydantic", "jinja2", "dev"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:352fec358ab7ad2bb66c2b1b8346daed2e46d46c49d6e6dc4b67b2b63293cda3"
+content_hash = "sha256:a337419b018c5538288c78a40e4b102075c864b1772dfe3923600ccf3ba12de0"
 
 [[package]]
 name = "annotated-types"
@@ -135,6 +135,28 @@ dependencies = [
 files = [
     {file = "bleach-6.0.0-py3-none-any.whl", hash = "sha256:33c16e3353dbd13028ab4799a0f89a83f113405c766e9c122df8a06f5b85b3f4"},
     {file = "bleach-6.0.0.tar.gz", hash = "sha256:1a1a85c1595e07d8db14c5f09f09e6433502c51c595970edc090551f0db99414"},
+]
+
+[[package]]
+name = "bump2version"
+version = "1.0.1"
+requires_python = ">=3.5"
+summary = "Version-bump your software with a single command!"
+files = [
+    {file = "bump2version-1.0.1-py2.py3-none-any.whl", hash = "sha256:37f927ea17cde7ae2d7baf832f8e80ce3777624554a653006c9144f8017fe410"},
+    {file = "bump2version-1.0.1.tar.gz", hash = "sha256:762cb2bfad61f4ec8e2bdf452c7c267416f8c70dd9ecb1653fd0bbb01fa936e6"},
+]
+
+[[package]]
+name = "bumpversion"
+version = "0.6.0"
+summary = "Version-bump your software with a single command!"
+dependencies = [
+    "bump2version",
+]
+files = [
+    {file = "bumpversion-0.6.0-py2.py3-none-any.whl", hash = "sha256:4eb3267a38194d09f048a2179980bb4803701969bff2c85fa8f6d1ce050be15e"},
+    {file = "bumpversion-0.6.0.tar.gz", hash = "sha256:4ba55e4080d373f80177b4dabef146c07ce73c7d1377aabf9d3c3ae1f94584a6"},
 ]
 
 [[package]]
