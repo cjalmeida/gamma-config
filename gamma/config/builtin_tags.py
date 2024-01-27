@@ -212,9 +212,6 @@ def render_node(node: Node, tag: RefTag, *, config=None, recursive=False, **ctx)
     return val
 
 
-CALL_FUNC_REGEX = re.compile(r"([a-zA-Z_][\w:\.]*?)\(.*?\)")
-
-
 def _resolve_callable(fq_name: str):
     if ":" not in fq_name:
         msg = "Expected function format <module>:<name>(<args>)"
@@ -248,10 +245,13 @@ def render_node(node: ScalarNode, tag: CallTag, *, dump=False, path=None, **ctx)
     code = node.value
 
     # use regex to parse node value
+    pattern = re.compile(r"([a-zA-Z_][\w\.:]*)\(.*?\)")
     pos = 0
-    while match := CALL_FUNC_REGEX.match(code, pos=pos):
+    while match := pattern.match(code, pos=pos):
         # Get the fully qualified function name
         fq_name = match.group(1)
+        if not fq_name:
+            break
 
         try:
             func = _resolve_callable(fq_name)
@@ -260,10 +260,12 @@ def render_node(node: ScalarNode, tag: CallTag, *, dump=False, path=None, **ctx)
             raise ValueError(f"Error in '!call {code}': {msg}")
 
         # Replace the fq name with a valid Python identifier and add to fmap
-        new_name = fq_name.replace(":", "__")
+        new_name = fq_name.replace(":", "__").replace(".", "__")
         func_map[new_name] = func
-        code = code.replace(fq_name, new_name)
-        pos = match.endpos
+        s, e = match.span(1)
+        code = code[:s] + new_name + code[e:]
+        pos = s + len(new_name) + 1
+        match = None
 
     # eval the updated code with the correct function references
     _locals = {}
