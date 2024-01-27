@@ -8,8 +8,8 @@ class Dataset(BaseModel):
     format: str
     path: str
     compression: str
-    separator: Optional[str]
-    columns: Optional[List[str]]
+    separator: Optional[str] = None
+    columns: Optional[List[str]] = None
 
 
 def test_manual():

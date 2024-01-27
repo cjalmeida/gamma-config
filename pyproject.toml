@@ -24,7 +24,9 @@ Documentation = "https://github.gamma.bcg.com/pages/BCG/gamma-config/"
 
 [project.optional-dependencies]
 jinja2 = ["jinja2 >= 3"]
-pydantic = ["pydantic >= 1.9"]
+pydantic = [
+    "pydantic<3.0,>=2.0",
+]
 
 [build-system]
 requires = ["pdm-backend"]

@@ -1,7 +1,7 @@
 from typing import Literal
 
 from beartype.typing import List, Optional, Union
-from pydantic import BaseModel, Field, parse_obj_as
+from pydantic import BaseModel, Field, TypeAdapter
 from typing_extensions import Annotated
 
 from gamma.config import RootConfig, to_dict
@@ -30,7 +30,7 @@ TYPES = [ParquetDataset, CsvDataset]
 def get_dataset_type():
     discr = Field(discriminator="format")
     field = Annotated[Union[tuple(TYPES)], discr]  # type: ignore
-    return field
+    return TypeAdapter(field)
 
 
 def test_manual():
@@ -55,7 +55,7 @@ datasets:
     def get_dataset(name):
         entry = get_config()["datasets"][name]
         Dataset = get_dataset_type()
-        obj = parse_obj_as(Dataset, to_dict(entry))
+        obj = Dataset.validate_python(to_dict(entry))
         return obj
 
     foo = get_dataset("foo")

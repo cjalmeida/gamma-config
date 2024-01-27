@@ -46,17 +46,17 @@ class Dataset(BaseModel):                         # (1)
 
 def get_dataset(name: str) -> Dataset:            # (2)
     entry = get_config()["datasets"][name]        # (3)
-    obj = Dataset.parse_obj(to_dict(entry))       # (4)
+    obj = Dataset(**to_dict(entry))               # (4)
     return obj
 ```
 
 Here we create in `(1)` a Pydantic model, and an accessor function in `(2)`. In the
 function implementation, we get the config entry `(3)`, convert to a plain dict using
-`to_dict` and call `.parse_obj` to build the object from the dictionary.
+`to_dict` to build the object from the dictionary.
 
 The `to_dict` helper will recursively convert the nested config data structure to a
 nested dictionary object, rendering dynamic values as needed. So, be aware of infinite
-recursion for dynamic entries. Pydantic's `BaseModel.parse_obj` knows how to handle
+recursion for dynamic entries. Pydantic's `BaseModel(...)` knows how to handle
 recursive dicts converting to the correct datatypes.
 
 The fact we need to model mandatory format-specific attributes (eg. `separator` for CSV)
@@ -64,12 +64,13 @@ as `Optional` fields is not very clean though. Pydantic has [discriminated union
 allow us to split the specification into separate format-specific types.
 
 ```python
-from typing import Literal, List, Optional, Union
+from typing import Literal
+
+from beartype.typing import List, Optional, Union
+from pydantic import BaseModel, Field, TypeAdapter
 from typing_extensions import Annotated
 
-from pydantic import BaseModel, Field, parse_obj_as
-
-from gamma.config import to_dict
+from gamma.config import RootConfig, to_dict
 
 
 class BaseDataset(BaseModel):
@@ -89,11 +90,14 @@ class CsvDataset(BaseDataset):
     separator: str
 
 
-Dataset = Annotated[Union[ParquetDataset, CsvDataset], Field(discriminator="format")]
+Dataset = TypeAdapter(
+    Annotated[Union[ParquetDataset, CsvDataset], Field(discriminator="format")]
+)
+
 
 def get_dataset(name: str) -> Dataset:
     entry = get_config()["datasets"][name]
-    obj = parse_obj_as(Dataset, to_dict(entry))
+    obj = Dataset.validate_python(to_dict(entry))
     return obj
 
 foo = get_dataset("foo")
@@ -105,19 +109,20 @@ assert isinstance(bar, ParquetDataset)
 
 In the modified full script example above:
 
--   We import the types from stdlib `typing`, including `Literal`, and `Annotated` from
-    `typing_extensions` or `typing` depending if you're on Python 3.9+. From pydantic,
-    we import `Field` and `parse_obj_as` in addition to `BaseModel`.
+- We import the types from stdlib `typing`, including `Literal`, and `Annotated` from
+  `typing_extensions` or `typing` depending if you're on Python 3.9+. From pydantic,
+  we import `Field` and `TypeAdapter` in addition to `BaseModel`.
 
--   We create our Pydantic class structure mimicking our expected model. Note that while
-    we use class inheritance here, this is not required.
+- We create our Pydantic class structure mimicking our expected model. Note that while
+  we use class inheritance here, this is not required.
 
--   We declare our `Dataset` as being an "annotated" union of our target classes. We
-    annotated it with a `Field` entry that provides the discriminator field. The
-    `Annotated` type was specified PEP 593 and [here's the full documentation](https://docs.python.org/3/library/typing.html#typing.Annotated)
+- We declare our `Dataset` as being an "annotated" union of our target classes. We
+  annotated it with a `Field` entry that provides the discriminator field. The
+  `Annotated` type was specified PEP 593 and [here's the full documentation](https://docs.python.org/3/library/typing.html#typing.Annotated)
+  Finally we wrap the annotated type in `TypeAdapter` to turn it into a full-fledged
+  Pydantic model.
 
--   In the `get_dataset` accessor, we modify it to use the `parse_obj_as` function
-    instead of the `parse_obj` method.
+- In the `get_dataset` accessor, we modify it to use the `validate_python` method.
 
-[pydantic]: https://pydantic-docs.helpmanual.io/
-[discriminated unions]: https://docs.pydantic.dev/dev-v1/usage/types/#discriminated-unions-aka-tagged-unions
+[pydantic]: https://docs.pydantic.dev/2.5/
+[discriminated unions]: https://docs.pydantic.dev/2.5/concepts/unions/#discriminated-unions
