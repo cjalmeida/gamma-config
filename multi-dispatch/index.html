@@ -932,10 +932,10 @@ typical class based object orientation. We hade our own homegrown multiple dispa
 infrastructure (<code>gamma.dispatch</code>) that was replaced in <code>0.7.x</code> by
 <a href="https://github.com/beartype/plum">plum</a></p>
 <h2 id="rationale">Rationale</h2>
-<p>The main reason was for me to learn more about the feasability of using multiple
+<p>The main reason was for me to learn more about the feasibility of using multiple
 dispatch in Python in a non-trivial project. I was inspired in how multiple dispatch
 enabled a rich ecosystem of reusable components Julia language, in a very short time.</p>
-<p>For the theorically inclined, multiple dispatch solves the
+<p>For the theoretically inclined, multiple dispatch solves the
 <a href="https://eli.thegreenplace.net/2016/the-expression-problem-and-its-solutions/">expression problem</a>
 in a very elegant way. In summary, the expression problem is a fundamental issue in
 programming language design: how can you structure your application so that you can:</p>
@@ -949,7 +949,7 @@ programming language design: how can you structure your application so that you 
 variety of techniques, where multiple dispatch is one of them (and probably the most
 elegant). But what sets Julia apart is that it's the only language where multiple
 dispatch is the core paradigm. This means that <strong>idiomatic Julia code is easily amenable
-to extension</strong> (and performant). In contrast, in most languages you have be very explict
+to extension</strong> (and performant). In contrast, in most languages you have be very explicit
 about extensibility, adding unwarranted complexity.</p>
 <p>Interestingly, the impact of multiple dispatch on code reuse was an unplanned
 side-effect. I recommend watching the following presentation by one of Julia creators:</p>
@@ -970,7 +970,7 @@ terminology of generic "functions" and associated "methods".</p>
 Two <code>@dispatch</code> annotated functions with the same name, in the same scope are
 considered "one single function with two methods. All <strong>POSITIONAL</strong> and <strong>POSITIONAL_OR_KEYWORD</strong>
 arguments are used for dispatching. Variadic positional arguments (eg. <code>_args</code>) and
-keyworkd-only arguments (those after <code>_</code>or<code>\*args</code>) are not considered for dispatching.</p>
+keyword-only arguments (those after <code>_</code>or<code>\*args</code>) are not considered for dispatching.</p>
 <p>Consider the example below:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">plum</span> <span class="kn">import</span> <span class="n">dispatch</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -1013,7 +1013,7 @@ to the same implementation. For instance:</p>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="k">assert</span> <span class="n">foo</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;first&quot;</span>
 </code></pre></div>
 <p>In the example above, it created <code>foo(:int, :int)</code> and <code>foo(:int)</code> methods. A
-common "gotcha" is to accidentally ovewrite the second method with a new signature.</p>
+common "gotcha" is to accidentally overwrite the second method with a new signature.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@dispatch</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">return</span> <span class="s2">&quot;first&quot;</span>

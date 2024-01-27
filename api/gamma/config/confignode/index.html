@@ -1449,7 +1449,10 @@ sort order and this affects merge results.</p>
 <span class="normal"><a href="#__codelineno-0-136">136</a></span>
 <span class="normal"><a href="#__codelineno-0-137">137</a></span>
 <span class="normal"><a href="#__codelineno-0-138">138</a></span>
-<span class="normal"><a href="#__codelineno-0-139">139</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="k">class</span> <span class="nc">RootConfig</span><span class="p">(</span><span class="n">ConfigNode</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-139">139</a></span>
+<span class="normal"><a href="#__codelineno-0-140">140</a></span>
+<span class="normal"><a href="#__codelineno-0-141">141</a></span>
+<span class="normal"><a href="#__codelineno-0-142">142</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="k">class</span> <span class="nc">RootConfig</span><span class="p">(</span><span class="n">ConfigNode</span><span class="p">):</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A root config object.</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    The object is a collection of `(entry_key: str, entry: Node)`, sorted by</span>
@@ -1466,21 +1469,24 @@ sort order and this affects merge results.</p>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    If `entry_key` is `None`, a dynamically generated entry key will be created.</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">entry</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_root_nodes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MappingNode</span><span class="p">]</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_dot_access</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>        <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">entry_key</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">bool</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>            <span class="n">_allow_unsafe</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>            <span class="k">if</span> <span class="n">entry_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>                <span class="n">entry_key</span> <span class="o">=</span> <span class="n">create_last_entry_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>                <span class="n">_allow_unsafe</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>            <span class="k">if</span> <span class="n">entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing &#39;entry&#39; argument&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">entry_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">entry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="kc">None</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a>        <span class="n">meta</span> <span class="o">=</span> <span class="n">meta</span> <span class="ow">or</span> <span class="p">{}</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_root_nodes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MappingNode</span><span class="p">]</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_dot_access</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;__enable_dot_access__&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>        <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">entry_key</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">bool</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>            <span class="n">_allow_unsafe</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>            <span class="k">if</span> <span class="n">entry_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>                <span class="n">entry_key</span> <span class="o">=</span> <span class="n">create_last_entry_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>                <span class="n">_allow_unsafe</span> <span class="o">=</span> <span class="kc">True</span>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>            <span class="n">push_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_key</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">_allow_unsafe</span><span class="o">=</span><span class="n">_allow_unsafe</span><span class="p">)</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a>            <span class="k">if</span> <span class="n">entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing &#39;entry&#39; argument&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>            <span class="n">push_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_key</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">_allow_unsafe</span><span class="o">=</span><span class="n">_allow_unsafe</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
         </details>
 
@@ -1521,13 +1527,13 @@ sort order and this affects merge results.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/confignode.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-362">362</a></span>
-<span class="normal"><a href="#__codelineno-0-363">363</a></span>
-<span class="normal"><a href="#__codelineno-0-364">364</a></span>
-<span class="normal"><a href="#__codelineno-0-365">365</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="k">def</span> <span class="nf">as_node</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="s2">&quot;ConfigNode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the underlying mapping node.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">_node</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span>
+<span class="normal"><a href="#__codelineno-0-353">353</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="k">def</span> <span class="nf">as_node</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="s2">&quot;ConfigNode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the underlying mapping node.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>    <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">_node</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1552,7 +1558,19 @@ sort order and this affects merge results.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/confignode.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-239">239</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
+<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+<span class="normal"><a href="#__codelineno-0-233">233</a></span>
+<span class="normal"><a href="#__codelineno-0-234">234</a></span>
+<span class="normal"><a href="#__codelineno-0-235">235</a></span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span>
+<span class="normal"><a href="#__codelineno-0-239">239</a></span>
 <span class="normal"><a href="#__codelineno-0-240">240</a></span>
 <span class="normal"><a href="#__codelineno-0-241">241</a></span>
 <span class="normal"><a href="#__codelineno-0-242">242</a></span>
@@ -1562,41 +1580,29 @@ sort order and this affects merge results.</p>
 <span class="normal"><a href="#__codelineno-0-246">246</a></span>
 <span class="normal"><a href="#__codelineno-0-247">247</a></span>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span>
-<span class="normal"><a href="#__codelineno-0-251">251</a></span>
-<span class="normal"><a href="#__codelineno-0-252">252</a></span>
-<span class="normal"><a href="#__codelineno-0-253">253</a></span>
-<span class="normal"><a href="#__codelineno-0-254">254</a></span>
-<span class="normal"><a href="#__codelineno-0-255">255</a></span>
-<span class="normal"><a href="#__codelineno-0-256">256</a></span>
-<span class="normal"><a href="#__codelineno-0-257">257</a></span>
-<span class="normal"><a href="#__codelineno-0-258">258</a></span>
-<span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span>
-<span class="normal"><a href="#__codelineno-0-261">261</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="k">def</span> <span class="nf">config_getitem</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">**</span><span class="n">ctx</span><span class="p">):</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get an item from a root config by key.</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    We find all entries matching the key and merge them dynamically using</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    `merge_nodes`.</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="n">node</span><span class="p">:</span> <span class="n">Node</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="k">for</span> <span class="n">entry_key</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">_root_nodes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="n">subkey</span><span class="p">,</span> <span class="n">subnode</span> <span class="o">=</span> <span class="n">get_entry</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="k">if</span> <span class="n">subnode</span><span class="p">:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>            <span class="c1"># append entry to the node comment</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>            <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">subkey</span><span class="p">,</span> <span class="n">subnode</span><span class="p">))</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">if</span> <span class="n">matches</span><span class="p">:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="n">key</span><span class="p">,</span> <span class="n">node</span> <span class="o">=</span> <span class="n">merge_nodes</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="k">return</span> <span class="n">resolve_item</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="o">**</span><span class="n">ctx</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="k">def</span> <span class="nf">config_getitem</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">**</span><span class="n">ctx</span><span class="p">):</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get an item from a root config by key.</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    We find all entries matching the key and merge them dynamically using</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    `merge_nodes`.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="n">node</span><span class="p">:</span> <span class="n">Node</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">for</span> <span class="n">entry_key</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">_root_nodes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">subkey</span><span class="p">,</span> <span class="n">subnode</span> <span class="o">=</span> <span class="n">get_entry</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="k">if</span> <span class="n">subnode</span><span class="p">:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>            <span class="c1"># append entry to the node comment</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">subkey</span><span class="p">,</span> <span class="n">subnode</span><span class="p">))</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="k">if</span> <span class="n">matches</span><span class="p">:</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="n">key</span><span class="p">,</span> <span class="n">node</span> <span class="o">=</span> <span class="n">merge_nodes</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>    <span class="k">return</span> <span class="n">resolve_item</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="o">**</span><span class="n">ctx</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1619,13 +1625,13 @@ sort order and this affects merge results.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/confignode.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="k">def</span> <span class="nf">config_len</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of *distinct* keys in a config node&quot;&quot;&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">get_keys</span><span class="p">(</span><span class="n">cfg</span><span class="p">)))</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="k">def</span> <span class="nf">config_len</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">):</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of *distinct* keys in a config node&quot;&quot;&quot;</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">get_keys</span><span class="p">(</span><span class="n">cfg</span><span class="p">)))</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1648,15 +1654,15 @@ sort order and this affects merge results.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/confignode.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="k">def</span> <span class="nf">create_last_entry_key</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an entry_key guaranteed to be the last entry for the object.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="n">clen</span> <span class="o">=</span> <span class="n">config_len</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;~</span><span class="si">{</span><span class="n">clen</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">-temp&quot;</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="k">def</span> <span class="nf">create_last_entry_key</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an entry_key guaranteed to be the last entry for the object.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="n">clen</span> <span class="o">=</span> <span class="n">config_len</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;~</span><span class="si">{</span><span class="n">clen</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">-temp&quot;</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1679,27 +1685,27 @@ sort order and this affects merge results.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/confignode.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span>
-<span class="normal"><a href="#__codelineno-0-311">311</a></span>
-<span class="normal"><a href="#__codelineno-0-312">312</a></span>
-<span class="normal"><a href="#__codelineno-0-313">313</a></span>
-<span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span>
-<span class="normal"><a href="#__codelineno-0-318">318</a></span>
-<span class="normal"><a href="#__codelineno-0-319">319</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="k">def</span> <span class="nf">get_keys</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Node</span><span class="p">]:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return all *distinct* keys in a config node&quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="n">returned</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">_root_nodes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">get_keys</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="n">key_id</span> <span class="o">=</span> <span class="n">get_id</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="k">if</span> <span class="n">key_id</span> <span class="ow">in</span> <span class="n">returned</span><span class="p">:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>                <span class="k">continue</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="n">returned</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key_id</span><span class="p">)</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="k">yield</span> <span class="n">key</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="k">def</span> <span class="nf">get_keys</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Node</span><span class="p">]:</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return all *distinct* keys in a config node&quot;&quot;&quot;</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="n">returned</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">_root_nodes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">get_keys</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="n">key_id</span> <span class="o">=</span> <span class="n">get_id</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="k">if</span> <span class="n">key_id</span> <span class="ow">in</span> <span class="n">returned</span><span class="p">:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>            <span class="n">returned</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key_id</span><span class="p">)</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">yield</span> <span class="n">key</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1751,10 +1757,7 @@ sort order and this affects merge results.</p>
 <span class="normal"><a href="#__codelineno-0-206">206</a></span>
 <span class="normal"><a href="#__codelineno-0-207">207</a></span>
 <span class="normal"><a href="#__codelineno-0-208">208</a></span>
-<span class="normal"><a href="#__codelineno-0-209">209</a></span>
-<span class="normal"><a href="#__codelineno-0-210">210</a></span>
-<span class="normal"><a href="#__codelineno-0-211">211</a></span>
-<span class="normal"><a href="#__codelineno-0-212">212</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="nd">@dispatch</span>
+<span class="normal"><a href="#__codelineno-0-209">209</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="nd">@dispatch</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="k">def</span> <span class="nf">push_entry</span><span class="p">(</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="n">root</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">,</span> <span class="n">entry_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">_allow_unsafe</span><span class="o">=</span><span class="kc">False</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1782,9 +1785,6 @@ sort order and this affects merge results.</p>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a>    <span class="c1"># sort by entry_key</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a>    <span class="n">s</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>    <span class="n">root</span><span class="o">.</span><span class="n">_root_nodes</span> <span class="o">=</span> <span class="n">s</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>    <span class="k">if</span> <span class="n">entry_key</span> <span class="o">==</span> <span class="s2">&quot;00-meta.yaml&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>        <span class="n">_update_meta_features</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1804,28 +1804,21 @@ sort order and this affects merge results.</p>
   <div class="doc doc-contents ">
   
       <p>Push all entries in a given folder.</p>
-<p>Note this will ignore any <code>00-meta.yaml</code> entries.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/confignode.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-157">157</a></span>
-<span class="normal"><a href="#__codelineno-0-158">158</a></span>
-<span class="normal"><a href="#__codelineno-0-159">159</a></span>
-<span class="normal"><a href="#__codelineno-0-160">160</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-160">160</a></span>
 <span class="normal"><a href="#__codelineno-0-161">161</a></span>
 <span class="normal"><a href="#__codelineno-0-162">162</a></span>
 <span class="normal"><a href="#__codelineno-0-163">163</a></span>
 <span class="normal"><a href="#__codelineno-0-164">164</a></span>
 <span class="normal"><a href="#__codelineno-0-165">165</a></span>
-<span class="normal"><a href="#__codelineno-0-166">166</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="k">def</span> <span class="nf">push_folder</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">,</span> <span class="n">folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Push all entries in a given folder.</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    Note this will ignore any `00-meta.yaml` entries.</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">    &quot;&quot;&quot;</span>
+<span class="normal"><a href="#__codelineno-0-166">166</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="k">def</span> <span class="nf">push_folder</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">,</span> <span class="n">folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Push all entries in a given folder.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a>    <span class="kn">from</span> <span class="nn">.findconfig</span> <span class="kn">import</span> <span class="n">get_entries</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a>    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">get_entries</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">meta_include_folders</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a>    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">get_entries</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a>        <span class="n">push_entry</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
@@ -1849,13 +1842,13 @@ sort order and this affects merge results.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/confignode.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span>
-<span class="normal"><a href="#__codelineno-0-226">226</a></span>
-<span class="normal"><a href="#__codelineno-0-227">227</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="k">def</span> <span class="nf">remove_entry</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">,</span> <span class="n">entry_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove an entry from the RootConfig object.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">del</span> <span class="n">cfg</span><span class="o">.</span><span class="n">_root_nodes</span><span class="p">[</span><span class="n">entry_key</span><span class="p">]</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-212">212</a></span>
+<span class="normal"><a href="#__codelineno-0-213">213</a></span>
+<span class="normal"><a href="#__codelineno-0-214">214</a></span>
+<span class="normal"><a href="#__codelineno-0-215">215</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="k">def</span> <span class="nf">remove_entry</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">RootConfig</span><span class="p">,</span> <span class="n">entry_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove an entry from the RootConfig object.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="k">del</span> <span class="n">cfg</span><span class="o">.</span><span class="n">_root_nodes</span><span class="p">[</span><span class="n">entry_key</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -1878,19 +1871,19 @@ sort order and this affects merge results.</p>
 
       <details class="quote">
         <summary>Source code in <code>gamma/config/confignode.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span>
-<span class="normal"><a href="#__codelineno-0-298">298</a></span>
-<span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="nd">@dispatch</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="k">def</span> <span class="nf">resolve_item</span><span class="p">(</span><span class="n">item</span><span class="p">:</span> <span class="n">SequenceNode</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="n">tags</span><span class="o">.</span><span class="n">Seq</span><span class="p">,</span> <span class="o">**</span><span class="n">ctx</span><span class="p">):</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Iterates on a `seq` node, resolving each child item node.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">get_values</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resolve_item</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="o">**</span><span class="n">ctx</span><span class="p">))</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">return</span> <span class="n">out</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-282">282</a></span>
+<span class="normal"><a href="#__codelineno-0-283">283</a></span>
+<span class="normal"><a href="#__codelineno-0-284">284</a></span>
+<span class="normal"><a href="#__codelineno-0-285">285</a></span>
+<span class="normal"><a href="#__codelineno-0-286">286</a></span>
+<span class="normal"><a href="#__codelineno-0-287">287</a></span>
+<span class="normal"><a href="#__codelineno-0-288">288</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="nd">@dispatch</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="k">def</span> <span class="nf">resolve_item</span><span class="p">(</span><span class="n">item</span><span class="p">:</span> <span class="n">SequenceNode</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="n">tags</span><span class="o">.</span><span class="n">Seq</span><span class="p">,</span> <span class="o">**</span><span class="n">ctx</span><span class="p">):</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Iterates on a `seq` node, resolving each child item node.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">get_values</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resolve_item</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="o">**</span><span class="n">ctx</span><span class="p">))</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="k">return</span> <span class="n">out</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>

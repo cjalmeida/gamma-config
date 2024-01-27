@@ -979,7 +979,10 @@ fragment to the known path of the <em>parent</em> of config root directory</p>
 <span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
 <span class="normal"><a href="#__codelineno-0-492">492</a></span>
-<span class="normal"><a href="#__codelineno-0-493">493</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="nd">@dispatch</span>
+<span class="normal"><a href="#__codelineno-0-493">493</a></span>
+<span class="normal"><a href="#__codelineno-0-494">494</a></span>
+<span class="normal"><a href="#__codelineno-0-495">495</a></span>
+<span class="normal"><a href="#__codelineno-0-496">496</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="nd">@dispatch</span>
 <a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="k">def</span> <span class="nf">render_node</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="n">PathTag</span><span class="p">,</span> <span class="o">**</span><span class="n">ctx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;[!path] Construct an absolute file path by joining a path</span>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    fragment to the known path of the *parent* of config root directory</span>
@@ -989,8 +992,11 @@ fragment to the known path of the <em>parent</em> of config root directory</p>
 <a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        my_var: !path data/hello_world.csv</span>
 <a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="n">path_fragment</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="n">base</span> <span class="o">=</span> <span class="n">get_config_root</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">path_fragment</span><span class="p">)</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="n">roots</span> <span class="o">=</span> <span class="n">get_config_roots</span><span class="p">()</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">roots</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;More than one root defined, cannot use !path&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="n">base</span> <span class="o">=</span> <span class="n">get_config_roots</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">path_fragment</span><span class="p">)</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>

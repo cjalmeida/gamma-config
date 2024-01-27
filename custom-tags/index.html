@@ -1015,7 +1015,7 @@ function to get a rendered object, including child nodes. (it works with
 </ul>
 <h3 id="uri-style-tags">URI-style tags</h3>
 <p>The default tag dispatch mechanism is to dispatch on the resolved tag value using a
-parameterized <code>Tag</code> subtype. For instance, <code>foo: !mytag 1</code> will only dipatch on <code>(node:
+parameterized <code>Tag</code> subtype. For instance, <code>foo: !mytag 1</code> will only dispatch on <code>(node:
 ScalarNode, tag: Tag["!mytag"])</code>.</p>
 <p>However, if the tag contains a <code>:</code> (colon), we're assuming the tag is an <em>URI-style tag</em>
 of the format (<code>![scheme]:[path]</code>). Besides the default tag dispatch, URI-style tags
@@ -1024,10 +1024,12 @@ will also dispatch on the <em>scheme</em> part only, and pass a <code>path</code
 <p>An example:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">foo</span><span class="p">:</span><span class="w"> </span><span class="kt">!mytag:mypath</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
 </code></pre></div>
-<p>will dispatch first on <code>(node: ScalarNode, tag: Tag["!mytag:mypath"])</code> and, failing to find such method, will also try <code>(node: ScalarNode, tag: Tag["!mytag"])</code> with <code>path = "mypath"</code> as extra keyword argument.</p>
+<p>will dispatch first on <code>(node: ScalarNode, tag: Tag["!mytag:mypath"])</code> and, failing to
+find such method, will also try <code>(node: ScalarNode, tag: Tag["!mytag"])</code> with <code>path =
+"mypath"</code> as extra keyword argument.</p>
 <h2 id="extending-the-render-context">Extending the render context</h2>
 <p>Some tags like <code>!j2</code> and <code>!expr</code> allow you to refer to variables in the <em>render context</em>.
-By default, we provide <code>env</code> and <code>c</code>, refering to a dict of environment variables, and
+By default, we provide <code>env</code> and <code>c</code>, referring to a dict of environment variables, and
 to the root config itself.</p>
 <p>We also allow you to add a <code>_context</code> mapping entry to any parent node to extend the
 render context without needing to write any code. This is useful to provide contextual
