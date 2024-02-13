@@ -19,8 +19,8 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
 ]
 [project.urls]
-Source = "https://github.gamma.bcg.com/BCG/gamma-config/"
-Documentation = "https://github.gamma.bcg.com/pages/BCG/gamma-config/"
+Source = "https://github.com/cjalmeida/gamma-config"
+Documentation = "https://cjalmeida.github.io/gamma-config/"
 
 [project.optional-dependencies]
 jinja2 = ["jinja2 >= 3"]
